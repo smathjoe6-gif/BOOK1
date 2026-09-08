@@ -49,18 +49,6 @@ export async function downloadFile(auth, fileId, fileName) {
   return destPath;
 }
 
-// Makes a file publicly viewable and returns a direct-download URL for it.
-// Buffer needs a public URL to fetch the video from (it can't take a raw file upload
-// the way YouTube's API does) — same approach used successfully in the Make.com pipeline.
-export async function makePublic(auth, fileId) {
-  const drive = google.drive({ version: 'v3', auth });
-  await drive.permissions.create({
-    fileId,
-    requestBody: { role: 'reader', type: 'anyone' },
-  });
-  return `https://drive.google.com/uc?export=download&id=${fileId}`;
-}
-
 // Moves a file into the DONE folder once it's been posted everywhere.
 export async function moveToDone(auth, fileId) {
   if (!config.doneFolderId) return;
