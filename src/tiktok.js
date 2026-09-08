@@ -75,9 +75,13 @@ export async function uploadToTikTok({ filePath, caption, privacyLevel = 'SELF_O
 
   const creatorInfo = await queryCreatorInfo(accessToken);
   const allowedPrivacyLevels = creatorInfo.privacy_level_options || [];
-  const resolvedPrivacyLevel = allowedPrivacyLevels.includes(privacyLevel)
-    ? privacyLevel
-    : (allowedPrivacyLevels[0] || privacyLevel);
+  // TikTok requires unaudited apps (sandbox client keys are always unaudited)
+  // to post as SELF_ONLY no matter what the creator's account otherwise
+  // allows -- posting any wider visibility is exactly what triggers the
+  // "review our integration guidelines" rejection.
+  const resolvedPrivacyLevel = config.tiktokUseSandbox
+    ? 'SELF_ONLY'
+    : (allowedPrivacyLevels.includes(privacyLevel) ? privacyLevel : (allowedPrivacyLevels[0] || privacyLevel));
 
   const initRes = await fetch('https://open.tiktokapis.com/v2/post/publish/video/init/', {
     method: 'POST',

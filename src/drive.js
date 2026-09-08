@@ -92,19 +92,27 @@ export async function mirrorNewVideos(auth) {
 
   for (const file of own) {
     if (mirrorNames.has(file.name)) continue;
-    await drive.files.copy({
-      fileId: file.id,
-      requestBody: { name: file.name, parents: [config.mirrorFolderId] },
-    });
-    console.log(`Mirrored "${file.name}" into the other folder so it posts everywhere.`);
+    try {
+      await drive.files.copy({
+        fileId: file.id,
+        requestBody: { name: file.name, parents: [config.mirrorFolderId] },
+      });
+      console.log(`Mirrored "${file.name}" into the other folder so it posts everywhere.`);
+    } catch (err) {
+      console.error(`Could not mirror "${file.name}" into GK_JING (skipping it, other files still mirrored):`, err.message);
+    }
   }
   for (const file of mirror) {
     if (ownNames.has(file.name)) continue;
-    await drive.files.copy({
-      fileId: file.id,
-      requestBody: { name: file.name, parents: [config.driveFolderId] },
-    });
-    console.log(`Mirrored "${file.name}" into the other folder so it posts everywhere.`);
+    try {
+      await drive.files.copy({
+        fileId: file.id,
+        requestBody: { name: file.name, parents: [config.driveFolderId] },
+      });
+      console.log(`Mirrored "${file.name}" into the other folder so it posts everywhere.`);
+    } catch (err) {
+      console.error(`Could not mirror "${file.name}" into GK_TERMINAL (skipping it, other files still mirrored):`, err.message);
+    }
   }
 }
 
