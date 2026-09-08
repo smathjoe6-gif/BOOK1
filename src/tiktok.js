@@ -51,14 +51,13 @@ async function queryCreatorInfo(accessToken) {
   return data.data;
 }
 
-// TikTok requires each upload chunk to be between 5MB and 64MB, except when
-// the whole video is under 5MB (then it must go up as a single chunk equal
-// to the full video size).
-const MIN_CHUNK_SIZE = 5 * 1024 * 1024;
+// TikTok allows a whole video up to 64MB to go up as a single chunk (chunk_size
+// equal to the exact video size). Only videos bigger than that need to be
+// split into multiple 64MB chunks (the last one holding the remainder).
 const MAX_CHUNK_SIZE = 64 * 1024 * 1024;
 
 function planChunks(videoSize) {
-  if (videoSize <= MIN_CHUNK_SIZE) {
+  if (videoSize <= MAX_CHUNK_SIZE) {
     return { chunkSize: videoSize, chunkCount: 1 };
   }
   const chunkCount = Math.ceil(videoSize / MAX_CHUNK_SIZE);
