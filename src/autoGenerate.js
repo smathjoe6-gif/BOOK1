@@ -85,5 +85,5 @@ export async function maybeAutoGenerateVideo(auth) {
   state.generatedHours.push(dueHour);
   saveState(state);
 
-  console.log(`Auto-generated video uploaded to GK_JING as "${fileName}" (${state.generatedHours.length}/${targets.length} today).`);
+  console.log(`Auto-generated video uploaded as "${fileName}" (${state.generatedHours.length}/${targets.length} today).`);
 }
