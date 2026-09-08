@@ -52,3 +52,27 @@ into your DONE folder.
 
 Videos without a matching spreadsheet row still get posted — the AI writes a
 title/caption for them and saves that row for you automatically.
+
+## Optional: automatic video creation
+
+You can have the script create its own videos with xAI's Grok Imagine API —
+no browser, no daily free-credit limits, just a real API that runs on its
+own schedule. It costs real money per video (roughly a few cents per second
+at current pricing), so it's off by default.
+
+To turn it on:
+
+1. Get an API key from x.ai (this is separate billing from your regular
+   Grok/X subscription — it needs its own payment method added).
+2. In `.env`, set:
+   ```
+   XAI_API_KEY=your-key-here
+   AUTO_GENERATE_VIDEOS=true
+   AUTO_GENERATE_DAILY_LIMIT=1
+   ```
+   `AUTO_GENERATE_DAILY_LIMIT` caps how many videos it's allowed to make per
+   day, so you're never surprised by the bill. Raise it once you're
+   comfortable with the cost.
+
+Auto-generated videos get uploaded into GK_JING like any other video, so they
+go through the exact same captioning and posting flow.

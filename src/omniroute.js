@@ -61,3 +61,10 @@ export async function writeReplyWithAI(commentText) {
   const userPrompt = `Someone commented this on one of our videos: "${commentText}"\n\nWrite a short, warm reply.`;
   return await askAI(REPLY_SYSTEM_PROMPT, userPrompt);
 }
+
+const VIDEO_CONCEPT_SYSTEM_PROMPT = `You are the creative director for "GK Legend Studio," a brand celebrating Somali heritage and culture through short viral videos. Describe a single short video scene for an AI video generator to create -- vivid, cinematic, and specific (setting, subject, mood, camera feel). One or two sentences, no hashtags, no titles, just the visual description.`;
+
+export async function writeVideoConceptWithAI() {
+  const userPrompt = `Describe one new short video concept (5-10 seconds) that fits GK Legend Studio's brand. Make it different from generic stock footage -- give it real cultural warmth and specificity.`;
+  return await askAI(VIDEO_CONCEPT_SYSTEM_PROMPT, userPrompt);
+}

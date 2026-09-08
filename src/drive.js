@@ -49,6 +49,18 @@ export async function downloadFile(auth, fileId, fileName) {
   return destPath;
 }
 
+// Uploads a local video file straight into the watched GK_JING folder, so
+// auto-generated videos show up alongside the ones Joe drops in by hand and
+// get picked up by the normal listNewVideos()/processVideo() flow.
+export async function uploadFile(auth, localPath, fileName) {
+  const drive = google.drive({ version: 'v3', auth });
+  await drive.files.create({
+    requestBody: { name: fileName, parents: [config.driveFolderId] },
+    media: { mimeType: 'video/mp4', body: fs.createReadStream(localPath) },
+    fields: 'id',
+  });
+}
+
 // Moves a file into the DONE folder once it's been posted everywhere.
 export async function moveToDone(auth, fileId) {
   if (!config.doneFolderId) return;

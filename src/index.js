@@ -8,6 +8,7 @@ import { generateCaption, isLikelyDuplicateVariant } from './autoCaption.js';
 import { replyToNewComments } from './comments.js';
 import { uploadToTikTok } from './tiktok.js';
 import { loadTikTokToken } from './tiktokAuth.js';
+import { maybeAutoGenerateVideo } from './autoGenerate.js';
 
 const auth = loadOAuthClient();
 if (!auth.credentials || !auth.credentials.refresh_token) {
@@ -96,6 +97,12 @@ async function checkOnce() {
     await replyToNewComments(auth);
   } catch (err) {
     console.error('Comment reply check failed:', err.message);
+  }
+
+  try {
+    await maybeAutoGenerateVideo(auth);
+  } catch (err) {
+    console.error('Auto video generation failed (will retry next cycle):', err.message);
   }
 }
 

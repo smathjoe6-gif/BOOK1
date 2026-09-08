@@ -4,3 +4,4 @@ node_modules/
 token.json
 tiktok_token.json
 tiktok_token.sandbox.json
+autogen-state.json
