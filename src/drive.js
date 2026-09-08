@@ -49,9 +49,9 @@ export async function downloadFile(auth, fileId, fileName) {
   return destPath;
 }
 
-// Uploads a local video file straight into the watched GK_JING folder, so
-// auto-generated videos show up alongside the ones Joe drops in by hand and
-// get picked up by the normal listNewVideos()/processVideo() flow.
+// Uploads a local video file straight into the watched folder (GK_TERMINAL),
+// so auto-generated videos show up alongside the ones Joe drops in by hand
+// and get picked up by the normal listNewVideos()/processVideo() flow.
 export async function uploadFile(auth, localPath, fileName) {
   const drive = google.drive({ version: 'v3', auth });
   await drive.files.create({
@@ -59,6 +59,53 @@ export async function uploadFile(auth, localPath, fileName) {
     media: { mimeType: 'video/mp4', body: fs.createReadStream(localPath) },
     fields: 'id',
   });
+}
+
+// Joe now drops videos into either GK_TERMINAL (this script's folder) or
+// GK_JING (the Make.com scenario's folder) and expects them to reach every
+// platform either way. Since the two systems no longer share any platform
+// (Make.com does Instagram/Facebook/Pinterest, this script does
+// YouTube/TikTok), copying a video into whichever folder it's missing from
+// is safe -- each side processes its own copy and moves it to DONE on its
+// own, without touching the other's copy.
+export async function mirrorNewVideos(auth) {
+  if (!config.mirrorFolderId) return;
+  const drive = google.drive({ version: 'v3', auth });
+
+  const [ownRes, mirrorRes] = await Promise.all([
+    drive.files.list({
+      q: `'${config.driveFolderId}' in parents and mimeType contains 'video/' and trashed = false`,
+      fields: 'files(id, name)',
+      pageSize: 50,
+    }),
+    drive.files.list({
+      q: `'${config.mirrorFolderId}' in parents and mimeType contains 'video/' and trashed = false`,
+      fields: 'files(id, name)',
+      pageSize: 50,
+    }),
+  ]);
+
+  const own = ownRes.data.files || [];
+  const mirror = mirrorRes.data.files || [];
+  const ownNames = new Set(own.map((f) => f.name));
+  const mirrorNames = new Set(mirror.map((f) => f.name));
+
+  for (const file of own) {
+    if (mirrorNames.has(file.name)) continue;
+    await drive.files.copy({
+      fileId: file.id,
+      requestBody: { name: file.name, parents: [config.mirrorFolderId] },
+    });
+    console.log(`Mirrored "${file.name}" into the other folder so it posts everywhere.`);
+  }
+  for (const file of mirror) {
+    if (ownNames.has(file.name)) continue;
+    await drive.files.copy({
+      fileId: file.id,
+      requestBody: { name: file.name, parents: [config.driveFolderId] },
+    });
+    console.log(`Mirrored "${file.name}" into the other folder so it posts everywhere.`);
+  }
 }
 
 // Moves a file into the DONE folder once it's been posted everywhere.

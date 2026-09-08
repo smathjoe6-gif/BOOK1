@@ -14,6 +14,7 @@ export const config = {
   googleClientSecret: required('GOOGLE_CLIENT_SECRET'),
   driveFolderId: required('DRIVE_FOLDER_ID'),
   doneFolderId: process.env.DONE_FOLDER_ID || '',
+  mirrorFolderId: process.env.MIRROR_FOLDER_ID || '',
   spreadsheetId: required('SPREADSHEET_ID'),
   pollIntervalMinutes: Number(process.env.POLL_INTERVAL_MINUTES || 10),
   postStaggerMinutes: Number(process.env.POST_STAGGER_MINUTES || 15),

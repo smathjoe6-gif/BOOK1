@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import { config } from './config.js';
 import { loadOAuthClient } from './googleAuth.js';
-import { listNewVideos, downloadFile, moveToDone } from './drive.js';
+import { listNewVideos, downloadFile, moveToDone, mirrorNewVideos } from './drive.js';
 import { findRowForFile, appendGeneratedRow } from './sheets.js';
 import { uploadToYouTube } from './youtube.js';
 import { generateCaption, isLikelyDuplicateVariant } from './autoCaption.js';
@@ -74,7 +74,13 @@ async function processVideo(file) {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function checkOnce() {
-  console.log(`[${new Date().toLocaleString()}] Checking GK_JING for new videos...`);
+  try {
+    await mirrorNewVideos(auth);
+  } catch (err) {
+    console.error('Mirroring videos between GK_TERMINAL and GK_JING failed:', err.message);
+  }
+
+  console.log(`[${new Date().toLocaleString()}] Checking for new videos...`);
   const files = await listNewVideos(auth);
   if (files.length === 0) {
     console.log('Nothing new.');

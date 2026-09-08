@@ -6,8 +6,11 @@ subscriptions. Runs entirely on your own Mac.
 
 Instagram, Facebook, and Pinterest are handled separately by the "Social
 media post" scenario on Make.com, which watches its own folder (GK_JING) —
-this script doesn't touch those. Drop a video into GK_TERMINAL for
-YouTube/TikTok, or into GK_JING for Instagram/Facebook/Pinterest.
+this script doesn't touch those directly. But the two folders mirror each
+other automatically: drop a video into **either** GK_TERMINAL or GK_JING
+and it gets copied into the other one too, so it reaches all 5 platforms
+(YouTube, TikTok, Instagram, Facebook, Pinterest) no matter which folder
+you use.
 
 ## One-time setup
 
@@ -24,14 +27,18 @@ YouTube/TikTok, or into GK_JING for Instagram/Facebook/Pinterest.
    Open `.env` and fill in the Google and TikTok credentials (see your
    GK_Automation_Memory Google Doc). Never commit this file.
 
-3. Log in with Google (only needed once):
+3. Set `MIRROR_FOLDER_ID` in `.env` to GK_JING's folder ID, so videos
+   dropped into either folder reach every platform. Leave it blank if you'd
+   rather keep the two folders separate.
+
+4. Log in with Google (only needed once):
    ```
    bun run auth
    ```
    This opens your browser — approve access with your Google account. It saves
    a `token.json` file so you never have to log in again.
 
-4. Log in with TikTok (only needed once):
+5. Log in with TikTok (only needed once):
    ```
    node src/tiktokAuth.js
    ```
@@ -71,19 +78,18 @@ To turn it on:
    ```
    XAI_API_KEY=your-key-here
    AUTO_GENERATE_VIDEOS=true
-   AUTO_GENERATE_DAILY_LIMIT=3
-   AUTO_GENERATE_DURATION_SECONDS=10
+   AUTO_GENERATE_DAILY_LIMIT=1
+   AUTO_GENERATE_DURATION_SECONDS=4
    ```
-   With these settings it aims for roughly three videos a day — morning
-   (~8am), early afternoon (~1pm), and evening (~6pm), local time on this
-   Mac — instead of just spacing them evenly. `AUTO_GENERATE_DAILY_LIMIT`
-   caps how many it's allowed to make per day; it only uses the first N of
-   those three time slots if you set it lower than 3.
+   With these settings it aims for one video a day, in the morning
+   (~8am local time on this Mac). `AUTO_GENERATE_DAILY_LIMIT` caps how many
+   it's allowed to make per day — raising it uses more of the fixed daily
+   time slots (morning/~1pm/~6pm).
 
-   **Cost at these settings**: 10 seconds at 720p is about $0.80/video.
-   Three a day is roughly **$2.40/day, ~$72/month**. Lower
-   `AUTO_GENERATE_DURATION_SECONDS` or `AUTO_GENERATE_DAILY_LIMIT` to spend
-   less.
+   **Cost at these settings**: 4 seconds at 720p is about $0.32/video, so
+   roughly **$9.60/month** at one a day. Raising duration or the daily
+   limit raises this proportionally — e.g. 3/day at 10 seconds is closer to
+   **$72/month** — so check the math before raising either.
 
 Concepts alternate between two lanes: broad, widely-shareable content with
 no cultural framing needed, and GK Legend Studio's Somali heritage lane —
@@ -91,6 +97,14 @@ both written for a first-second hook and described sound, since Grok
 Imagine generates real audio synced to what's described in the prompt.
 
 Auto-generated videos get uploaded into GK_TERMINAL like any other video, so
-they go through the exact same captioning and posting flow (YouTube +
-TikTok). Ask Claude if you'd rather have them land in GK_JING for
-Instagram/Facebook/Pinterest instead.
+they go through the exact same captioning and posting flow — and mirror
+into GK_JING too if `MIRROR_FOLDER_ID` is set, reaching every platform.
+
+## Free alternative: manual prompts
+
+If you'd rather not pay per video, check the **GK_Viral_Prompts** Drive
+folder — a fresh batch of ready-to-paste viral video prompts (written with
+the same first-second-hook, real-sound approach as above) lands there every
+morning automatically. Paste one into your own Grok app (covered by your
+existing subscription, no extra cost) to generate a video yourself, then
+drop the finished file into GK_TERMINAL or GK_JING like any other video.
