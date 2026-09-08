@@ -41,6 +41,7 @@ async function processVideo(file) {
   const caption = `${row.capture} ${row.hashtag}`.trim();
 
   console.log('Uploading to YouTube...');
+  let youtubePosted = false;
   try {
     const yt = await uploadToYouTube(auth, {
       filePath: localPath,
@@ -48,27 +49,38 @@ async function processVideo(file) {
       description: caption,
     });
     console.log(`YouTube: posted, id ${yt.id}`);
+    youtubePosted = true;
   } catch (err) {
     console.error('YouTube upload failed:', err.message);
   }
 
-  if (loadTikTokToken()) {
-    console.log('Posting to TikTok...');
-    try {
-      const tk = await uploadToTikTok({ filePath: localPath, caption });
-      console.log(`TikTok: posted, publish id ${tk.publishId}`);
-    } catch (err) {
-      console.error('TikTok upload failed (other posts above still stand):', err.message);
+  // Only attempt TikTok (and only mark this video done) once YouTube has
+  // actually posted -- otherwise a video with a permanently broken YouTube
+  // upload would still get moved to DONE and never retried, while a video
+  // that succeeds on retry could end up posted to TikTok twice.
+  if (youtubePosted) {
+    if (loadTikTokToken()) {
+      console.log('Posting to TikTok...');
+      try {
+        const tk = await uploadToTikTok({ filePath: localPath, caption });
+        console.log(`TikTok: posted, publish id ${tk.publishId}`);
+      } catch (err) {
+        console.error('TikTok upload failed (other posts above still stand):', err.message);
+      }
+    } else {
+      console.log('Not logged in to TikTok yet — skipping (run "node src/tiktokAuth.js" to connect).');
     }
-  } else {
-    console.log('Not logged in to TikTok yet — skipping (run "node src/tiktokAuth.js" to connect).');
   }
 
   fs.unlink(localPath, () => {});
 
-  console.log('Moving to DONE folder...');
-  await moveToDone(auth, file.id);
-  console.log(`--- Finished: ${file.name} ---\n`);
+  if (youtubePosted) {
+    console.log('Moving to DONE folder...');
+    await moveToDone(auth, file.id);
+    console.log(`--- Finished: ${file.name} ---\n`);
+  } else {
+    console.log(`--- YouTube failed for "${file.name}" -- leaving it in place to retry next cycle ---\n`);
+  }
 }
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
