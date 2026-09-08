@@ -1,0 +1,17 @@
+{
+  "name": "gk-automation",
+  "version": "1.0.0",
+  "description": "GK Legend Studio — watches a Google Drive folder and auto-posts videos to YouTube, TikTok, Facebook, Pinterest and Instagram (via Buffer)",
+  "type": "module",
+  "scripts": {
+    "auth": "node src/googleAuth.js",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "googleapis": "^144.0.0",
+    "google-auth-library": "^9.15.0",
+    "dotenv": "^16.4.5",
+    "node-fetch": "^3.3.2",
+    "open": "^10.1.0"
+  }
+}
