@@ -51,6 +51,20 @@ async function queryCreatorInfo(accessToken) {
   return data.data;
 }
 
+// TikTok requires each upload chunk to be between 5MB and 64MB, except when
+// the whole video is under 5MB (then it must go up as a single chunk equal
+// to the full video size).
+const MIN_CHUNK_SIZE = 5 * 1024 * 1024;
+const MAX_CHUNK_SIZE = 64 * 1024 * 1024;
+
+function planChunks(videoSize) {
+  if (videoSize <= MIN_CHUNK_SIZE) {
+    return { chunkSize: videoSize, chunkCount: 1 };
+  }
+  const chunkCount = Math.ceil(videoSize / MAX_CHUNK_SIZE);
+  return { chunkSize: MAX_CHUNK_SIZE, chunkCount };
+}
+
 // Posts a video directly to the TikTok account that logged in via tiktokAuth.js.
 // privacyLevel is only a preference — if the creator's account doesn't allow
 // it (per queryCreatorInfo), we fall back to whatever they do allow.
@@ -58,6 +72,7 @@ export async function uploadToTikTok({ filePath, caption, privacyLevel = 'SELF_O
   const accessToken = await getAccessToken();
   const stats = fs.statSync(filePath);
   const videoSize = stats.size;
+  const { chunkSize, chunkCount } = planChunks(videoSize);
 
   const creatorInfo = await queryCreatorInfo(accessToken);
   const allowedPrivacyLevels = creatorInfo.privacy_level_options || [];
@@ -84,8 +99,8 @@ export async function uploadToTikTok({ filePath, caption, privacyLevel = 'SELF_O
       source_info: {
         source: 'FILE_UPLOAD',
         video_size: videoSize,
-        chunk_size: videoSize,
-        total_chunk_count: 1,
+        chunk_size: chunkSize,
+        total_chunk_count: chunkCount,
       },
     }),
   });
@@ -97,16 +112,21 @@ export async function uploadToTikTok({ filePath, caption, privacyLevel = 'SELF_O
   const { publish_id, upload_url } = initData.data;
 
   const fileBuffer = fs.readFileSync(filePath);
-  const uploadRes = await fetch(upload_url, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'video/mp4',
-      'Content-Range': `bytes 0-${videoSize - 1}/${videoSize}`,
-    },
-    body: fileBuffer,
-  });
-  if (!uploadRes.ok) {
-    throw new Error(`TikTok video upload failed: ${uploadRes.status}`);
+  for (let i = 0; i < chunkCount; i++) {
+    const start = i * chunkSize;
+    const end = Math.min(start + chunkSize, videoSize) - 1;
+    const chunk = fileBuffer.subarray(start, end + 1);
+    const uploadRes = await fetch(upload_url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'video/mp4',
+        'Content-Range': `bytes ${start}-${end}/${videoSize}`,
+      },
+      body: chunk,
+    });
+    if (!uploadRes.ok) {
+      throw new Error(`TikTok video upload failed on chunk ${i + 1}/${chunkCount}: ${uploadRes.status}`);
+    }
   }
 
   return { publishId: publish_id };
