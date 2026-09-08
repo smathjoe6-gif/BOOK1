@@ -31,13 +31,39 @@ async function getAccessToken() {
   return refreshAccessToken(token.refresh_token);
 }
 
+// TikTok requires this call before every post — it returns the creator's
+// current interaction settings (which privacy levels they're allowed to post
+// with, and whether they've turned off duet/comment/stitch). Posting without
+// checking this first, or posting with settings it doesn't allow, is exactly
+// what triggers the "review our integration guidelines" error.
+async function queryCreatorInfo(accessToken) {
+  const res = await fetch('https://open.tiktokapis.com/v2/post/publish/creator_info/query/', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+  });
+  const data = await res.json();
+  if (data.error && data.error.code !== 'ok') {
+    throw new Error(`TikTok creator info query failed: ${data.error.message || JSON.stringify(data.error)}`);
+  }
+  return data.data;
+}
+
 // Posts a video directly to the TikTok account that logged in via tiktokAuth.js.
-// privacy_level defaults to SELF_ONLY, which is required for apps that
-// haven't completed TikTok's full audit yet — change it once approved.
+// privacyLevel is only a preference — if the creator's account doesn't allow
+// it (per queryCreatorInfo), we fall back to whatever they do allow.
 export async function uploadToTikTok({ filePath, caption, privacyLevel = 'SELF_ONLY' }) {
   const accessToken = await getAccessToken();
   const stats = fs.statSync(filePath);
   const videoSize = stats.size;
+
+  const creatorInfo = await queryCreatorInfo(accessToken);
+  const allowedPrivacyLevels = creatorInfo.privacy_level_options || [];
+  const resolvedPrivacyLevel = allowedPrivacyLevels.includes(privacyLevel)
+    ? privacyLevel
+    : (allowedPrivacyLevels[0] || privacyLevel);
 
   const initRes = await fetch('https://open.tiktokapis.com/v2/post/publish/video/init/', {
     method: 'POST',
@@ -48,10 +74,12 @@ export async function uploadToTikTok({ filePath, caption, privacyLevel = 'SELF_O
     body: JSON.stringify({
       post_info: {
         title: caption,
-        privacy_level: privacyLevel,
-        disable_duet: false,
-        disable_comment: false,
-        disable_stitch: false,
+        privacy_level: resolvedPrivacyLevel,
+        // Can only disable an interaction the creator hasn't already disabled
+        // themselves — TikTok rejects the post if we try to re-enable one.
+        disable_duet: Boolean(creatorInfo.duet_disabled),
+        disable_comment: Boolean(creatorInfo.comment_disabled),
+        disable_stitch: Boolean(creatorInfo.stitch_disabled),
       },
       source_info: {
         source: 'FILE_UPLOAD',

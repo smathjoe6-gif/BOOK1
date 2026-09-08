@@ -1,10 +1,9 @@
 import fs from 'node:fs';
 import { config } from './config.js';
 import { loadOAuthClient } from './googleAuth.js';
-import { listNewVideos, downloadFile, makePublic, moveToDone } from './drive.js';
+import { listNewVideos, downloadFile, moveToDone } from './drive.js';
 import { findRowForFile, appendGeneratedRow } from './sheets.js';
 import { uploadToYouTube } from './youtube.js';
-import { postVideoToBuffer, getChannels } from './buffer.js';
 import { generateCaption, isLikelyDuplicateVariant } from './autoCaption.js';
 import { replyToNewComments } from './comments.js';
 import { uploadToTikTok } from './tiktok.js';
@@ -62,34 +61,6 @@ async function processVideo(file) {
     }
   } else {
     console.log('Not logged in to TikTok yet — skipping (run "node src/tiktokAuth.js" to connect).');
-  }
-
-  if (config.bufferAccessToken) {
-    try {
-      const channels = await getChannels(); // e.g. { tiktok: 'abc', facebook: 'def', pinterest: 'ghi', instagram: 'jkl' }
-      const bufferTargets = Object.entries(channels).filter(([platform]) =>
-        ['tiktok', 'facebook', 'pinterest', 'instagram'].includes(platform)
-      );
-
-      if (bufferTargets.length > 0) {
-        console.log('Getting a public link for Buffer...');
-        const publicUrl = await makePublic(auth, file.id);
-
-        for (const [platform, channelId] of bufferTargets) {
-          console.log(`Posting to ${platform} via Buffer...`);
-          try {
-            await postVideoToBuffer({ channelId, text: caption, videoUrl: publicUrl });
-            console.log(`${platform}: posted`);
-          } catch (err) {
-            console.error(`${platform} post failed:`, err.message);
-          }
-        }
-      } else {
-        console.log('No TikTok/Facebook/Pinterest/Instagram channels found connected in Buffer — skipping those.');
-      }
-    } catch (err) {
-      console.error('Buffer step failed (YouTube post above still stands):', err.message);
-    }
   }
 
   fs.unlink(localPath, () => {});
