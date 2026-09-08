@@ -131,7 +131,7 @@ async function safeCheckOnce() {
 async function main() {
   await safeCheckOnce();
   const intervalMs = config.pollIntervalMinutes * 60 * 1000;
-  console.log(`\nWatching GK_JING — checking every ${config.pollIntervalMinutes} minutes, posting one video every ${config.postStaggerMinutes} minutes when several show up at once. Leave this running (Ctrl+C to stop).`);
+  console.log(`\nWatching your configured Drive folder${config.mirrorFolderId ? ' (and mirroring with its pair folder)' : ''} — checking every ${config.pollIntervalMinutes} minutes, posting one video every ${config.postStaggerMinutes} minutes when several show up at once. Leave this running (Ctrl+C to stop).`);
   setInterval(safeCheckOnce, intervalMs);
 }
 
