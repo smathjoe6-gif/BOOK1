@@ -3,7 +3,7 @@ import { config } from './config.js';
 import { loadOAuthClient } from './googleAuth.js';
 import { listNewVideos, downloadFile, moveToDone, mirrorNewVideos } from './drive.js';
 import { findRowForFile, appendGeneratedRow } from './sheets.js';
-import { uploadToYouTube } from './youtube.js';
+import { uploadToYouTube, postEngagementComment } from './youtube.js';
 import { generateCaption, isLikelyDuplicateVariant } from './autoCaption.js';
 import { replyToNewComments } from './comments.js';
 import { uploadToTikTok } from './tiktok.js';
@@ -50,6 +50,16 @@ async function processVideo(file) {
     });
     console.log(`YouTube: posted, id ${yt.id}`);
     youtubePosted = true;
+    try {
+      await postEngagementComment(
+        auth,
+        yt.id,
+        '👀 What did you think? Drop a comment below and let us know! — GK Legend Studio'
+      );
+      console.log('YouTube: posted engagement comment');
+    } catch (err) {
+      console.error('Could not post the YouTube engagement comment (video still posted fine):', err.message);
+    }
   } catch (err) {
     console.error('YouTube upload failed:', err.message);
   }

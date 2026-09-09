@@ -84,10 +84,10 @@ side has worked reliably.
   ("OmniRoute", `http://localhost:20128`) running on Joe's Mac to write the
   video concept — falls back to a small hardcoded list of concepts if that's
   unreachable, so it still works, just less freshly.
-- Make's Facebook route posts an engagement-invite comment after every
-  video ("👀 What did you think? Drop a comment below..."). **YouTube does
-  not currently do this** — no auto-comment gets posted alongside new
-  YouTube uploads, only replies to comments others leave
+- Make's Facebook route and the script's YouTube upload both post the same
+  engagement-invite comment after every video ("👀 What did you think? Drop
+  a comment below..." — see `postEngagementComment` in `src/youtube.js`),
+  plus the script separately replies to comments others leave
   (`replyToNewComments` in `src/comments.js`).
 - Every video that generates fresh (via the daily Grok-prompts routine, or
   via `autoGenerateVideos`) should include: a first-second hook, loud
