@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import { config } from './config.js';
 
 const OMNIROUTE_URL = 'http://localhost:20128/v1/chat/completions';
 const TIMEOUT_MS = 15000;
@@ -10,7 +11,10 @@ async function askAI(systemPrompt, userPrompt) {
   try {
     const res = await fetch(OMNIROUTE_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(config.omnirouteApiKey ? { Authorization: `Bearer ${config.omnirouteApiKey}` } : {}),
+      },
       body: JSON.stringify({
         model: 'auto',
         messages: [
