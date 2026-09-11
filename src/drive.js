@@ -72,23 +72,30 @@ export async function mirrorNewVideos(auth) {
   if (!config.mirrorFolderId) return;
   const drive = google.drive({ version: 'v3', auth });
 
-  const [ownRes, mirrorRes] = await Promise.all([
-    drive.files.list({
-      q: `'${config.driveFolderId}' in parents and mimeType contains 'video/' and trashed = false`,
-      fields: 'files(id, name)',
-      pageSize: 50,
-    }),
-    drive.files.list({
-      q: `'${config.mirrorFolderId}' in parents and mimeType contains 'video/' and trashed = false`,
-      fields: 'files(id, name)',
-      pageSize: 50,
-    }),
+  const listVideos = (folderId) =>
+    folderId
+      ? drive.files.list({
+          q: `'${folderId}' in parents and mimeType contains 'video/' and trashed = false`,
+          fields: 'files(id, name)',
+          pageSize: 50,
+        })
+      : Promise.resolve({ data: { files: [] } });
+
+  const [ownRes, mirrorRes, ownDoneRes, mirrorDoneRes] = await Promise.all([
+    listVideos(config.driveFolderId),
+    listVideos(config.mirrorFolderId),
+    listVideos(config.doneFolderId),
+    listVideos(config.mirrorDoneFolderId),
   ]);
 
   const own = ownRes.data.files || [];
   const mirror = mirrorRes.data.files || [];
-  const ownNames = new Set(own.map((f) => f.name));
-  const mirrorNames = new Set(mirror.map((f) => f.name));
+  // A video already sitting in either side's DONE folder counts as "already
+  // there" too -- otherwise a video that's finished on one side but still
+  // pending on the other looks "missing" and gets copied right back,
+  // reposting it a second time once the still-pending side processes it.
+  const ownNames = new Set([...own, ...(ownDoneRes.data.files || [])].map((f) => f.name));
+  const mirrorNames = new Set([...mirror, ...(mirrorDoneRes.data.files || [])].map((f) => f.name));
 
   for (const file of own) {
     if (mirrorNames.has(file.name)) continue;

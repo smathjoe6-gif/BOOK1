@@ -15,6 +15,11 @@ export const config = {
   driveFolderId: required('DRIVE_FOLDER_ID'),
   doneFolderId: process.env.DONE_FOLDER_ID || '',
   mirrorFolderId: process.env.MIRROR_FOLDER_ID || '',
+  // The Make.com side's own done folder (GK_JING_DONE) -- mirroring needs to
+  // know about it too, otherwise a video that's already finished on one side
+  // and moved to its done folder looks "missing" to the still-pending other
+  // side and gets copied right back, causing a duplicate post loop.
+  mirrorDoneFolderId: process.env.MIRROR_DONE_FOLDER_ID || '',
   spreadsheetId: required('SPREADSHEET_ID'),
   pollIntervalMinutes: Number(process.env.POLL_INTERVAL_MINUTES || 10),
   postStaggerMinutes: Number(process.env.POST_STAGGER_MINUTES || 15),
