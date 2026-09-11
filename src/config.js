@@ -22,7 +22,6 @@ export const config = {
   mirrorDoneFolderId: process.env.MIRROR_DONE_FOLDER_ID || '',
   spreadsheetId: required('SPREADSHEET_ID'),
   pollIntervalMinutes: Number(process.env.POLL_INTERVAL_MINUTES || 10),
-  postStaggerMinutes: Number(process.env.POST_STAGGER_MINUTES || 15),
   tiktokUseSandbox: process.env.TIKTOK_USE_SANDBOX === 'true',
   tiktokClientKey: process.env.TIKTOK_USE_SANDBOX === 'true'
     ? (process.env.TIKTOK_SANDBOX_CLIENT_KEY || '')

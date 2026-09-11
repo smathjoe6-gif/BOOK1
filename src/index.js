@@ -93,8 +93,6 @@ async function processVideo(file) {
   }
 }
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 async function checkOnce() {
   try {
     await mirrorNewVideos(auth);
@@ -107,16 +105,16 @@ async function checkOnce() {
   if (files.length === 0) {
     console.log('Nothing new.');
   } else {
-    for (let i = 0; i < files.length; i++) {
-      try {
-        await processVideo(files[i]);
-      } catch (err) {
-        console.error(`Failed to process "${files[i].name}":`, err.message);
-      }
-      if (i < files.length - 1) {
-        console.log(`Waiting ${config.postStaggerMinutes} minutes before the next one, so they don't all land at once...`);
-        await sleep(config.postStaggerMinutes * 60 * 1000);
-      }
+    // Post only the oldest one this cycle -- the rest wait for their own
+    // future check, so posts land one per poll interval instead of all
+    // bunching up together.
+    if (files.length > 1) {
+      console.log(`Found ${files.length} videos waiting -- posting the oldest one now, the rest will follow on future checks.`);
+    }
+    try {
+      await processVideo(files[0]);
+    } catch (err) {
+      console.error(`Failed to process "${files[0].name}":`, err.message);
     }
   }
 
@@ -153,7 +151,7 @@ async function safeCheckOnce() {
 async function main() {
   await safeCheckOnce();
   const intervalMs = config.pollIntervalMinutes * 60 * 1000;
-  console.log(`\nWatching your configured Drive folder${config.mirrorFolderId ? ' (and mirroring with its pair folder)' : ''} — checking every ${config.pollIntervalMinutes} minutes, posting one video every ${config.postStaggerMinutes} minutes when several show up at once. Leave this running (Ctrl+C to stop).`);
+  console.log(`\nWatching your configured Drive folder${config.mirrorFolderId ? ' (and mirroring with its pair folder)' : ''} — checking every ${config.pollIntervalMinutes} minutes, posting at most one video per check so they never all land at once. Leave this running (Ctrl+C to stop).`);
   setInterval(safeCheckOnce, intervalMs);
 }
 
