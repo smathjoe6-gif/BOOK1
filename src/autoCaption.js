@@ -24,7 +24,7 @@ const THEME_BANK = [
 ];
 
 function isGenericIdFilename(filename) {
-  return /^grok-video-[0-9a-f-]+\.[a-zA-Z0-9]+$/i.test(filename);
+  return /^(grok-video-[0-9a-f-]+|grok-auto-\d+)\.[a-zA-Z0-9]+$/i.test(filename);
 }
 
 function titleCase(text) {
