@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { config } from './config.js';
-import { generateVideo } from './grokVideo.js';
+import { generateVideo } from './omnirouteVideo.js';
 import { writeVideoConceptWithAI } from './omniroute.js';
 import { uploadFile } from './drive.js';
 
@@ -10,7 +10,8 @@ const STATE_PATH = path.join(process.cwd(), 'autogen-state.json');
 // Used only if OmniRoute isn't reachable when it's time to generate. Mixes
 // broad, no-cultural-framing-needed viral bait with GK Legend Studio's
 // Somali heritage lane -- both written with a first-second hook and real
-// described sound, since Grok Imagine generates synced audio from the prompt.
+// described sound, since the video generator is expected to produce synced
+// audio from the prompt.
 const FALLBACK_CONCEPTS = [
   'A cat leaps and snatches a falling leaf out of mid-air in slow motion, the crunch of paws landing on a pile of autumn leaves, warm low afternoon light.',
   "A hand slices open a ripe mango in one clean cut revealing golden flesh, juice dripping immediately, the sharp thwack of the knife on the board, a busy Somali market's ambient chatter and tea-stall steam in the background.",
@@ -70,7 +71,7 @@ export async function maybeAutoGenerateVideo(auth) {
   if (dueHour === undefined) return;
 
   const concept = await pickConcept();
-  console.log(`Auto-generating a video with Grok Imagine (${dueHour}:00 slot): "${concept}"`);
+  console.log(`Auto-generating a video with Veo AI Free via OmniRoute (${dueHour}:00 slot): "${concept}"`);
 
   const localPath = await generateVideo(concept);
   const fileName = `grok-auto-${Date.now()}.mp4`;
