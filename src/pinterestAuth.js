@@ -12,7 +12,11 @@ import { config } from './config.js';
 
 const TOKEN_PATH = new URL('../pinterest_token.json', import.meta.url);
 const REDIRECT_PORT = 53684;
-const REDIRECT_URI = `http://127.0.0.1:${REDIRECT_PORT}/pinterest/callback`;
+// Pinterest's redirect-URI validator specifically requires the literal
+// hostname "localhost" for http redirects -- "127.0.0.1" (which Canva's
+// OAuth setup uses fine) gets rejected as "not a valid OAuth 2.0 redirect
+// URI" even though they resolve to the same place.
+const REDIRECT_URI = `http://localhost:${REDIRECT_PORT}/pinterest/callback`;
 const AUTHORIZE_URL = 'https://www.pinterest.com/oauth/';
 const TOKEN_URL = 'https://api.pinterest.com/v5/oauth/token';
 const SCOPES = 'pins:read,pins:write,boards:read';
