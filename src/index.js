@@ -147,8 +147,6 @@ async function processVideo(file) {
         console.log(`Pinterest: already at today's test limit (${config.pinterestDailyLimit}/day) — skipping until tomorrow.`);
       } else {
         console.log('Posting to Pinterest...');
-        pinterestState.count += 1;
-        savePinterestState(pinterestState);
         try {
           let coverImageUrl;
           if (config.canvaBrandTemplateId) {
@@ -167,6 +165,11 @@ async function processVideo(file) {
           }
           const pin = await uploadToPinterest({ filePath: localPath, title: row.title, description: caption, coverImageUrl });
           console.log(`Pinterest: posted, pin id ${pin.id}`);
+          // Only count successful posts against the daily test cap -- a
+          // failed attempt (bad token, transient API error, etc.) shouldn't
+          // burn one of today's slots before it's even posted anything.
+          pinterestState.count += 1;
+          savePinterestState(pinterestState);
         } catch (err) {
           console.error('Pinterest upload failed (other posts above still stand):', err.message);
         }
