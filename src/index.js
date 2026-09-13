@@ -56,8 +56,31 @@ async function processVideo(file) {
     const generated = await generateCaption(file.name);
     console.log(`No spreadsheet entry for "${file.name}" — auto-writing one: "${generated.title}"`);
     row = { title: generated.title, capture: generated.capture, hashtag: generated.hashtag };
+
+    // Generate a unique Pinterest cover image here too, not just in
+    // backfillGkJingCaptions() -- this same row can end up feeding Make's
+    // GK_JING/Pinterest posting (via folder mirroring, or if Joe drops the
+    // video in both folders), and without a cover URL in column G, Make
+    // falls back to its generic rotating template cover instead of a
+    // unique one.
+    let coverImageUrl = '';
+    if (config.canvaBrandTemplateId) {
+      try {
+        const localCoverPath = await generateCoverImage(generated.title);
+        coverImageUrl = await uploadPublicImage(
+          auth,
+          localCoverPath,
+          `pin-cover-${Date.now()}.png`,
+          config.pinterestCoversFolderId
+        );
+        fs.unlink(localCoverPath, () => {});
+      } catch (err) {
+        console.error(`Could not generate a Pinterest cover image for "${file.name}" (falling back to Make's default rotation):`, err.message);
+      }
+    }
+
     try {
-      await appendGeneratedRow(auth, file.name, generated);
+      await appendGeneratedRow(auth, file.name, generated, coverImageUrl);
     } catch (err) {
       console.error('Could not save the auto-generated row to the spreadsheet (posting anyway):', err.message);
     }
