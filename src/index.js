@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import { config } from './config.js';
 import { loadOAuthClient } from './googleAuth.js';
-import { listNewVideos, downloadFile, moveToDone, mirrorNewVideos } from './drive.js';
+import { listNewVideos, listVideosInFolder, downloadFile, moveToDone, mirrorNewVideos } from './drive.js';
 import { findRowForFile, appendGeneratedRow } from './sheets.js';
 import { uploadToYouTube, postEngagementComment } from './youtube.js';
 import { generateCaption, isLikelyDuplicateVariant } from './autoCaption.js';
@@ -93,11 +93,41 @@ async function processVideo(file) {
   }
 }
 
+// Make.com's scenario only posts a GK_JING video once it finds a matching
+// row with a non-blank Title -- it never writes captions itself. This backs
+// that up: for any GK_JING video with no row yet, write one the same way we
+// already do for GK_TERMINAL, so Instagram/Facebook/Pinterest never get
+// stuck on a missing caption either. Read-only on the Drive side -- this
+// never downloads, moves, or touches the video file itself, only the sheet.
+async function backfillGkJingCaptions() {
+  if (!config.gkJingFolderId) return;
+
+  const files = await listVideosInFolder(auth, config.gkJingFolderId);
+  for (const file of files) {
+    try {
+      const row = await findRowForFile(auth, file.name);
+      if (row || isLikelyDuplicateVariant(file.name)) continue;
+
+      const generated = await generateCaption(file.name);
+      await appendGeneratedRow(auth, file.name, generated);
+      console.log(`GK_JING: no caption for "${file.name}" -- auto-wrote one: "${generated.title}"`);
+    } catch (err) {
+      console.error(`GK_JING caption backfill failed for "${file.name}" (skipping, others still checked):`, err.message);
+    }
+  }
+}
+
 async function checkOnce() {
   try {
     await mirrorNewVideos(auth);
   } catch (err) {
     console.error('Mirroring videos between GK_TERMINAL and GK_JING failed:', err.message);
+  }
+
+  try {
+    await backfillGkJingCaptions();
+  } catch (err) {
+    console.error('GK_JING caption backfill check failed:', err.message);
   }
 
   console.log(`[${new Date().toLocaleString()}] Checking for new videos...`);

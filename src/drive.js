@@ -4,25 +4,25 @@ import os from 'node:os';
 import path from 'node:path';
 import { config } from './config.js';
 
-// Joe sometimes drops videos straight into GK_JING, and sometimes into
-// whatever subfolder happens to be open (out of habit from the old Make.com
-// setup) — so instead of watching one fixed subfolder, we look up every
-// subfolder under GK_JING each time and watch all of them too.
-async function listWatchedFolderIds(drive) {
+// Joe sometimes drops videos straight into a watched folder, and sometimes
+// into whatever subfolder happens to be open (out of habit from the old
+// Make.com setup) — so instead of watching one fixed subfolder, we look up
+// every subfolder under it each time and watch all of them too.
+async function listWatchedFolderIds(drive, rootFolderId) {
   const res = await drive.files.list({
-    q: `'${config.driveFolderId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`,
+    q: `'${rootFolderId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`,
     fields: 'files(id)',
     pageSize: 50,
   });
   const subfolderIds = (res.data.files || []).map((f) => f.id);
-  return [config.driveFolderId, ...subfolderIds];
+  return [rootFolderId, ...subfolderIds];
 }
 
-// Lists video files sitting in the watched folder or any subfolder inside
-// it, oldest first — same order the Make.com scenario used.
-export async function listNewVideos(auth) {
+// Lists video files sitting in the given folder or any subfolder inside it,
+// oldest first — same order the Make.com scenario used.
+export async function listVideosInFolder(auth, rootFolderId) {
   const drive = google.drive({ version: 'v3', auth });
-  const folderIds = await listWatchedFolderIds(drive);
+  const folderIds = await listWatchedFolderIds(drive, rootFolderId);
   const parentClause = folderIds.map((id) => `'${id}' in parents`).join(' or ');
 
   const res = await drive.files.list({
@@ -32,6 +32,11 @@ export async function listNewVideos(auth) {
     pageSize: 50,
   });
   return res.data.files || [];
+}
+
+// Lists video files in GK_TERMINAL (this script's own watched folder).
+export async function listNewVideos(auth) {
+  return listVideosInFolder(auth, config.driveFolderId);
 }
 
 // Downloads a file to a temp path and returns that path.
