@@ -19,7 +19,12 @@ const REDIRECT_PORT = 53684;
 const REDIRECT_URI = `http://localhost:${REDIRECT_PORT}/pinterest/callback`;
 const AUTHORIZE_URL = 'https://www.pinterest.com/oauth/';
 const TOKEN_URL = 'https://api.pinterest.com/v5/oauth/token';
-const SCOPES = 'pins:read,pins:write,boards:read';
+// boards:write is required even though we're only creating pins on an
+// existing board -- Pinterest's pin-creation endpoint checks for write
+// access to the target board, not just pins:write. Missing it produces
+// "Your token does not have sufficient permissions... Missing: ['boards:write']"
+// on every single pin attempt.
+const SCOPES = 'pins:read,pins:write,boards:read,boards:write';
 
 function base64url(buffer) {
   return buffer.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
