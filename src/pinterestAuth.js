@@ -54,7 +54,7 @@ async function runInteractiveLogin() {
   console.log('\nOpening your browser to log in with Pinterest...');
   console.log('If it does not open automatically, visit this URL:\n');
   console.log(authUrl.toString(), '\n');
-  console.log(`Make sure ${REDIRECT_URI} is registered as a redirect URI for App ID 1607774 at developers.pinterest.com.\n`);
+  console.log(`Make sure ${REDIRECT_URI} is registered as a redirect URI for this app (Client ID ${config.pinterestClientId}) at developers.pinterest.com.\n`);
 
   const code = await new Promise((resolve, reject) => {
     const server = http.createServer((req, res) => {
