@@ -46,7 +46,7 @@ async function queryCreatorInfo(accessToken) {
   });
   const data = await res.json();
   if (data.error && data.error.code !== 'ok') {
-    throw new Error(`TikTok creator info query failed: ${data.error.message || JSON.stringify(data.error)}`);
+    throw new Error(`TikTok creator info query failed [${data.error.code}]: ${data.error.message || JSON.stringify(data.error)}`);
   }
   return data.data;
 }
@@ -109,7 +109,7 @@ export async function uploadToTikTok({ filePath, caption, privacyLevel = 'SELF_O
   });
   const initData = await initRes.json();
   if (initData.error && initData.error.code !== 'ok') {
-    throw new Error(`TikTok init failed: ${initData.error.message || JSON.stringify(initData.error)}`);
+    throw new Error(`TikTok init failed [${initData.error.code}]: ${initData.error.message || JSON.stringify(initData.error)}`);
   }
 
   const { publish_id, upload_url } = initData.data;
