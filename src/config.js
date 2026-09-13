@@ -59,4 +59,12 @@ export const config = {
   autoGenerateHours: (process.env.AUTO_GENERATE_HOURS || '8,13,18')
     .split(',')
     .map((h) => Number(h.trim())),
+  // Independent Pinterest posting for GK_TERMINAL videos, separate from
+  // Make.com's own Pinterest posting for GK_JING videos -- this is a
+  // deliberately slow, capped test rollout (see PINTEREST_DAILY_LIMIT)
+  // while Joe's new trial API access proves itself out.
+  pinterestClientId: process.env.PINTEREST_CLIENT_ID || '',
+  pinterestClientSecret: process.env.PINTEREST_CLIENT_SECRET || '',
+  pinterestBoardId: process.env.PINTEREST_BOARD_ID || '987484724485476675',
+  pinterestDailyLimit: Number(process.env.PINTEREST_DAILY_LIMIT || 2),
 };

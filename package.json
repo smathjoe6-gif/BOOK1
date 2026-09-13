@@ -6,6 +6,7 @@
   "scripts": {
     "auth": "node src/googleAuth.js",
     "canva-auth": "node src/canvaAuth.js",
+    "pinterest-auth": "node src/pinterestAuth.js",
     "start": "node src/index.js"
   },
   "dependencies": {

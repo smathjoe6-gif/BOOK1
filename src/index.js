@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import path from 'node:path';
 import { config } from './config.js';
 import { loadOAuthClient } from './googleAuth.js';
 import { listNewVideos, listVideosInFolder, downloadFile, moveToDone, mirrorNewVideos, uploadPublicImage } from './drive.js';
@@ -9,7 +10,33 @@ import { generateCoverImage } from './canvaCover.js';
 import { replyToNewComments } from './comments.js';
 import { uploadToTikTok } from './tiktok.js';
 import { loadTikTokToken } from './tiktokAuth.js';
+import { uploadToPinterest } from './pinterest.js';
+import { loadPinterestToken } from './pinterestAuth.js';
 import { maybeAutoGenerateVideo } from './autoGenerate.js';
+
+// Independent test rollout of Pinterest posting for GK_TERMINAL videos,
+// capped at config.pinterestDailyLimit attempts per day while Joe's new
+// trial API access proves itself out -- separate from, and in addition to,
+// Make.com's own long-running Pinterest posting for GK_JING videos.
+const PINTEREST_STATE_PATH = path.join(process.cwd(), 'pinterest-state.json');
+
+function todayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function loadPinterestState() {
+  try {
+    const state = JSON.parse(fs.readFileSync(PINTEREST_STATE_PATH, 'utf8'));
+    if (state.date !== todayKey()) return { date: todayKey(), count: 0 };
+    return state;
+  } catch {
+    return { date: todayKey(), count: 0 };
+  }
+}
+
+function savePinterestState(state) {
+  fs.writeFileSync(PINTEREST_STATE_PATH, JSON.stringify(state, null, 2));
+}
 
 const auth = loadOAuthClient();
 if (!auth.credentials || !auth.credentials.refresh_token) {
@@ -80,6 +107,47 @@ async function processVideo(file) {
       }
     } else {
       console.log('Not logged in to TikTok yet — skipping (run "node src/tiktokAuth.js" to connect).');
+    }
+  }
+
+  // Independent test rollout: also post to Pinterest directly from this
+  // script (separate from Make.com's own Pinterest posting for GK_JING
+  // videos), capped at a few per day while the new trial API access is
+  // still being proven out. A failure or a not-yet-logged-in state here
+  // never blocks YouTube/TikTok above or the move-to-done below.
+  if (youtubePosted) {
+    if (!loadPinterestToken()) {
+      console.log('Not logged in to Pinterest yet — skipping (run "node src/pinterestAuth.js" to connect).');
+    } else {
+      const pinterestState = loadPinterestState();
+      if (pinterestState.count >= config.pinterestDailyLimit) {
+        console.log(`Pinterest: already at today's test limit (${config.pinterestDailyLimit}/day) — skipping until tomorrow.`);
+      } else {
+        console.log('Posting to Pinterest...');
+        pinterestState.count += 1;
+        savePinterestState(pinterestState);
+        try {
+          let coverImageUrl;
+          if (config.canvaBrandTemplateId) {
+            try {
+              const localCoverPath = await generateCoverImage(row.title);
+              coverImageUrl = await uploadPublicImage(
+                auth,
+                localCoverPath,
+                `pin-cover-${Date.now()}.png`,
+                config.pinterestCoversFolderId
+              );
+              fs.unlink(localCoverPath, () => {});
+            } catch (err) {
+              console.error('Could not generate a Pinterest cover image (posting without one):', err.message);
+            }
+          }
+          const pin = await uploadToPinterest({ filePath: localPath, title: row.title, description: caption, coverImageUrl });
+          console.log(`Pinterest: posted, pin id ${pin.id}`);
+        } catch (err) {
+          console.error('Pinterest upload failed (other posts above still stand):', err.message);
+        }
+      }
     }
   }
 

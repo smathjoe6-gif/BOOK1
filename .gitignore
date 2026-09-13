@@ -4,4 +4,7 @@ node_modules/
 token.json
 tiktok_token.json
 tiktok_token.sandbox.json
+canva-token.json
+pinterest_token.json
 autogen-state.json
+pinterest-state.json
