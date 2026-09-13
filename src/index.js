@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import { config } from './config.js';
 import { loadOAuthClient } from './googleAuth.js';
 import { listNewVideos, listVideosInFolder, downloadFile, moveToDone, mirrorNewVideos, uploadPublicImage } from './drive.js';
-import { findRowForFile, appendGeneratedRow } from './sheets.js';
+import { findRowForFile, appendGeneratedRow, updateCoverImage } from './sheets.js';
 import { uploadToYouTube, postEngagementComment } from './youtube.js';
 import { generateCaption, isLikelyDuplicateVariant } from './autoCaption.js';
 import { generateCoverImage } from './canvaCover.js';
@@ -107,7 +107,33 @@ async function backfillGkJingCaptions() {
   for (const file of files) {
     try {
       const row = await findRowForFile(auth, file.name);
-      if (row || isLikelyDuplicateVariant(file.name)) continue;
+
+      if (row) {
+        // A caption already exists (written here or by the hourly Claude Code backfill
+        // routine, which only ever writes text) -- but it might still be missing a
+        // Pinterest cover image. Without this, that row's blank column G stays blank
+        // forever, since nothing else ever revisits an existing row, and Pinterest
+        // just falls back to the same generic rotating cover every time.
+        if (!row.coverImageUrl && config.canvaBrandTemplateId) {
+          try {
+            const localCoverPath = await generateCoverImage(row.title);
+            const coverImageUrl = await uploadPublicImage(
+              auth,
+              localCoverPath,
+              `pin-cover-${Date.now()}.png`,
+              config.pinterestCoversFolderId
+            );
+            fs.unlink(localCoverPath, () => {});
+            await updateCoverImage(auth, row.rowNumber, coverImageUrl);
+            console.log(`GK_JING: added a unique Pinterest cover image for "${file.name}" (caption already existed).`);
+          } catch (err) {
+            console.error(`Could not generate a Pinterest cover image for "${file.name}" (leaving it on the fallback rotation):`, err.message);
+          }
+        }
+        continue;
+      }
+
+      if (isLikelyDuplicateVariant(file.name)) continue;
 
       const generated = await generateCaption(file.name);
 
