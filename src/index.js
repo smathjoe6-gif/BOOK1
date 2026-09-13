@@ -1,10 +1,11 @@
 import fs from 'node:fs';
 import { config } from './config.js';
 import { loadOAuthClient } from './googleAuth.js';
-import { listNewVideos, listVideosInFolder, downloadFile, moveToDone, mirrorNewVideos } from './drive.js';
+import { listNewVideos, listVideosInFolder, downloadFile, moveToDone, mirrorNewVideos, uploadPublicImage } from './drive.js';
 import { findRowForFile, appendGeneratedRow } from './sheets.js';
 import { uploadToYouTube, postEngagementComment } from './youtube.js';
 import { generateCaption, isLikelyDuplicateVariant } from './autoCaption.js';
+import { generateCoverImage } from './canvaCover.js';
 import { replyToNewComments } from './comments.js';
 import { uploadToTikTok } from './tiktok.js';
 import { loadTikTokToken } from './tiktokAuth.js';
@@ -109,8 +110,25 @@ async function backfillGkJingCaptions() {
       if (row || isLikelyDuplicateVariant(file.name)) continue;
 
       const generated = await generateCaption(file.name);
-      await appendGeneratedRow(auth, file.name, generated);
-      console.log(`GK_JING: no caption for "${file.name}" -- auto-wrote one: "${generated.title}"`);
+
+      let coverImageUrl = '';
+      if (config.canvaBrandTemplateId) {
+        try {
+          const localCoverPath = await generateCoverImage(generated.title);
+          coverImageUrl = await uploadPublicImage(
+            auth,
+            localCoverPath,
+            `pin-cover-${Date.now()}.png`,
+            config.pinterestCoversFolderId
+          );
+          fs.unlink(localCoverPath, () => {});
+        } catch (err) {
+          console.error(`Could not generate a Pinterest cover image for "${file.name}" (falling back to Make's default rotation):`, err.message);
+        }
+      }
+
+      await appendGeneratedRow(auth, file.name, generated, coverImageUrl);
+      console.log(`GK_JING: no caption for "${file.name}" -- auto-wrote one: "${generated.title}"${coverImageUrl ? ' (with a unique cover image)' : ''}`);
     } catch (err) {
       console.error(`GK_JING caption backfill failed for "${file.name}" (skipping, others still checked):`, err.message);
     }

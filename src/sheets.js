@@ -18,14 +18,14 @@ export async function findRowForFile(auth, filename) {
   return { originalFilename, newFilename, title, capture: capture || '', hashtag: hashtag || '' };
 }
 
-export async function appendGeneratedRow(auth, filename, generated) {
+export async function appendGeneratedRow(auth, filename, generated, coverImageUrl = '') {
   const sheets = google.sheets({ version: 'v4', auth });
   await sheets.spreadsheets.values.append({
     spreadsheetId: config.spreadsheetId,
-    range: 'Sheet1!A:F',
+    range: 'Sheet1!A:G',
     valueInputOption: 'USER_ENTERED',
     requestBody: {
-      values: [[filename, '', '', generated.title, generated.capture, generated.hashtag]],
+      values: [[filename, '', '', generated.title, generated.capture, generated.hashtag, coverImageUrl]],
     },
   });
 }

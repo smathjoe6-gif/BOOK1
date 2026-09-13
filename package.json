@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "auth": "node src/googleAuth.js",
+    "canva-auth": "node src/canvaAuth.js",
     "start": "node src/index.js"
   },
   "dependencies": {

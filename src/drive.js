@@ -128,6 +128,24 @@ export async function mirrorNewVideos(auth) {
   }
 }
 
+// Uploads a local image and makes it publicly viewable, returning a stable
+// direct-image URL (Canva's own export links expire after a few hours, so
+// generated cover images get rehosted here for the spreadsheet/Make to use
+// indefinitely).
+export async function uploadPublicImage(auth, localPath, fileName, folderId) {
+  const drive = google.drive({ version: 'v3', auth });
+  const file = await drive.files.create({
+    requestBody: { name: fileName, parents: folderId ? [folderId] : undefined },
+    media: { mimeType: 'image/png', body: fs.createReadStream(localPath) },
+    fields: 'id',
+  });
+  await drive.permissions.create({
+    fileId: file.data.id,
+    requestBody: { role: 'reader', type: 'anyone' },
+  });
+  return `https://drive.google.com/uc?export=view&id=${file.data.id}`;
+}
+
 // Moves a file into the DONE folder once it's been posted everywhere.
 export async function moveToDone(auth, fileId) {
   if (!config.doneFolderId) return;

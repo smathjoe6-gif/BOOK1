@@ -20,6 +20,11 @@ export const config = {
   // just its own GK_TERMINAL ones. Leave blank to skip this and only
   // caption GK_TERMINAL videos as before.
   gkJingFolderId: process.env.GK_JING_FOLDER_ID || '',
+  canvaClientId: process.env.CANVA_CLIENT_ID || '',
+  canvaClientSecret: process.env.CANVA_CLIENT_SECRET || '',
+  canvaBrandTemplateId: process.env.CANVA_BRAND_TEMPLATE_ID || '',
+  canvaTitleField: process.env.CANVA_TITLE_FIELD || 'title',
+  pinterestCoversFolderId: process.env.PINTEREST_COVERS_FOLDER_ID || '',
   // The Make.com side's own done folder (GK_JING_DONE) -- mirroring needs to
   // know about it too, otherwise a video that's already finished on one side
   // and moved to its done folder looks "missing" to the still-pending other
