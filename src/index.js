@@ -300,6 +300,13 @@ async function checkOnce() {
   }
 }
 
+// A backstop, not the primary fix -- the real fix is bounding every network
+// call that checkOnce() can reach (see grokVideo.js's fetchWithTimeout) so
+// nothing hangs in the first place. This just guarantees that even an
+// unforeseen hang somewhere else can't wedge isChecking forever and require
+// a manual restart, the way one un-timed-out fetch just did.
+const CHECK_TIMEOUT_MS = 10 * 60 * 1000;
+
 let isChecking = false;
 async function safeCheckOnce() {
   if (isChecking) {
@@ -308,7 +315,12 @@ async function safeCheckOnce() {
   }
   isChecking = true;
   try {
-    await checkOnce();
+    await Promise.race([
+      checkOnce(),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error(`Check cycle took longer than ${CHECK_TIMEOUT_MS / 60000} minutes`)), CHECK_TIMEOUT_MS)
+      ),
+    ]);
   } catch (err) {
     console.error('Check cycle failed (will retry next cycle):', err.message);
   } finally {

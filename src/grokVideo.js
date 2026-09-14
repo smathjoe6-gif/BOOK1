@@ -7,6 +7,29 @@ import { config } from './config.js';
 const API_BASE = 'https://api.x.ai/v1/videos';
 const POLL_INTERVAL_MS = 5000;
 const POLL_TIMEOUT_MS = 5 * 60 * 1000;
+const REQUEST_TIMEOUT_MS = 30 * 1000;
+const DOWNLOAD_TIMEOUT_MS = 3 * 60 * 1000;
+
+// Plain node-fetch calls never time out on their own -- a single stalled
+// connection here would hang forever, which keeps the caller's isChecking
+// lock stuck and silently freezes the whole script until someone manually
+// restarts it (this is what was happening: pollJob's 5-minute deadline only
+// gets re-checked between fetch calls, so one hung fetch skips the deadline
+// entirely). Bounding every request fixes that at the source.
+async function fetchWithTimeout(url, options = {}, timeoutMs = REQUEST_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error(`Request to ${url} timed out after ${Math.round(timeoutMs / 1000)}s`);
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 const DONE_STATUSES = ['completed', 'succeeded', 'success', 'done', 'ready'];
 const FAILED_STATUSES = ['failed', 'error', 'cancelled', 'canceled'];
@@ -32,7 +55,7 @@ function extractVideoUrl(job) {
 }
 
 async function startJob(prompt) {
-  const res = await fetch(`${API_BASE}/generations`, {
+  const res = await fetchWithTimeout(`${API_BASE}/generations`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -60,7 +83,7 @@ async function startJob(prompt) {
 async function pollJob(requestId) {
   const deadline = Date.now() + POLL_TIMEOUT_MS;
   while (Date.now() < deadline) {
-    const res = await fetch(`${API_BASE}/${requestId}`, {
+    const res = await fetchWithTimeout(`${API_BASE}/${requestId}`, {
       headers: { Authorization: `Bearer ${config.xaiApiKey}` },
     });
     const data = await res.json();
@@ -98,7 +121,7 @@ export async function generateVideo(prompt) {
   const videoUrl = await pollJob(requestId);
 
   const destPath = path.join(os.tmpdir(), `gk-grok-${requestId}.mp4`);
-  const videoRes = await fetch(videoUrl);
+  const videoRes = await fetchWithTimeout(videoUrl, {}, DOWNLOAD_TIMEOUT_MS);
   if (!videoRes.ok) {
     throw new Error(`Could not download the generated video: ${videoRes.status}`);
   }
