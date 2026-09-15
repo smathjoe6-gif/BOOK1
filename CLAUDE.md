@@ -95,6 +95,20 @@ the caption sheet (`appendGeneratedRow`/`updateCoverImage` in `src/sheets.js`)
 a caption but is still missing a cover, e.g. one the hourly Claude Code
 caption routine wrote — that routine only ever writes text, never a cover).
 
+**Keeping the pool clean — `npm run organize-covers` (`src/organizeCoverPool.js`).**
+Joe bulk-drops photos into `GK_Pinterest_Covers` in large batches from
+wherever he's been collecting them, which routinely mixes in: browser-export
+junk (stray `.html`/binary files, not images), watermarked stock-photo
+thumbnails (filenames starting `watermarked_img_` — unusable as a real
+cover), and exact duplicate photos saved more than once. Running this script
+sorts all of that out of the main pool into three subfolders it
+finds-or-creates inside `GK_Pinterest_Covers` — `Papers` (non-image files),
+`Watermarked - Not Used` (by filename prefix), `Duplicates` (exact-match via
+Drive's `md5Checksum`, oldest copy kept) — leaving only clean, unique photos
+in the pool for `coverPool.js` to hand out. Safe to run any time, including
+repeatedly; already-sorted files are left alone. Run it after every big
+batch Joe drops in.
+
 **Make's scenario reads column G too** (the "Create Pinterest Video Pin"
 step's `cover_image_url` field, both the main path and its retry twin) —
 `{{ifempty(<row>.`7`; <4-image day-of-month rotation>)}}`. So: a unique

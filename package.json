@@ -7,6 +7,7 @@
     "auth": "node src/googleAuth.js",
     "canva-auth": "node src/canvaAuth.js",
     "pinterest-auth": "node src/pinterestAuth.js",
+    "organize-covers": "node src/organizeCoverPool.js",
     "start": "node src/index.js"
   },
   "dependencies": {
