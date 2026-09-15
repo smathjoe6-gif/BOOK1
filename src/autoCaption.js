@@ -1,4 +1,8 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { writeCaptionWithAI } from './omniroute.js';
+
+const THEME_STATE_PATH = path.join(process.cwd(), 'theme-caption-state.json');
 
 const HASHTAG_BANK = [
   '#GKLegend', '#GKLegendStudio', '#SomaliHeritage', '#ViralVideo',
@@ -31,9 +35,31 @@ const THEME_BANK = [
   { title: 'Nothing Like the Original 💫', capture: '💫 Authentic, unmistakable, unforgettable. GK Legend Studio at its core.' },
 ];
 
-let recentThemeTitles = [];
+// Persisted to disk (not just kept in memory) so a script restart -- the
+// Mac sleeping, launchd restarting the agent -- can't reset this and let two
+// videos in a row land on the same fallback theme, which is exactly what
+// caused two duplicate-looking posts on 15 Sep 2026 (two pairs of videos
+// both got byte-identical "Where Culture Meets Craft"/"Roots Run Deep"
+// captions right after a restart wiped the in-memory history).
+function loadRecentThemeTitles() {
+  try {
+    const state = JSON.parse(fs.readFileSync(THEME_STATE_PATH, 'utf8'));
+    return Array.isArray(state.recentThemeTitles) ? state.recentThemeTitles : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveRecentThemeTitles(titles) {
+  try {
+    fs.writeFileSync(THEME_STATE_PATH, JSON.stringify({ recentThemeTitles: titles }, null, 2));
+  } catch (err) {
+    console.log(`Could not persist theme caption state: ${err.message}`);
+  }
+}
 
 function pickUnusedTheme() {
+  const recentThemeTitles = loadRecentThemeTitles();
   const available = THEME_BANK.filter((t) => !recentThemeTitles.includes(t.title));
   const pool = available.length ? available : THEME_BANK;
   const pick = pool[Math.floor(Math.random() * pool.length)];
@@ -41,6 +67,7 @@ function pickUnusedTheme() {
   if (recentThemeTitles.length > Math.floor(THEME_BANK.length / 2)) {
     recentThemeTitles.shift();
   }
+  saveRecentThemeTitles(recentThemeTitles);
   return pick;
 }
 
