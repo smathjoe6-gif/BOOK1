@@ -2,9 +2,11 @@ import fetch from 'node-fetch';
 import { config } from './config.js';
 
 const OMNIROUTE_URL = 'http://localhost:20128/v1/chat/completions';
-const TIMEOUT_MS = 15000;
+const TIMEOUT_MS = 25000;
+const MAX_ATTEMPTS = 3;
+const RETRY_DELAY_MS = 3000;
 
-async function askAI(systemPrompt, userPrompt) {
+async function requestOnce(systemPrompt, userPrompt) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
@@ -36,6 +38,30 @@ async function askAI(systemPrompt, userPrompt) {
   } finally {
     clearTimeout(timeout);
   }
+}
+
+// OmniRoute already routes across whichever AI providers Joe has connected
+// on his end -- "model: auto" picks one of them per request. A single failed
+// attempt here (Mac just waking up, a provider cold-starting, one dropped
+// connection) shouldn't immediately give up and fall back to a canned
+// template, since a retry a few seconds later -- possibly landing on a
+// different provider via "auto" -- often succeeds. So this retries a couple
+// of times before finally giving the caller (autoCaption.js, the reply
+// pipeline) a chance to fall back.
+async function askAI(systemPrompt, userPrompt) {
+  let lastErr;
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    try {
+      return await requestOnce(systemPrompt, userPrompt);
+    } catch (err) {
+      lastErr = err;
+      if (attempt < MAX_ATTEMPTS) {
+        console.log(`OmniRoute attempt ${attempt}/${MAX_ATTEMPTS} failed (${err.message}), retrying...`);
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS * attempt));
+      }
+    }
+  }
+  throw lastErr;
 }
 
 const CAPTION_SYSTEM_PROMPT = `You are the social media voice of "GK Legend Studio," a brand celebrating Somali heritage and culture through short videos. Write warm, punchy, on-brand copy with real emotion -- one or two emoji, never robotic or repetitive-sounding. Never include hashtags in your response.`;
