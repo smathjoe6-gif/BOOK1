@@ -8,6 +8,7 @@
     "canva-auth": "node src/canvaAuth.js",
     "pinterest-auth": "node src/pinterestAuth.js",
     "organize-covers": "node src/organizeCoverPool.js",
+    "organize-drive-root": "node src/organizeDriveRoot.js",
     "start": "node src/index.js"
   },
   "dependencies": {
