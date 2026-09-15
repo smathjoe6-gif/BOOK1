@@ -69,9 +69,11 @@ call site goes through one function, `getCoverImage(auth, title)` in
    any tool, exported by hand, no Canva API/OAuth needed. Each time a video
    needs a cover, the script takes the oldest untouched image in that
    folder, makes it publicly viewable, and moves it into the folder's
-   `Used` subfolder (id `12zc1JcJkeYfoG6oc_9CCwkrqHnvjUfSe`) so it's never
-   handed out twice. Config: `COVER_POOL_FOLDER_ID`/`COVER_POOL_USED_FOLDER_ID`
-   in `.env`, already defaulted to those two IDs.
+   `Done` subfolder (id `12zc1JcJkeYfoG6oc_9CCwkrqHnvjUfSe`, matching the
+   `DONE_FOLDER_ID`/`GK_JING_DONE` naming used everywhere else in this
+   pipeline) so it's never handed out twice. Config:
+   `COVER_POOL_FOLDER_ID`/`COVER_POOL_DONE_FOLDER_ID` in `.env`, already
+   defaulted to those two IDs.
 2. **The Canva API (`src/canvaCover.js`) — the advanced, fully-automatic
    option.** Only used if the pool is empty. Autofills a Canva **brand
    template** (`CANVA_BRAND_TEMPLATE_ID`) with the video's title, exports a

@@ -6,10 +6,12 @@ import { config } from './config.js';
 // needed) straight into COVER_POOL_FOLDER_ID in Drive. Each call here takes
 // the oldest untouched image, makes it publicly viewable the same way
 // uploadPublicImage() does for Canva-API covers, and moves it into the
-// pool's "Used" subfolder so the same image never gets assigned twice.
-// Returns its public view URL, or null if the pool is currently empty.
+// pool's "Done" subfolder (matching the DONE_FOLDER_ID/GK_JING_DONE naming
+// used everywhere else in this pipeline) so the same image never gets
+// assigned twice. Returns its public view URL, or null if the pool is
+// currently empty.
 export async function pickFromCoverPool(auth) {
-  if (!config.coverPoolFolderId || !config.coverPoolUsedFolderId) return null;
+  if (!config.coverPoolFolderId || !config.coverPoolDoneFolderId) return null;
 
   const drive = google.drive({ version: 'v3', auth });
   const res = await drive.files.list({
@@ -28,7 +30,7 @@ export async function pickFromCoverPool(auth) {
   });
   await drive.files.update({
     fileId: file.id,
-    addParents: config.coverPoolUsedFolderId,
+    addParents: config.coverPoolDoneFolderId,
     removeParents: config.coverPoolFolderId,
     fields: 'id, parents',
   });
