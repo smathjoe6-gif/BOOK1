@@ -21,7 +21,44 @@ const THEME_BANK = [
   { title: 'Crafted With Purpose 🔥', capture: '🔥 Passion, precision, and pride. GK Legend Studio delivers.' },
   { title: 'The Legend Continues 👑', capture: '👑 The story doesn\'t stop here. GK Legend Studio keeps building the legacy.' },
   { title: 'Roots Run Deep 🌿', capture: '🌿 Deep roots, bold vision. GK Legend Studio honors both.' },
+  { title: 'Somewhere Between Then and Now ⏳', capture: '⏳ The past and the present, in one frame. GK Legend Studio bridges both.' },
+  { title: 'This Is How Legends Are Made 🎬', capture: '🎬 Behind every legend is a moment like this one. GK Legend Studio captures it.' },
+  { title: 'Held Together by Heritage 🧵', capture: '🧵 Every thread, every note, every step — woven into who we are. GK Legend Studio.' },
+  { title: 'Straight From the Source 🌍', capture: '🌍 No filter needed when the story is this real. GK Legend Studio brings it to you.' },
+  { title: 'A Piece of the Legacy 🕊️', capture: '🕊️ Some things are made to be remembered. GK Legend Studio keeps them alive.' },
+  { title: 'Built to Be Remembered 🏆', capture: '🏆 Legends aren\'t made overnight — they\'re built, frame by frame. GK Legend Studio.' },
+  { title: 'The Story Behind the Story 🎙️', capture: '🎙️ There\'s always more beneath the surface. GK Legend Studio tells it all.' },
+  { title: 'Nothing Like the Original 💫', capture: '💫 Authentic, unmistakable, unforgettable. GK Legend Studio at its core.' },
 ];
+
+let recentThemeTitles = [];
+
+function pickUnusedTheme() {
+  const available = THEME_BANK.filter((t) => !recentThemeTitles.includes(t.title));
+  const pool = available.length ? available : THEME_BANK;
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  recentThemeTitles.push(pick.title);
+  if (recentThemeTitles.length > Math.floor(THEME_BANK.length / 2)) {
+    recentThemeTitles.shift();
+  }
+  return pick;
+}
+
+const CAPTION_TAIL_BANK = [
+  'Real sound, real story, real legacy.',
+  'This is what GK Legend Studio stands for.',
+  'Another piece of the legacy, captured for you.',
+  'Heritage told the way it deserves to be told.',
+  'GK Legend Studio brings you the real thing.',
+  'Every frame here means something.',
+  'Made to be watched, made to be remembered.',
+];
+
+const EMOJI_BANK = ['✨', '🌅', '🎬', '👑', '🌿', '🔥', '📖', '🕊️'];
+
+function pickOne(bank) {
+  return bank[Math.floor(Math.random() * bank.length)];
+}
 
 function isGenericIdFilename(filename) {
   return /^(grok-video-[0-9a-f-]+|grok-auto-\d+)\.[a-zA-Z0-9]+$/i.test(filename);
@@ -39,8 +76,17 @@ function cleanFilenameToTitle(filename) {
   let name = filename.replace(/\.[^/.]+$/, '');
   name = name.replace(/_(\d{6,})(_\d+)?$/, '');
   name = name.replace(/_\d+$/, '');
-  name = name.replace(/[_\-]+/g, ' ').trim();
-  return titleCase(name) || 'GK Legend Studio Video';
+  name = name.replace(/\b(4k|2k|1080p|720p|480p|360p)\b/gi, '');
+  name = name.replace(/[_\-]+/g, ' ').replace(/\s+/g, ' ').trim();
+  return titleCase(name);
+}
+
+// A cleaned filename with 1 word or fewer (e.g. "gk_1080p_20260915030604.mp4"
+// -> "Gk" once the resolution/timestamp are stripped) carries no real
+// descriptive content -- there's nothing useful to build a title from, so
+// treat it the same as a generic grok-video-<uuid> filename.
+function isTooGenericForTitle(cleanedTitle) {
+  return cleanedTitle.split(' ').filter(Boolean).length <= 1;
 }
 
 export function isLikelyDuplicateVariant(filename) {
@@ -48,7 +94,7 @@ export function isLikelyDuplicateVariant(filename) {
 }
 
 export function randomThemedCaption() {
-  const pick = THEME_BANK[Math.floor(Math.random() * THEME_BANK.length)];
+  const pick = pickUnusedTheme();
   return { title: pick.title, capture: pick.capture, hashtag: pickRandomHashtags(6) };
 }
 
@@ -67,7 +113,18 @@ export async function generateCaption(filename) {
     return { ...randomThemedCaption(), hashtag };
   }
 
-  const title = cleanFilenameToTitle(filename);
-  const capture = `✨ ${title} — brought to you by GK Legend Studio. Real sound, real story, real legacy.`;
+  const cleaned = cleanFilenameToTitle(filename);
+  if (isTooGenericForTitle(cleaned)) {
+    return { ...randomThemedCaption(), hashtag };
+  }
+
+  // The filename itself has real descriptive words worth keeping (e.g. "Two
+  // Women Sharing Tea") -- so dress it up with an emoji and a rotating brand
+  // line instead of ever posting the raw cleaned filename verbatim, or the
+  // exact same boilerplate sentence, as the title/caption.
+  const emoji = pickOne(EMOJI_BANK);
+  const tail = pickOne(CAPTION_TAIL_BANK);
+  const title = `${cleaned} ${emoji}`;
+  const capture = `${emoji} ${cleaned} — ${tail}`;
   return { title, capture, hashtag };
 }
