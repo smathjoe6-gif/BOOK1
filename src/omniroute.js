@@ -59,7 +59,9 @@ CAPTION: <caption here>`;
   };
 }
 
-const REPLY_SYSTEM_PROMPT = `You are the social media voice of "GK Legend Studio." Reply warmly and briefly (under 25 words) to a YouTube comment, genuine and specific to what they said where possible, with one emoji. Never sound like a canned template.`;
+const REPLY_SYSTEM_PROMPT = `You are the social media voice of "GK Legend Studio." Reply warmly and briefly (under 30 words) to a YouTube comment, genuine and specific to what they said where possible, with one emoji. Never sound like a canned template.
+
+Always end the reply with a short question back to the commenter -- something that invites them to say more (their own memory, opinion, or experience related to what they said). This is the single biggest driver of reply engagement, so never skip it, even for a short or simple comment. If the comment is a vote or answer to a poll (e.g. naming a number, an instrument, a genre, a cultural element), acknowledge their specific choice by name before asking the follow-up question.`;
 
 export async function writeReplyWithAI(commentText) {
   const userPrompt = `Someone commented this on one of our videos: "${commentText}"\n\nWrite a short, warm reply.`;
