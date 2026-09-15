@@ -60,26 +60,33 @@ Pinterest cover images section below.
 There's a real, already-built pipeline for giving each video its own unique
 Pinterest cover instead of reusing one of 4 generic branded templates. Every
 call site goes through one function, `getCoverImage(auth, title)` in
-`src/coverImage.js`, which tries two sources in order:
+`src/coverImage.js`.
 
-1. **The manual pool (`src/coverPool.js`) — the simple option, zero setup.**
-   Joe drops finished cover images straight into the Drive folder
-   `GK_Pinterest_Covers` (id `1_2dyzrmG9wr_F67mKUHLIPOMczP2XgRl`, created
-   15 Sep 2026, sits next to GK_JING/GK_TERMINAL under `02_Brand_Assets`) —
-   any tool, exported by hand, no Canva API/OAuth needed. Each time a video
-   needs a cover, the script takes the oldest untouched image in that
-   folder, makes it publicly viewable, and moves it into the folder's
-   `Done` subfolder (id `12zc1JcJkeYfoG6oc_9CCwkrqHnvjUfSe`, matching the
-   `DONE_FOLDER_ID`/`GK_JING_DONE` naming used everywhere else in this
-   pipeline) so it's never handed out twice. Config:
-   `COVER_POOL_FOLDER_ID`/`COVER_POOL_DONE_FOLDER_ID` in `.env`, already
-   defaulted to those two IDs.
-2. **The Canva API (`src/canvaCover.js`) — the advanced, fully-automatic
-   option.** Only used if the pool is empty. Autofills a Canva **brand
-   template** (`CANVA_BRAND_TEMPLATE_ID`) with the video's title, exports a
-   PNG, uploads it to `PINTEREST_COVERS_FOLDER_ID`. Needs
-   `CANVA_CLIENT_ID`/`CANVA_CLIENT_SECRET` and a one-time OAuth login
-   (`src/canvaAuth.js`) — if that's not set up, this step is just skipped.
+**The intended flow (Joe's actual plan):** Joe drops a raw/source **photo**
+(no design needed) into the manual pool — the Drive folder
+`GK_Pinterest_Covers` (id `1_2dyzrmG9wr_F67mKUHLIPOMczP2XgRl`, created
+15 Sep 2026, sits next to GK_JING/GK_TERMINAL under `02_Brand_Assets`).
+`src/coverPool.js` downloads the oldest untouched photo and moves the Drive
+original into the folder's `Done` subfolder (id
+`12zc1JcJkeYfoG6oc_9CCwkrqHnvjUfSe`, matching the `DONE_FOLDER_ID`/
+`GK_JING_DONE` naming used everywhere else in this pipeline) so it's never
+picked twice. That photo then gets run through the **Canva brand template**
+(`src/canvaCover.js`) — autofilling both the title text field
+(`CANVA_TITLE_FIELD`) and an image placeholder field (`CANVA_IMAGE_FIELD`)
+in the same autofill call, via Canva's asset-upload API — producing one
+polished, on-brand, titled Pinterest cover per video instead of a raw photo
+or a generic template. Requires `CANVA_CLIENT_ID`/`CANVA_CLIENT_SECRET`, a
+one-time OAuth login (`src/canvaAuth.js`), `CANVA_BRAND_TEMPLATE_ID`, and
+the brand template having **both** a title field and an image field tagged
+as data fields (Canva's "Bulk create" app, same process for each).
+
+**Fallbacks if any of that isn't set up yet** (so this never blocks
+posting): a dropped photo with Canva not configured (or a Canva run that
+fails) just gets used as the cover directly, as-is. No photo in the pool at
+all falls back to text-only Canva autofill (the original, simpler version
+of this feature) if `CANVA_BRAND_TEMPLATE_ID` is set. Neither available ->
+`getCoverImage()` returns `''` and Make's generic 4-image rotation is used
+instead — not a bug, just nothing to work with yet.
 
 Whichever source wins, the resulting link gets written into **column G** of
 the caption sheet (`appendGeneratedRow`/`updateCoverImage` in `src/sheets.js`)

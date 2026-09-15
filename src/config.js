@@ -24,13 +24,21 @@ export const config = {
   canvaClientSecret: process.env.CANVA_CLIENT_SECRET || '',
   canvaBrandTemplateId: process.env.CANVA_BRAND_TEMPLATE_ID || '',
   canvaTitleField: process.env.CANVA_TITLE_FIELD || 'title',
+  // The data field name for an image placeholder in the brand template
+  // (tagged the same way as canvaTitleField, via Canva's "Bulk create" app)
+  // -- only needed if feeding a raw photo from the manual cover pool
+  // through Canva (see src/coverPool.js + src/coverImage.js). Leave blank
+  // to skip this and only autofill the title text.
+  canvaImageField: process.env.CANVA_IMAGE_FIELD || '',
   pinterestCoversFolderId: process.env.PINTEREST_COVERS_FOLDER_ID || '',
-  // Manual cover-image pool (see src/coverPool.js) -- Joe drops finished
-  // cover images into this folder himself (any tool, exported by hand, no
-  // Canva API/OAuth needed), and the script assigns the oldest untouched one
-  // to each video that needs a cover, moving it into the "Done" subfolder
-  // afterward. Defaults to the folder pair created 15 Sep 2026 so this works
-  // with zero setup; override here only if Joe wants to point it elsewhere.
+  // Manual cover-image pool (see src/coverPool.js) -- Joe drops a raw/source
+  // image into this folder himself (a photo, no design needed), and the
+  // script feeds it through the Canva brand template above (if configured)
+  // to render a polished, titled Pinterest cover -- or, if Canva isn't set
+  // up, just uses the dropped image as-is. Either way the used image moves
+  // into the "Done" subfolder afterward so it's never picked twice.
+  // Defaults to the folder pair created 15 Sep 2026 so this works with zero
+  // setup; override here only if Joe wants to point it elsewhere.
   coverPoolFolderId: process.env.COVER_POOL_FOLDER_ID || '1_2dyzrmG9wr_F67mKUHLIPOMczP2XgRl',
   coverPoolDoneFolderId: process.env.COVER_POOL_DONE_FOLDER_ID || '12zc1JcJkeYfoG6oc_9CCwkrqHnvjUfSe',
   // The Make.com side's own done folder (GK_JING_DONE) -- mirroring needs to

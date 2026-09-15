@@ -24,29 +24,71 @@ async function pollJob(url, headers, extractStatus, extractResult, label) {
   throw new Error(`Canva ${label} job timed out after 60 seconds`);
 }
 
+// Uploads a local image to Canva as an asset (for autofilling an image
+// placeholder field) and waits for it to finish processing. Returns the
+// asset ID.
+async function uploadAsset(localPath, authHeader) {
+  const fileBuffer = fs.readFileSync(localPath);
+  const metadata = Buffer.from(JSON.stringify({ name: `pool-cover-${Date.now()}` })).toString('base64');
+
+  const res = await fetch(`${API_BASE}/asset-uploads`, {
+    method: 'POST',
+    headers: {
+      ...authHeader,
+      'Content-Type': 'application/octet-stream',
+      'Asset-Upload-Metadata': metadata,
+    },
+    body: fileBuffer,
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(`Canva asset upload failed: ${data.error?.message || res.status}`);
+  }
+
+  return pollJob(
+    `${API_BASE}/asset-uploads/${data.job.id}`,
+    authHeader,
+    (d) => d.job?.status,
+    (d) => d.job.asset.id,
+    'asset upload'
+  );
+}
+
 // Generates a unique Pinterest cover image for one video by autofilling the
-// configured brand template's title field, then exporting it as a PNG.
-// Returns a local file path. Callers are responsible for deleting it and for
-// re-hosting it somewhere permanent -- Canva's own export links expire.
-export async function generateCoverImage(title) {
+// configured brand template's title field (and, if sourceImagePath is
+// given, its image placeholder field too -- e.g. a raw photo Joe dropped
+// into the manual cover pool, run through the template to get a polished,
+// titled design instead of using the raw photo as-is), then exporting the
+// result as a PNG. Returns a local file path. Callers are responsible for
+// deleting it and for re-hosting it somewhere permanent -- Canva's own
+// export links expire.
+export async function generateCoverImage(title, sourceImagePath) {
   if (!config.canvaBrandTemplateId) {
     throw new Error('CANVA_BRAND_TEMPLATE_ID is not set -- run the Bulk create/brand template setup in Canva first.');
   }
 
   const accessToken = await getCanvaAccessToken();
-  const headers = {
-    Authorization: `Bearer ${accessToken}`,
-    'Content-Type': 'application/json',
+  const authHeader = { Authorization: `Bearer ${accessToken}` };
+  const headers = { ...authHeader, 'Content-Type': 'application/json' };
+
+  const data = {
+    [config.canvaTitleField]: { type: 'text', text: title },
   };
+
+  if (sourceImagePath) {
+    if (!config.canvaImageField) {
+      throw new Error('CANVA_IMAGE_FIELD is not set -- tag an image placeholder as a data field in the brand template first.');
+    }
+    const assetId = await uploadAsset(sourceImagePath, authHeader);
+    data[config.canvaImageField] = { type: 'image', asset_id: assetId };
+  }
 
   const autofillRes = await fetch(`${API_BASE}/autofills`, {
     method: 'POST',
     headers,
     body: JSON.stringify({
       brand_template_id: config.canvaBrandTemplateId,
-      data: {
-        [config.canvaTitleField]: { type: 'text', text: title },
-      },
+      data,
     }),
   });
   const autofillData = await autofillRes.json();
