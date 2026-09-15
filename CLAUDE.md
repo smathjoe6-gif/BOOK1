@@ -55,38 +55,50 @@ Pinterest cover images section below.
   this rarely needs manual attention. This routine only ever writes text
   (columns A/D/E/F) — it never touches column G.
 
-## Pinterest cover images (per-video, via Canva)
+## Pinterest cover images (per-video)
 
 There's a real, already-built pipeline for giving each video its own unique
-Pinterest cover instead of reusing one of 4 generic branded templates:
+Pinterest cover instead of reusing one of 4 generic branded templates. Every
+call site goes through one function, `getCoverImage(auth, title)` in
+`src/coverImage.js`, which tries two sources in order:
 
-- `src/canvaCover.js` autofills a Canva **brand template** (`CANVA_BRAND_TEMPLATE_ID`
-  in `.env`) with the video's title, exports it as a PNG.
-- The script uploads that PNG to a Google Drive folder (`PINTEREST_COVERS_FOLDER_ID`
-  in `.env` — this is "the folder for the images" Joe sets up in Drive) so it
-  gets a stable, permanent link (Canva's own export links expire after a few
-  hours).
-- That link gets written into **column G** of the caption sheet
-  (`appendGeneratedRow`/`updateCoverImage` in `src/sheets.js`) — for GK_TERMINAL
-  videos processed by `processVideo()`, for GK_JING videos processed by
-  `backfillGkJingCaptions()` (also fills in column G on a row that already
-  has a caption but is still missing a cover, e.g. one the hourly Claude
-  Code caption routine wrote — that routine only writes text, never a cover).
-- **Make's scenario reads column G too** (the "Create Pinterest Video Pin"
-  step's `cover_image_url` field, both the main path and its retry twin) —
-  `{{ifempty(<row>.`7`; <4-image day-of-month rotation>)}}`. So: a unique
-  cover if column G has one, otherwise the generic rotation as a fallback.
-  **This field literally broke once already** (it was pointing at field `6`
-  — the Hashtag column — instead of field `7`, so it silently never found a
-  real cover and always fell back to the generic rotation even when Canva
-  had generated one). Fixed 15 Sep 2026 — if Pinterest covers ever look
-  wrong/repetitive again, check this field first before assuming the bug is
-  back.
-- None of this runs without `CANVA_CLIENT_ID`/`CANVA_CLIENT_SECRET` (from
-  canva.com/developers) and a one-time Canva OAuth login on Joe's Mac
-  (`src/canvaAuth.js`) — if those aren't set up yet, everything above stays
-  a no-op and every Pinterest pin just uses the generic rotation, which is
-  not a bug.
+1. **The manual pool (`src/coverPool.js`) — the simple option, zero setup.**
+   Joe drops finished cover images straight into the Drive folder
+   `GK_Pinterest_Covers` (id `1_2dyzrmG9wr_F67mKUHLIPOMczP2XgRl`, created
+   15 Sep 2026, sits next to GK_JING/GK_TERMINAL under `02_Brand_Assets`) —
+   any tool, exported by hand, no Canva API/OAuth needed. Each time a video
+   needs a cover, the script takes the oldest untouched image in that
+   folder, makes it publicly viewable, and moves it into the folder's
+   `Used` subfolder (id `12zc1JcJkeYfoG6oc_9CCwkrqHnvjUfSe`) so it's never
+   handed out twice. Config: `COVER_POOL_FOLDER_ID`/`COVER_POOL_USED_FOLDER_ID`
+   in `.env`, already defaulted to those two IDs.
+2. **The Canva API (`src/canvaCover.js`) — the advanced, fully-automatic
+   option.** Only used if the pool is empty. Autofills a Canva **brand
+   template** (`CANVA_BRAND_TEMPLATE_ID`) with the video's title, exports a
+   PNG, uploads it to `PINTEREST_COVERS_FOLDER_ID`. Needs
+   `CANVA_CLIENT_ID`/`CANVA_CLIENT_SECRET` and a one-time OAuth login
+   (`src/canvaAuth.js`) — if that's not set up, this step is just skipped.
+
+Whichever source wins, the resulting link gets written into **column G** of
+the caption sheet (`appendGeneratedRow`/`updateCoverImage` in `src/sheets.js`)
+— for GK_TERMINAL videos via `processVideo()`, for GK_JING videos via
+`backfillGkJingCaptions()` (also fills in column G on a row that already has
+a caption but is still missing a cover, e.g. one the hourly Claude Code
+caption routine wrote — that routine only ever writes text, never a cover).
+
+**Make's scenario reads column G too** (the "Create Pinterest Video Pin"
+step's `cover_image_url` field, both the main path and its retry twin) —
+`{{ifempty(<row>.`7`; <4-image day-of-month rotation>)}}`. So: a unique
+cover if column G has one, otherwise the generic rotation as a fallback.
+**This field literally broke once already** (it was pointing at field `6`
+— the Hashtag column — instead of field `7`, so it silently never found a
+real cover and always fell back to the generic rotation even when a cover
+existed). Fixed 15 Sep 2026 — if Pinterest covers ever look wrong/repetitive
+again, check this field first before assuming the bug is back.
+
+If neither source has anything available, `getCoverImage()` returns an empty
+string and everything above is a no-op — Pinterest pins just use the
+generic 4-image rotation, which is expected, not a bug.
 
 ## Why two systems instead of one
 

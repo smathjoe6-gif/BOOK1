@@ -25,6 +25,14 @@ export const config = {
   canvaBrandTemplateId: process.env.CANVA_BRAND_TEMPLATE_ID || '',
   canvaTitleField: process.env.CANVA_TITLE_FIELD || 'title',
   pinterestCoversFolderId: process.env.PINTEREST_COVERS_FOLDER_ID || '',
+  // Manual cover-image pool (see src/coverPool.js) -- Joe drops finished
+  // cover images into this folder himself (any tool, exported by hand, no
+  // Canva API/OAuth needed), and the script assigns the oldest untouched one
+  // to each video that needs a cover, moving it into the "Used" subfolder
+  // afterward. Defaults to the folder pair created 15 Sep 2026 so this works
+  // with zero setup; override here only if Joe wants to point it elsewhere.
+  coverPoolFolderId: process.env.COVER_POOL_FOLDER_ID || '1_2dyzrmG9wr_F67mKUHLIPOMczP2XgRl',
+  coverPoolUsedFolderId: process.env.COVER_POOL_USED_FOLDER_ID || '12zc1JcJkeYfoG6oc_9CCwkrqHnvjUfSe',
   // The Make.com side's own done folder (GK_JING_DONE) -- mirroring needs to
   // know about it too, otherwise a video that's already finished on one side
   // and moved to its done folder looks "missing" to the still-pending other

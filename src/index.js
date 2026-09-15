@@ -2,11 +2,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { config } from './config.js';
 import { loadOAuthClient } from './googleAuth.js';
-import { listNewVideos, listVideosInFolder, downloadFile, moveToDone, mirrorNewVideos, uploadPublicImage } from './drive.js';
+import { listNewVideos, listVideosInFolder, downloadFile, moveToDone, mirrorNewVideos } from './drive.js';
 import { findRowForFile, appendGeneratedRow, updateCoverImage } from './sheets.js';
 import { uploadToYouTube, postEngagementComment } from './youtube.js';
 import { generateCaption, isLikelyDuplicateVariant } from './autoCaption.js';
-import { generateCoverImage } from './canvaCover.js';
+import { getCoverImage } from './coverImage.js';
 import { replyToNewComments } from './comments.js';
 import { uploadToTikTok } from './tiktok.js';
 import { loadTikTokToken } from './tiktokAuth.js';
@@ -65,19 +65,10 @@ async function processVideo(file) {
     // falls back to its generic rotating template cover instead of a
     // unique one.
     let coverImageUrl = '';
-    if (config.canvaBrandTemplateId) {
-      try {
-        const localCoverPath = await generateCoverImage(generated.title);
-        coverImageUrl = await uploadPublicImage(
-          auth,
-          localCoverPath,
-          `pin-cover-${Date.now()}.png`,
-          config.pinterestCoversFolderId
-        );
-        fs.unlink(localCoverPath, () => {});
-      } catch (err) {
-        console.error(`Could not generate a Pinterest cover image for "${file.name}" (falling back to Make's default rotation):`, err.message);
-      }
+    try {
+      coverImageUrl = await getCoverImage(auth, generated.title);
+    } catch (err) {
+      console.error(`Could not get a Pinterest cover image for "${file.name}" (falling back to Make's default rotation):`, err.message);
     }
 
     try {
@@ -156,19 +147,10 @@ async function processVideo(file) {
         console.log('Posting to Pinterest...');
         try {
           let coverImageUrl;
-          if (config.canvaBrandTemplateId) {
-            try {
-              const localCoverPath = await generateCoverImage(row.title);
-              coverImageUrl = await uploadPublicImage(
-                auth,
-                localCoverPath,
-                `pin-cover-${Date.now()}.png`,
-                config.pinterestCoversFolderId
-              );
-              fs.unlink(localCoverPath, () => {});
-            } catch (err) {
-              console.error('Could not generate a Pinterest cover image (posting without one):', err.message);
-            }
+          try {
+            coverImageUrl = await getCoverImage(auth, row.title);
+          } catch (err) {
+            console.error('Could not get a Pinterest cover image (posting without one):', err.message);
           }
           const pin = await uploadToPinterest({ filePath: localPath, title: row.title, description: caption, coverImageUrl });
           console.log(`Pinterest: posted, pin id ${pin.id}`);
@@ -215,20 +197,15 @@ async function backfillGkJingCaptions() {
         // Pinterest cover image. Without this, that row's blank column G stays blank
         // forever, since nothing else ever revisits an existing row, and Pinterest
         // just falls back to the same generic rotating cover every time.
-        if (!row.coverImageUrl && config.canvaBrandTemplateId) {
+        if (!row.coverImageUrl) {
           try {
-            const localCoverPath = await generateCoverImage(row.title);
-            const coverImageUrl = await uploadPublicImage(
-              auth,
-              localCoverPath,
-              `pin-cover-${Date.now()}.png`,
-              config.pinterestCoversFolderId
-            );
-            fs.unlink(localCoverPath, () => {});
-            await updateCoverImage(auth, row.rowNumber, coverImageUrl);
-            console.log(`GK_JING: added a unique Pinterest cover image for "${file.name}" (caption already existed).`);
+            const coverImageUrl = await getCoverImage(auth, row.title);
+            if (coverImageUrl) {
+              await updateCoverImage(auth, row.rowNumber, coverImageUrl);
+              console.log(`GK_JING: added a unique Pinterest cover image for "${file.name}" (caption already existed).`);
+            }
           } catch (err) {
-            console.error(`Could not generate a Pinterest cover image for "${file.name}" (leaving it on the fallback rotation):`, err.message);
+            console.error(`Could not get a Pinterest cover image for "${file.name}" (leaving it on the fallback rotation):`, err.message);
           }
         }
         continue;
@@ -239,19 +216,10 @@ async function backfillGkJingCaptions() {
       const generated = await generateCaption(file.name);
 
       let coverImageUrl = '';
-      if (config.canvaBrandTemplateId) {
-        try {
-          const localCoverPath = await generateCoverImage(generated.title);
-          coverImageUrl = await uploadPublicImage(
-            auth,
-            localCoverPath,
-            `pin-cover-${Date.now()}.png`,
-            config.pinterestCoversFolderId
-          );
-          fs.unlink(localCoverPath, () => {});
-        } catch (err) {
-          console.error(`Could not generate a Pinterest cover image for "${file.name}" (falling back to Make's default rotation):`, err.message);
-        }
+      try {
+        coverImageUrl = await getCoverImage(auth, generated.title);
+      } catch (err) {
+        console.error(`Could not get a Pinterest cover image for "${file.name}" (falling back to Make's default rotation):`, err.message);
       }
 
       await appendGeneratedRow(auth, file.name, generated, coverImageUrl);
