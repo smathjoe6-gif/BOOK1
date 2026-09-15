@@ -40,14 +40,60 @@ async function requestOnce(systemPrompt, userPrompt) {
   }
 }
 
+const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
+const ANTHROPIC_TIMEOUT_MS = 25000;
+
+// Hard backup that doesn't go through OmniRoute at all -- called directly
+// over the network, so it works even when OmniRoute itself isn't running on
+// Joe's Mac (app closed, Mac asleep), not just when a connected provider is
+// briefly unreachable. Only used if ANTHROPIC_API_KEY is set.
+async function askAnthropic(systemPrompt, userPrompt) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), ANTHROPIC_TIMEOUT_MS);
+
+  try {
+    const res = await fetch(ANTHROPIC_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': config.anthropicApiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: config.anthropicModel,
+        max_tokens: 300,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }],
+      }),
+      signal: controller.signal,
+    });
+
+    if (!res.ok) {
+      const body = await res.text().catch(() => '');
+      throw new Error(`Anthropic API returned ${res.status}: ${body.slice(0, 200)}`);
+    }
+
+    const data = await res.json();
+    const text = data.content?.[0]?.text?.trim();
+    if (!text) throw new Error('Anthropic API gave an empty response');
+    return text;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 // OmniRoute already routes across whichever AI providers Joe has connected
 // on his end -- "model: auto" picks one of them per request. A single failed
 // attempt here (Mac just waking up, a provider cold-starting, one dropped
 // connection) shouldn't immediately give up and fall back to a canned
 // template, since a retry a few seconds later -- possibly landing on a
 // different provider via "auto" -- often succeeds. So this retries a couple
-// of times before finally giving the caller (autoCaption.js, the reply
-// pipeline) a chance to fall back.
+// of times first. If OmniRoute is still down after that (most likely
+// because it isn't running at all, not a transient blip), and a direct
+// Anthropic key is configured, that's tried next as a hard backup that
+// doesn't depend on OmniRoute or the Mac app being open. Only if both fail
+// does the caller (autoCaption.js, the reply pipeline) fall back to its own
+// built-in templates.
 async function askAI(systemPrompt, userPrompt) {
   let lastErr;
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
@@ -61,6 +107,17 @@ async function askAI(systemPrompt, userPrompt) {
       }
     }
   }
+
+  if (config.anthropicApiKey) {
+    try {
+      console.log('OmniRoute exhausted, falling back to direct Anthropic call...');
+      return await askAnthropic(systemPrompt, userPrompt);
+    } catch (err) {
+      console.log(`Anthropic backup also failed (${err.message}), falling back to template.`);
+      lastErr = err;
+    }
+  }
+
   throw lastErr;
 }
 
