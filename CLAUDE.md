@@ -108,6 +108,77 @@ it's configured entirely in the Manychat dashboard and can't be checked or
 fixed from a coding session; ask Joe to check the Manychat dashboard
 directly if a reply isn't firing.
 
+## Brand & creative voice reference
+
+This is the current, authoritative brand guide — used for writing captions,
+video/song prompts, and any other GK Legend Studio copy. It replaces any
+older brand-brief document that mentioned Buffer, Zapier, Asana, or hosting
+things on an external storefront domain — none of that is part of this
+pipeline. If a routine or session turns up an old copy of that material,
+treat this section as the replacement.
+
+**Core philosophy** — GK Legend Studio doesn't just make posts or products,
+it curates artifacts: the bridge between Somali ancestral heritage (Alindi
+weaving, Kaban resonance) and a cinematic modern future. Cultural
+preservation through the work itself.
+
+**Visual identity** — high-contrast, cinematic, editorial (a documentary
+still, not an ad). Deep earth tones (ochre, gold, midnight black) balanced
+against future-forward metallic accents. Cultural anchors — Alindi
+textiles, Guntiino, Shabal — rendered with real specificity, never generic
+"African print" styling. The GK logo integrated organically into the frame,
+like a signature on a painting, not a watermark slapped on top.
+
+**Audio/music style** — Kaban (oud) as lead instrument, never a background
+prop: heavy, melancholic vibrato, microtonal slides. Traditional playing run
+through clean modern compression — intimate and high-fidelity, not lo-fi.
+Slow-attack synth pads underneath for warmth (the "Alindi" layering feel).
+Slow syncopated 6/8 or 4/4 groove, felt sub-bass, dry crisp snare. Vocals:
+breathy, vulnerable verses breaking into soaring, melismatic choruses —
+telling a story, not just singing. Space between phrases matters as much as
+the notes. Every track closes with a short, recognizable "audio logo" pluck
+identifying it as GK Legend Studio.
+
+**Post structure ("Heritage Drop")** — (1) The Hook: one evocative line
+that stops the scroll. (2) The Story: the artisan, material, or cultural
+significance. (3) The Vision: a line describing the visual/cinematic
+direction, for later asset generation. (4) The Call: invite the audience to
+*secure* or *join* — never "buy." (5) Footer (mandatory on every public
+post): copyright notice + channel link (see below).
+
+**Voice** — never "sell," always *invite*. Preferred CTA phrasing: "Secure
+a Piece of the Legacy." Warm, human, specific to the craft — if a draft
+reads corporate, rewrite it around the person/craft behind it. Never invent
+phonetic-sounding filler and call it "Somali" or "Benadiri" — if a real
+word or detail isn't known, ask rather than fabricate.
+
+**Mandatory footer on public content:**
+> © 2026 GK Legend Studio. All rights reserved.
+> https://www.youtube.com/@PathFoundGK
+
+**Generation safety valve** — never generate an actual image/video/audio
+asset based on this guide until Joe explicitly says "Generate now" or "Go."
+Everything before that is text/prompt refinement only.
+
+**Somali music reference (for grounding lyrics/captions in real tradition)**
+— two distinct traditions, don't conflate them:
+- *Banaadiri (Xamari)* — coastal Mogadishu tradition, Kaban-led, local
+  dialect. Reference artist: Axmed Shariif Killer (solo, reverent); duet
+  partner Siteey Maxamed Sheekh ("Qosol Wanaag") — signature duet "Qayr Iyo
+  Qasaaro."
+- *Pan-Somali Qaraami* — standard literary Somali, wider mainstream
+  tradition. Reference artist: Maxamed Saleebaan Tubeec — signature
+  "Hodan."
+
+Poetic meters: *Gabay* (long-form, 100+ lines, formal, deliberate — the
+prestige form) vs. *Geeraar* (short, urgent, high-energy, traditionally
+chanted on horseback — closer to a rap cadence).
+
+Practical rule: "Benadiri/soul" → Killer solo mode. "Back-and-forth
+Benadiri" → Killer + Qosol Wanaag duet dynamic. "Somali" (not Benadiri) →
+Tubeec-style Qaraami. "Gabay" → long and weighty. "Geeraar" → short and
+punchy.
+
 ## Other Google Drive folders in play
 
 - `GK_JING_DONE` — Make's done folder for IG/FB/Pinterest.
