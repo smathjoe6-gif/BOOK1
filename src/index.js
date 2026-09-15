@@ -13,6 +13,7 @@ import { loadTikTokToken } from './tiktokAuth.js';
 import { uploadToPinterest } from './pinterest.js';
 import { loadPinterestToken } from './pinterestAuth.js';
 import { maybeAutoGenerateVideo } from './autoGenerate.js';
+import { ensureVerticalVideo } from './aspectRatio.js';
 
 // Independent test rollout of Pinterest posting for GK_TERMINAL videos,
 // capped at config.pinterestDailyLimit attempts per day while Joe's new
@@ -87,7 +88,13 @@ async function processVideo(file) {
   }
 
   console.log(`Downloading...`);
-  const localPath = await downloadFile(auth, file.id, file.name);
+  let localPath = await downloadFile(auth, file.id, file.name);
+
+  try {
+    localPath = await ensureVerticalVideo(localPath);
+  } catch (err) {
+    console.error(`Could not check/convert "${file.name}" to vertical 9:16 (posting as-is):`, err.message);
+  }
 
   const caption = `${row.capture} ${row.hashtag}`.trim();
 
