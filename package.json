@@ -9,6 +9,8 @@
     "pinterest-auth": "node src/pinterestAuth.js",
     "organize-covers": "node src/organizeCoverPool.js",
     "organize-drive": "node src/organizeDriveDuplicates.js",
+    "organize-music": "node src/organizeMusicByLanguage.js",
+    "organize-videos": "node src/organizeVideosByOrientation.js",
     "start": "node src/index.js"
   },
   "dependencies": {
