@@ -24,7 +24,7 @@ async function hostAndCleanUp(auth, localPath) {
 // directly rather than losing it. Callers already treat a blank return as
 // "fall back to Make's generic rotation," so this always degrades safely.
 export async function getCoverImage(auth, title) {
-  const poolImagePath = await pickFromCoverPool(auth);
+  const poolImagePath = await pickFromCoverPool(auth, title);
 
   if (poolImagePath) {
     if (config.canvaBrandTemplateId && config.canvaImageField) {
