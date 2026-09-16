@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { config } from './config.js';
+import { findRowForFile } from './sheets.js';
 
 // Joe sometimes drops videos straight into a watched folder, and sometimes
 // into whatever subfolder happens to be open (out of habit from the old
@@ -104,6 +105,21 @@ export async function mirrorNewVideos(auth) {
 
   for (const file of own) {
     if (mirrorNames.has(file.name)) continue;
+    // Don't mirror a GK_TERMINAL video into GK_JING until it already has its
+    // caption + Pinterest cover row written. Make polls independently and
+    // can pick the video up the moment it appears in GK_JING -- if that
+    // happens before processVideo() has written column G (which can take a
+    // while, since it runs after the YouTube upload), Make falls back to
+    // its generic rotation cover, and since Pinterest pins don't update
+    // after publishing, that pin is stuck looking that way forever. Safer
+    // to wait: it'll mirror on a later cycle, once its row exists.
+    try {
+      const row = await findRowForFile(auth, file.name);
+      if (!row) continue;
+    } catch (err) {
+      console.error(`Could not check for a caption row for "${file.name}" (skipping mirroring it this cycle):`, err.message);
+      continue;
+    }
     try {
       await drive.files.copy({
         fileId: file.id,
