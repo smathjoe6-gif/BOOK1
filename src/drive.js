@@ -159,7 +159,17 @@ export async function uploadPublicImage(auth, localPath, fileName, folderId) {
     fileId: file.data.id,
     requestBody: { role: 'reader', type: 'anyone' },
   });
-  return `https://drive.google.com/uc?export=view&id=${file.data.id}`;
+  // NOT drive.google.com/uc?export=view -- that endpoint is built for a
+  // browser tab, and frequently serves an HTML "can't scan this file"
+  // interstitial instead of raw image bytes when a server (like Pinterest's
+  // own fetcher, not a person's browser) requests it directly. The
+  // ifempty() check in Make's blueprint only looks at whether this string
+  // is blank, so a technically-non-empty-but-unfetchable link like that
+  // slips through as "ready" and Pinterest is left with nothing usable --
+  // silently falling back to its own default rather than erroring loudly.
+  // The /thumbnail endpoint is built for exactly this (external, non-browser
+  // fetches) and reliably returns the actual image.
+  return `https://drive.google.com/thumbnail?id=${file.data.id}&sz=w1000`;
 }
 
 // Moves a file into the DONE folder once it's been posted everywhere.
