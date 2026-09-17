@@ -88,7 +88,7 @@ function pickOne(bank) {
 }
 
 function isGenericIdFilename(filename) {
-  return /^(grok-video-[0-9a-f-]+|grok-auto-\d+)\.[a-zA-Z0-9]+$/i.test(filename);
+  return /^(grok-video-[0-9a-f-]+|grok-auto-\d+)( \(\d+\))?\.[a-zA-Z0-9]+$/i.test(filename);
 }
 
 function titleCase(text) {
@@ -117,7 +117,10 @@ function isTooGenericForTitle(cleanedTitle) {
 }
 
 export function isLikelyDuplicateVariant(filename) {
-  return /_\d{1,2}\.[a-zA-Z0-9]+$/.test(filename);
+  // "_2.mp4" etc is how Joe names an intentional extra copy; " (1).mp4" etc
+  // is what Google Drive/macOS append automatically when a file with the
+  // same name already exists -- both mean "don't treat this as brand new."
+  return /_\d{1,2}\.[a-zA-Z0-9]+$/.test(filename) || / \(\d{1,2}\)\.[a-zA-Z0-9]+$/.test(filename);
 }
 
 export function randomThemedCaption() {
