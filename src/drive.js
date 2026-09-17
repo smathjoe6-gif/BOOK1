@@ -103,7 +103,14 @@ export async function mirrorNewVideos(auth) {
   const ownNames = new Set([...own, ...(ownDoneRes.data.files || [])].map((f) => f.name));
   const mirrorNames = new Set([...mirror, ...(mirrorDoneRes.data.files || [])].map((f) => f.name));
 
-  for (const file of own) {
+  // Candidates for the GK_TERMINAL -> GK_JING direction include GK_TERMINAL's
+  // own DONE folder, not just its current contents -- processVideo() writes
+  // the caption row and moves a video to DONE in the same step (right after
+  // YouTube succeeds), so a video is never simultaneously "still in
+  // GK_TERMINAL" and "has a row." Checking only `own` meant this direction
+  // could never find an eligible file and silently mirrored nothing, ever.
+  const ownMirrorCandidates = [...own, ...(ownDoneRes.data.files || [])];
+  for (const file of ownMirrorCandidates) {
     if (mirrorNames.has(file.name)) continue;
     // Don't mirror a GK_TERMINAL video into GK_JING until it already has its
     // caption + Pinterest cover row written. Make polls independently and
