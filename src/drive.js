@@ -5,16 +5,25 @@ import path from 'node:path';
 import { config } from './config.js';
 import { findRowForFile } from './sheets.js';
 
+// No timeout on any of these Drive API calls used to mean a stalled request
+// could hang the whole check cycle forever -- some of these (listing files)
+// run at the very start of every single cycle, so a hang here blocked
+// everything downstream too, not just one video.
+const API_TIMEOUT_MS = 30000;
+
 // Joe sometimes drops videos straight into a watched folder, and sometimes
 // into whatever subfolder happens to be open (out of habit from the old
 // Make.com setup) — so instead of watching one fixed subfolder, we look up
 // every subfolder under it each time and watch all of them too.
 async function listWatchedFolderIds(drive, rootFolderId) {
-  const res = await drive.files.list({
-    q: `'${rootFolderId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`,
-    fields: 'files(id)',
-    pageSize: 50,
-  });
+  const res = await drive.files.list(
+    {
+      q: `'${rootFolderId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`,
+      fields: 'files(id)',
+      pageSize: 50,
+    },
+    { timeout: API_TIMEOUT_MS }
+  );
   const subfolderIds = (res.data.files || []).map((f) => f.id);
   return [rootFolderId, ...subfolderIds];
 }
@@ -26,12 +35,15 @@ export async function listVideosInFolder(auth, rootFolderId) {
   const folderIds = await listWatchedFolderIds(drive, rootFolderId);
   const parentClause = folderIds.map((id) => `'${id}' in parents`).join(' or ');
 
-  const res = await drive.files.list({
-    q: `(${parentClause}) and mimeType contains 'video/' and trashed = false`,
-    fields: 'files(id, name, mimeType, createdTime)',
-    orderBy: 'createdTime',
-    pageSize: 50,
-  });
+  const res = await drive.files.list(
+    {
+      q: `(${parentClause}) and mimeType contains 'video/' and trashed = false`,
+      fields: 'files(id, name, mimeType, createdTime)',
+      orderBy: 'createdTime',
+      pageSize: 50,
+    },
+    { timeout: API_TIMEOUT_MS }
+  );
   return res.data.files || [];
 }
 
@@ -40,17 +52,39 @@ export async function listNewVideos(auth) {
   return listVideosInFolder(auth, config.driveFolderId);
 }
 
+// Every Drive stream download in this file used to have no time limit at
+// all -- a stalled connection mid-download would hang the whole check cycle
+// forever instead of failing and letting the next video through. This bounds
+// the WHOLE transfer (not just time-to-first-byte), destroying the stream on
+// timeout so the underlying request doesn't linger either.
+const DOWNLOAD_TIMEOUT_MS = 4 * 60 * 1000;
+
+export function pipeWithTimeout(readable, dest, timeoutMs = DOWNLOAD_TIMEOUT_MS) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      readable.destroy(new Error(`Download timed out after ${Math.round(timeoutMs / 1000)}s`));
+    }, timeoutMs);
+    readable
+      .on('end', () => {
+        clearTimeout(timer);
+        resolve();
+      })
+      .on('error', (err) => {
+        clearTimeout(timer);
+        reject(err);
+      })
+      .pipe(dest);
+  });
+}
+
 // Downloads a file to a temp path and returns that path.
 export async function downloadFile(auth, fileId, fileName) {
   const drive = google.drive({ version: 'v3', auth });
   const destPath = path.join(os.tmpdir(), `gk-${fileId}-${fileName}`);
   const dest = fs.createWriteStream(destPath);
 
-  const res = await drive.files.get({ fileId, alt: 'media' }, { responseType: 'stream' });
-
-  await new Promise((resolve, reject) => {
-    res.data.on('end', resolve).on('error', reject).pipe(dest);
-  });
+  const res = await drive.files.get({ fileId, alt: 'media' }, { responseType: 'stream', timeout: API_TIMEOUT_MS });
+  await pipeWithTimeout(res.data, dest);
 
   return destPath;
 }
@@ -60,11 +94,14 @@ export async function downloadFile(auth, fileId, fileName) {
 // and get picked up by the normal listNewVideos()/processVideo() flow.
 export async function uploadFile(auth, localPath, fileName) {
   const drive = google.drive({ version: 'v3', auth });
-  await drive.files.create({
-    requestBody: { name: fileName, parents: [config.driveFolderId] },
-    media: { mimeType: 'video/mp4', body: fs.createReadStream(localPath) },
-    fields: 'id',
-  });
+  await drive.files.create(
+    {
+      requestBody: { name: fileName, parents: [config.driveFolderId] },
+      media: { mimeType: 'video/mp4', body: fs.createReadStream(localPath) },
+      fields: 'id',
+    },
+    { timeout: 4 * 60 * 1000 }
+  );
 }
 
 // Joe now drops videos into either GK_TERMINAL (this script's folder) or
@@ -80,11 +117,14 @@ export async function mirrorNewVideos(auth) {
 
   const listVideos = (folderId) =>
     folderId
-      ? drive.files.list({
-          q: `'${folderId}' in parents and mimeType contains 'video/' and trashed = false`,
-          fields: 'files(id, name)',
-          pageSize: 50,
-        })
+      ? drive.files.list(
+          {
+            q: `'${folderId}' in parents and mimeType contains 'video/' and trashed = false`,
+            fields: 'files(id, name)',
+            pageSize: 50,
+          },
+          { timeout: API_TIMEOUT_MS }
+        )
       : Promise.resolve({ data: { files: [] } });
 
   const [ownRes, mirrorRes, ownDoneRes, mirrorDoneRes] = await Promise.all([
@@ -128,10 +168,13 @@ export async function mirrorNewVideos(auth) {
       continue;
     }
     try {
-      await drive.files.copy({
-        fileId: file.id,
-        requestBody: { name: file.name, parents: [config.mirrorFolderId] },
-      });
+      await drive.files.copy(
+        {
+          fileId: file.id,
+          requestBody: { name: file.name, parents: [config.mirrorFolderId] },
+        },
+        { timeout: 4 * 60 * 1000 }
+      );
       console.log(`Mirrored "${file.name}" into the other folder so it posts everywhere.`);
     } catch (err) {
       console.error(`Could not mirror "${file.name}" into GK_JING (skipping it, other files still mirrored):`, err.message);
@@ -140,10 +183,13 @@ export async function mirrorNewVideos(auth) {
   for (const file of mirror) {
     if (ownNames.has(file.name)) continue;
     try {
-      await drive.files.copy({
-        fileId: file.id,
-        requestBody: { name: file.name, parents: [config.driveFolderId] },
-      });
+      await drive.files.copy(
+        {
+          fileId: file.id,
+          requestBody: { name: file.name, parents: [config.driveFolderId] },
+        },
+        { timeout: 4 * 60 * 1000 }
+      );
       console.log(`Mirrored "${file.name}" into the other folder so it posts everywhere.`);
     } catch (err) {
       console.error(`Could not mirror "${file.name}" into GK_TERMINAL (skipping it, other files still mirrored):`, err.message);
@@ -157,15 +203,21 @@ export async function mirrorNewVideos(auth) {
 // indefinitely).
 export async function uploadPublicImage(auth, localPath, fileName, folderId) {
   const drive = google.drive({ version: 'v3', auth });
-  const file = await drive.files.create({
-    requestBody: { name: fileName, parents: folderId ? [folderId] : undefined },
-    media: { mimeType: 'image/png', body: fs.createReadStream(localPath) },
-    fields: 'id',
-  });
-  await drive.permissions.create({
-    fileId: file.data.id,
-    requestBody: { role: 'reader', type: 'anyone' },
-  });
+  const file = await drive.files.create(
+    {
+      requestBody: { name: fileName, parents: folderId ? [folderId] : undefined },
+      media: { mimeType: 'image/png', body: fs.createReadStream(localPath) },
+      fields: 'id',
+    },
+    { timeout: 60000 }
+  );
+  await drive.permissions.create(
+    {
+      fileId: file.data.id,
+      requestBody: { role: 'reader', type: 'anyone' },
+    },
+    { timeout: API_TIMEOUT_MS }
+  );
   // NOT drive.google.com/uc?export=view -- that endpoint is built for a
   // browser tab, and frequently serves an HTML "can't scan this file"
   // interstitial instead of raw image bytes when a server (like Pinterest's
@@ -183,12 +235,15 @@ export async function uploadPublicImage(auth, localPath, fileName, folderId) {
 export async function moveToDone(auth, fileId) {
   if (!config.doneFolderId) return;
   const drive = google.drive({ version: 'v3', auth });
-  const file = await drive.files.get({ fileId, fields: 'parents' });
+  const file = await drive.files.get({ fileId, fields: 'parents' }, { timeout: API_TIMEOUT_MS });
   const previousParents = (file.data.parents || []).join(',');
-  await drive.files.update({
-    fileId,
-    addParents: config.doneFolderId,
-    removeParents: previousParents,
-    fields: 'id, parents',
-  });
+  await drive.files.update(
+    {
+      fileId,
+      addParents: config.doneFolderId,
+      removeParents: previousParents,
+      fields: 'id, parents',
+    },
+    { timeout: API_TIMEOUT_MS }
+  );
 }

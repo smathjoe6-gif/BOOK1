@@ -3,14 +3,26 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 
+// ffmpeg/ffprobe hanging on a corrupt or unusual file used to freeze the
+// whole check cycle indefinitely -- there was no time limit at all. This
+// kills the process instead, so a bad file fails fast rather than jamming
+// every other video waiting behind it.
+const PROCESS_TIMEOUT_MS = 4 * 60 * 1000;
+
 function run(cmd, args) {
   return new Promise((resolve, reject) => {
     const proc = spawn(cmd, args);
     let stdout = '';
     let stderr = '';
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      proc.kill('SIGKILL');
+    }, PROCESS_TIMEOUT_MS);
     proc.stdout.on('data', (d) => (stdout += d));
     proc.stderr.on('data', (d) => (stderr += d));
     proc.on('error', (err) => {
+      clearTimeout(timer);
       if (err.code === 'ENOENT') {
         reject(new Error(`"${cmd}" is not installed -- run "brew install ffmpeg" on your Mac, then try again.`));
       } else {
@@ -18,8 +30,14 @@ function run(cmd, args) {
       }
     });
     proc.on('close', (code) => {
-      if (code === 0) resolve(stdout);
-      else reject(new Error(`${cmd} exited with code ${code}: ${stderr.slice(-500)}`));
+      clearTimeout(timer);
+      if (timedOut) {
+        reject(new Error(`${cmd} timed out after ${Math.round(PROCESS_TIMEOUT_MS / 60000)} minutes and was killed`));
+      } else if (code === 0) {
+        resolve(stdout);
+      } else {
+        reject(new Error(`${cmd} exited with code ${code}: ${stderr.slice(-500)}`));
+      }
     });
   });
 }

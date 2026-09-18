@@ -1,10 +1,10 @@
 import fs from 'node:fs';
-import fetch from 'node-fetch';
 import { config } from './config.js';
 import { loadTikTokToken, saveTikTokToken } from './tiktokAuth.js';
+import { fetchWithTimeout } from './fetchWithTimeout.js';
 
 async function refreshAccessToken(refreshToken) {
-  const res = await fetch('https://open.tiktokapis.com/v2/oauth/token/', {
+  const res = await fetchWithTimeout('https://open.tiktokapis.com/v2/oauth/token/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Cache-Control': 'no-cache' },
     body: new URLSearchParams({
@@ -37,7 +37,7 @@ async function getAccessToken() {
 // checking this first, or posting with settings it doesn't allow, is exactly
 // what triggers the "review our integration guidelines" error.
 async function queryCreatorInfo(accessToken) {
-  const res = await fetch('https://open.tiktokapis.com/v2/post/publish/creator_info/query/', {
+  const res = await fetchWithTimeout('https://open.tiktokapis.com/v2/post/publish/creator_info/query/', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -83,7 +83,7 @@ export async function uploadToTikTok({ filePath, caption, privacyLevel = 'SELF_O
     ? 'SELF_ONLY'
     : (allowedPrivacyLevels.includes(privacyLevel) ? privacyLevel : (allowedPrivacyLevels[0] || privacyLevel));
 
-  const initRes = await fetch('https://open.tiktokapis.com/v2/post/publish/video/init/', {
+  const initRes = await fetchWithTimeout('https://open.tiktokapis.com/v2/post/publish/video/init/', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -119,14 +119,14 @@ export async function uploadToTikTok({ filePath, caption, privacyLevel = 'SELF_O
     const start = i * chunkSize;
     const end = Math.min(start + chunkSize, videoSize) - 1;
     const chunk = fileBuffer.subarray(start, end + 1);
-    const uploadRes = await fetch(upload_url, {
+    const uploadRes = await fetchWithTimeout(upload_url, {
       method: 'PUT',
       headers: {
         'Content-Type': 'video/mp4',
         'Content-Range': `bytes ${start}-${end}/${videoSize}`,
       },
       body: chunk,
-    });
+    }, 3 * 60 * 1000);
     if (!uploadRes.ok) {
       throw new Error(`TikTok video upload failed on chunk ${i + 1}/${chunkCount}: ${uploadRes.status}`);
     }

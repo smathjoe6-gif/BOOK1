@@ -1,13 +1,14 @@
 import fs from 'node:fs';
-import fetch, { FormData, Blob } from 'node-fetch';
+import { FormData, Blob } from 'node-fetch';
 import { config } from './config.js';
 import { loadPinterestToken, savePinterestToken } from './pinterestAuth.js';
+import { fetchWithTimeout } from './fetchWithTimeout.js';
 
 const API_BASE = 'https://api.pinterest.com/v5';
 
 async function refreshAccessToken(refreshToken) {
   const basic = Buffer.from(`${config.pinterestClientId}:${config.pinterestClientSecret}`).toString('base64');
-  const res = await fetch(`${API_BASE}/oauth/token`, {
+  const res = await fetchWithTimeout(`${API_BASE}/oauth/token`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -41,7 +42,7 @@ async function getAccessToken() {
 
 async function pollMediaStatus(accessToken, mediaId) {
   for (let attempt = 0; attempt < 30; attempt++) {
-    const res = await fetch(`${API_BASE}/media/${mediaId}`, {
+    const res = await fetchWithTimeout(`${API_BASE}/media/${mediaId}`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     const data = await res.json();
@@ -64,7 +65,7 @@ async function pollMediaStatus(accessToken, mediaId) {
 export async function uploadToPinterest({ filePath, title, description, coverImageUrl }) {
   const accessToken = await getAccessToken();
 
-  const initRes = await fetch(`${API_BASE}/media`, {
+  const initRes = await fetchWithTimeout(`${API_BASE}/media`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -83,7 +84,7 @@ export async function uploadToPinterest({ filePath, title, description, coverIma
   }
   form.append('file', new Blob([fs.readFileSync(filePath)]), 'video.mp4');
 
-  const uploadRes = await fetch(initData.upload_url, { method: 'POST', body: form });
+  const uploadRes = await fetchWithTimeout(initData.upload_url, { method: 'POST', body: form }, 3 * 60 * 1000);
   if (!uploadRes.ok) {
     throw new Error(`Pinterest video upload failed: ${uploadRes.status}`);
   }
@@ -93,7 +94,7 @@ export async function uploadToPinterest({ filePath, title, description, coverIma
   const mediaSource = { source_type: 'video_id', media_id: initData.media_id };
   if (coverImageUrl) mediaSource.cover_image_url = coverImageUrl;
 
-  const pinRes = await fetch(`${API_BASE}/pins`, {
+  const pinRes = await fetchWithTimeout(`${API_BASE}/pins`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,

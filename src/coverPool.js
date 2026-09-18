@@ -3,6 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { google } from 'googleapis';
 import { config } from './config.js';
+import { pipeWithTimeout } from './drive.js';
 
 // Somali/heritage words are deliberately left out -- they're common across
 // nearly every filename in the pool and would match everything, defeating
@@ -42,12 +43,15 @@ export async function pickFromCoverPool(auth, title = '') {
 
   const drive = google.drive({ version: 'v3', auth });
   const keywords = keywordsFrom(title);
-  const res = await drive.files.list({
-    q: `'${config.coverPoolFolderId}' in parents and mimeType contains 'image/' and trashed = false`,
-    orderBy: 'createdTime',
-    pageSize: keywords.length > 0 ? 50 : 1,
-    fields: 'files(id, name)',
-  });
+  const res = await drive.files.list(
+    {
+      q: `'${config.coverPoolFolderId}' in parents and mimeType contains 'image/' and trashed = false`,
+      orderBy: 'createdTime',
+      pageSize: keywords.length > 0 ? 50 : 1,
+      fields: 'files(id, name)',
+    },
+    { timeout: 30000 }
+  );
 
   const candidates = res.data.files || [];
   if (candidates.length === 0) return null;
@@ -59,18 +63,19 @@ export async function pickFromCoverPool(auth, title = '') {
     : candidates[0];
 
   const localPath = path.join(os.tmpdir(), `cover-pool-${file.id}${path.extname(file.name) || '.png'}`);
-  const download = await drive.files.get({ fileId: file.id, alt: 'media' }, { responseType: 'stream' });
+  const download = await drive.files.get({ fileId: file.id, alt: 'media' }, { responseType: 'stream', timeout: 30000 });
   const dest = fs.createWriteStream(localPath);
-  await new Promise((resolve, reject) => {
-    download.data.pipe(dest).on('finish', resolve).on('error', reject);
-  });
+  await pipeWithTimeout(download.data, dest);
 
-  await drive.files.update({
-    fileId: file.id,
-    addParents: config.coverPoolDoneFolderId,
-    removeParents: config.coverPoolFolderId,
-    fields: 'id, parents',
-  });
+  await drive.files.update(
+    {
+      fileId: file.id,
+      addParents: config.coverPoolDoneFolderId,
+      removeParents: config.coverPoolFolderId,
+      fields: 'id, parents',
+    },
+    { timeout: 30000 }
+  );
 
   return localPath;
 }

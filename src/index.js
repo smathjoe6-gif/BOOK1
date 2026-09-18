@@ -39,13 +39,41 @@ function savePinterestState(state) {
   fs.writeFileSync(PINTEREST_STATE_PATH, JSON.stringify(state, null, 2));
 }
 
+// Persisted (not just in memory) so a script restart can't reset how many
+// times a video has already failed -- a video that fails on every single
+// attempt (a corrupt file, a permanently broken upload, anything) used to
+// jam every video behind it forever, since the main loop only ever retries
+// the same oldest file. This still allows a few genuine retries (a transient
+// network blip shouldn't set a video aside permanently), but after that it
+// stops retrying it every cycle so newer videos keep flowing -- exactly the
+// kind of stuck-until-someone-restarts-it episode that hit 3 videos for
+// hours on 17-18 Sep 2026.
+const VIDEO_FAILURE_STATE_PATH = path.join(process.cwd(), 'video-failure-state.json');
+const MAX_ATTEMPTS_BEFORE_SETTING_ASIDE = 3;
+
+function loadVideoFailureState() {
+  try {
+    return JSON.parse(fs.readFileSync(VIDEO_FAILURE_STATE_PATH, 'utf8'));
+  } catch {
+    return {};
+  }
+}
+
+function saveVideoFailureState(state) {
+  try {
+    fs.writeFileSync(VIDEO_FAILURE_STATE_PATH, JSON.stringify(state, null, 2));
+  } catch (err) {
+    console.log(`Could not persist video failure state: ${err.message}`);
+  }
+}
+
 const auth = loadOAuthClient();
 if (!auth.credentials || !auth.credentials.refresh_token) {
   console.error('Not logged in to Google yet. Run "npm run auth" first, then try again.');
   process.exit(1);
 }
 
-async function processVideo(file) {
+async function processVideoOnce(file) {
   console.log(`\n--- Found: ${file.name} ---`);
 
   let row = await findRowForFile(auth, file.name);
@@ -174,7 +202,44 @@ async function processVideo(file) {
     console.log(`--- Finished: ${file.name} ---\n`);
   } else {
     console.log(`--- YouTube failed for "${file.name}" -- leaving it in place to retry next cycle ---\n`);
+    return 'failed';
   }
+}
+
+// Wraps processVideoOnce() with the persisted failure counter described
+// above. Anything processVideoOnce throws (a download/conversion error, a
+// timeout from one of the network calls it makes) counts as a failed
+// attempt the same as an explicit 'failed' return (a YouTube upload that
+// failed cleanly) -- either way, after enough attempts this stops retrying
+// the file every cycle so it can't block the videos behind it.
+async function processVideo(file) {
+  const state = loadVideoFailureState();
+  let result;
+  try {
+    result = await processVideoOnce(file);
+  } catch (err) {
+    console.error(`"${file.name}" threw an unexpected error: ${err.message}`);
+    result = 'failed';
+  }
+
+  if (result !== 'failed') {
+    if (state[file.name]) {
+      delete state[file.name];
+      saveVideoFailureState(state);
+    }
+    return result;
+  }
+
+  const attempts = (state[file.name] || 0) + 1;
+  state[file.name] = attempts;
+  saveVideoFailureState(state);
+
+  if (attempts >= MAX_ATTEMPTS_BEFORE_SETTING_ASIDE) {
+    console.error(`"${file.name}" has now failed ${attempts} times in a row -- setting it aside so it doesn't block every video behind it. It's still sitting in the folder; check automation.log for the real error, fix it by hand, then restart the script to give it a fresh try.`);
+    return 'skipped';
+  }
+  console.log(`"${file.name}" has failed ${attempts}/${MAX_ATTEMPTS_BEFORE_SETTING_ASIDE} times so far -- will retry it next cycle before setting it aside.`);
+  return 'failed';
 }
 
 // Make.com's scenario only posts a GK_JING video once it finds a matching

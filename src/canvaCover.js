@@ -1,15 +1,16 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import fetch from 'node-fetch';
 import { config } from './config.js';
 import { getCanvaAccessToken } from './canvaAuth.js';
+import { fetchWithTimeout } from './fetchWithTimeout.js';
+import { pipeWithTimeout } from './drive.js';
 
 const API_BASE = 'https://api.canva.com/rest/v1';
 
 async function pollJob(url, headers, extractStatus, extractResult, label) {
   for (let attempt = 0; attempt < 30; attempt++) {
-    const res = await fetch(url, { headers });
+    const res = await fetchWithTimeout(url, { headers });
     const data = await res.json();
     if (!res.ok) {
       throw new Error(`Canva ${label} check failed: ${data.error?.message || res.status}`);
@@ -31,7 +32,7 @@ async function uploadAsset(localPath, authHeader) {
   const fileBuffer = fs.readFileSync(localPath);
   const metadata = Buffer.from(JSON.stringify({ name: `pool-cover-${Date.now()}` })).toString('base64');
 
-  const res = await fetch(`${API_BASE}/asset-uploads`, {
+  const res = await fetchWithTimeout(`${API_BASE}/asset-uploads`, {
     method: 'POST',
     headers: {
       ...authHeader,
@@ -39,7 +40,7 @@ async function uploadAsset(localPath, authHeader) {
       'Asset-Upload-Metadata': metadata,
     },
     body: fileBuffer,
-  });
+  }, 60000);
   const data = await res.json();
   if (!res.ok) {
     throw new Error(`Canva asset upload failed: ${data.error?.message || res.status}`);
@@ -83,7 +84,7 @@ export async function generateCoverImage(title, sourceImagePath) {
     data[config.canvaImageField] = { type: 'image', asset_id: assetId };
   }
 
-  const autofillRes = await fetch(`${API_BASE}/autofills`, {
+  const autofillRes = await fetchWithTimeout(`${API_BASE}/autofills`, {
     method: 'POST',
     headers,
     body: JSON.stringify({
@@ -104,7 +105,7 @@ export async function generateCoverImage(title, sourceImagePath) {
     'autofill'
   );
 
-  const exportRes = await fetch(`${API_BASE}/exports`, {
+  const exportRes = await fetchWithTimeout(`${API_BASE}/exports`, {
     method: 'POST',
     headers,
     body: JSON.stringify({ design_id: designId, format: { type: 'png' } }),
@@ -123,14 +124,12 @@ export async function generateCoverImage(title, sourceImagePath) {
   );
 
   const destPath = path.join(os.tmpdir(), `gk-pin-cover-${Date.now()}.png`);
-  const imageRes = await fetch(downloadUrl);
+  const imageRes = await fetchWithTimeout(downloadUrl);
   if (!imageRes.ok) {
     throw new Error(`Could not download the generated cover image: ${imageRes.status}`);
   }
   const dest = fs.createWriteStream(destPath);
-  await new Promise((resolve, reject) => {
-    imageRes.body.pipe(dest).on('finish', resolve).on('error', reject);
-  });
+  await pipeWithTimeout(imageRes.body, dest);
 
   return destPath;
 }

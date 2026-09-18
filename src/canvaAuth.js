@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import fetch from 'node-fetch';
 import open from 'open';
 import { config } from './config.js';
+import { fetchWithTimeout } from './fetchWithTimeout.js';
 
 const TOKEN_PATH = new URL('../canva-token.json', import.meta.url);
 const REDIRECT_PORT = 53683;
@@ -36,7 +37,7 @@ function saveToken(token) {
 }
 
 async function refreshAccessToken(refreshToken) {
-  const res = await fetch(TOKEN_URL, {
+  const res = await fetchWithTimeout(TOKEN_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
