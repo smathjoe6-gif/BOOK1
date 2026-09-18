@@ -208,6 +208,10 @@ Read `references/acquisition-functions.md` before writing up any BO result — i
 
 Read `references/thompson-sampling.md` for the policy underneath any "Thompson" row above — draw one world from the posterior, act optimally in that world, update. Covers the clean conjugate finite-arm cases (Beta-Bernoulli, Normal-Normal, etc.), the continuous GP-TS extension used in Bayesian optimization (drawing a whole posterior function via pathwise/Matheron updates or random Fourier features — never per-point independent Normals), batching by drawing multiple independent worlds, and the regret guarantees that say it isn't reckless without saying it picked your kernel or prior for you. A never-played arm after many rounds is a prior problem, not bad luck — check the prior predictive before round one.
 
+### Knowledge Gradient Variants — the map (same utility, different information patterns)
+
+Read `references/kg-variants.md` before assuming "KG" means one fixed algorithm — every variant shares the utility "expected drop in `argmin μ`" but differs in what may be measured versus recommended, discrete vs. continuous domain, noise/fidelity handling, how many `y`'s return together, and constraints or multi-objective handling. If the formula in front of you is `E[(f*-f(x))+]`, it's EI, not KG, whatever it's labeled. Use its chooser to pick the right variant instead of defaulting to whichever one shipped last time.
+
 ### Knowledge Gradient (look-ahead on the recommendation, not the sample)
 
 Read `references/knowledge-gradient.md` when the last few runs are expensive, alternatives are discrete, or noise has already made EI-on-best-observation dishonest — KG values a measurement by how much it's expected to move `argmin μ` itself, which can land on a completely different `x` than the one just measured. Covers the discrete closed form versus the continuous fantasy-based approximation, why an inner set that forgets the current incumbent understates KG, and why it's not the weekly default on a cheap simulator where the compute cost isn't earning its keep. See `references/qkg.md` for the batch version.

@@ -19,7 +19,13 @@ Joint qKG is one expectation over `y(1:q)` with all of `Z` free at once. FA-gree
 
 ## Slot mechanics
 
-**Slot 1.** Ordinary `KGn(z)`. No prefix yet.
+**Slot 1.** No prefix — ordinary one-point KG on the real GP:
+
+```
+KGn(z) = E_{y | z, Dn} [ min μn - min μ(n+1)(· | z,y) ]
+```
+
+Estimate by discrete KG on an inner set, or by Monte Carlo `y` plus `argmin μ(n+1)`. Multi-start `z1 = argmax KGn`.
 
 **Later slots:**
 
@@ -59,9 +65,15 @@ KB is FA with `T=1` and `ỹ` replaced by the posterior mean (`references/krigin
 
 qTS (`references/qts.md`) still doesn't belong anywhere in this table: it never computes KG at all.
 
+### What the average does that KB cannot
+
+Each prefix fantasy deepens a slightly different story — the mean actually moves, and `σ` near `Zi` drops in that fantasy's particular way. `K̄G` is the mix of those one-point KGs, not a single frozen story. If half the fantasies deepen basin A and half deepen basin B, slot `i+1` can still value B fairly. KB freezes `μ` and only kills `σ`, so it plans the rest of the week inside one story — whatever the current mean happens to say.
+
+Neither method revises `z1`, though. If 1-KG in slot 1 refused an informational ridge, FA will not retroactively put `z1` there later — only joint qKG can actually do that.
+
 ## Joint qKG versus FA-greedy-KG, in full
 
-Both target the same utility family — expected drop in `min μ` (`references/qkg.md`) — and disagree about which variables are free when that drop is computed.
+**Joint qKG treats the batch as one decision. FA-greedy-KG treats it as `q` stacked one-point decisions.** Both target the same utility family — expected drop in `min μ` (`references/qkg.md`) — and disagree about which variables are free when that drop is computed.
 
 **Joint qKG** is one expectation with the whole set `Z` free at once:
 

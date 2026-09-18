@@ -2,7 +2,7 @@
 
 Knowledge Gradient is a one-step look-ahead on the **recommendation**, not on the sample about to be taken. After the next `y`, the recommendation will still be the minimizer of the posterior mean. KG picks the place to measure that most improves that minimizer in expectation.
 
-EI (`references/bayesian-optimization.md`) asks: how much do I expect this `y` to beat the incumbent *at this point*? KG asks: how much do I expect `min_x μ` to fall *after* I've seen that `y`? The inner minimum can move to a completely different `x` than the one just measured — that's the method, not an edge case.
+EI (`references/bayesian-optimization.md`) asks: how much do I expect this `y` to beat the incumbent *at this point*? KG asks: how much do I expect `min_x μ` to fall *after* I've seen that `y`? The inner minimum can move to a completely different `x` than the one just measured — that's the method, not an edge case. See `references/kg-variants.md` for the full map of variants (domain, noise/fidelity, batch, constraints) that all share this one utility.
 
 ## The definition
 

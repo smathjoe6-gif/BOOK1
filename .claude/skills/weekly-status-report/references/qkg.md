@@ -1,5 +1,7 @@
 # qKG (Batch Knowledge Gradient)
 
+See `references/kg-variants.md` for how this fits among every other KG variant (domain, noise/fidelity, constraints) that shares the same underlying utility.
+
 qKG is Knowledge Gradient (`references/knowledge-gradient.md`) when `q` points return together. The look-ahead is one calendar step, not one shot. **Joint qKG is the definition** — greedy and fantasize variants are approximations to it, not alternate definitions.
 
 ## The joint object
