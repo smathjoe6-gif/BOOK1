@@ -30,6 +30,7 @@ Recalculate limits only after a genuine change *and* a new stable stretch of dat
 | Fraction defective, large n | p (np if n is fixed) |
 | Defect counts | c or u |
 | Rare events | t or g — not a p-chart full of zeros |
+| Short-run mixed jobs | Difference-from-nominal or Z charts |
 
 A **rational subgroup** puts common-cause variation *inside* the group, so that special causes show up *between* groups instead. A grab bag pulled from the warehouse is not a rational subgroup. Mix several shifts or several tools into one subgroup and the limits go artificially fat — nothing ever signals, even real problems. Filter and sort too aggressively instead, and within-group variation shrinks artificially, the Xbar limits go too tight, and everything starts looking like a special cause that isn't one.
 
@@ -67,6 +68,12 @@ Two distinct bad stories that look superficially similar but need very different
 
 - **In control, and incapable** — stable junk. The process is doing exactly what it always does, and what it always does doesn't meet spec. Quality goes Amber/Red from *spec risk*, not from chaos — more inspection and firefighting won't fix this, the system itself needs to change.
 - **Inside spec this week, but out of control** — a lucky streak, not a result to trust. Do not color this Green; an out-of-control process will eventually produce a bad unit, it just hasn't yet.
+
+## Three cases textbooks skip
+
+- **Short run.** Real short-run work will never give you 25 identical subgroups of the same part. Chart difference-from-nominal across similar jobs instead, or run I-MR on the thing that actually repeats (cycle time, first-pass yield) rather than the part dimension itself. Do not pool unlike products together just to artificially fill a subgroup to n=5 — that manufactures a rational subgroup that isn't actually rational.
+- **Autocorrelation.** A daily backlog figure that includes yesterday's number, or a continuous sensor feed, will make a plain Shewhart chart fire on nearly every point — the data isn't independent, so the usual control-limit math no longer applies cleanly. Sample less often, chart residuals from a simple time-series model instead of the raw series, or add EWMA/CUSUM specifically to catch small sustained drifts — and say explicitly which of these was done. Do not just swap in a smoother and quietly lose the common-cause/special-cause language that makes the chart useful to talk about.
+- **Transactional work.** Cycle-time clocks and wrap/disposition codes follow exactly the same rules as a physical measurement, once MSA has actually been run on them (`references/msa.md`) — a wrap code is still a measurement, and can still have bias, drift, or poor inter-rater agreement. A weekly KPI number with a flat 95% target line drawn across it is not a control chart; it has no baseline-derived limits and no common/special-cause distinction behind it.
 
 ## Next to Six Sigma, Lean, and TOC
 
