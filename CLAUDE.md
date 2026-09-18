@@ -15,7 +15,15 @@ Google Drive folders that mirror each other:
   post"), team 1643250. Posts to **Instagram, Facebook, Pinterest**.
 - **`GK_TERMINAL`** — watched by **this repo's script** (`src/index.js`,
   run via a `launchd` agent `com.gklegend.automation.plist` on Joe's Mac,
-  working dir `~/gk-automation`). Posts to **YouTube, TikTok**.
+  working dir `~/gk-automation`). Posts to **YouTube, TikTok, and X
+  (Twitter)** — X posting (`src/twitter.js`) only fires after YouTube
+  succeeds for that video, same gating as TikTok/Pinterest below. Configured
+  via `X_API_KEY`/`X_API_SECRET`/`X_ACCESS_TOKEN`/`X_ACCESS_TOKEN_SECRET` in
+  `.env` (OAuth 1.0a user-context credentials from developer.x.com's "Keys
+  and tokens" page — no interactive login flow needed, unlike
+  TikTok/Pinterest). Joe added these directly in Terminal on his Mac on the
+  night of 17-18 Sep 2026; no daily cap on X posting, unlike Pinterest's
+  trial-access limit (see below).
 
 A background job on each side copies any video that lands in one folder into
 the other (Make does this inside scenario 9696465; the script does it via
