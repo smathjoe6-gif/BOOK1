@@ -260,7 +260,11 @@ Read `references/qff.md` for the quadrature version of `references/rff.md` — n
 
 Read `references/qmc-rff.md` for the point in between `references/rff.md` and `references/qff.md` — frequencies come from a low-discrepancy sequence (Sobol' with an Owen scramble is the default) mapped through the spectral measure's inverse-cdf, not sampled i.i.d. and not a quadrature grid. Covers why the inverse-cdf choice *is* the kernel claim (Sobol' through a Gaussian inverse-cdf under a Matérn poster is the same spectrum-mixing mistake as elsewhere in this family), why QMC mainly helps local kernel accuracy rather than far lags, and why it still doesn't restore residual variance outside `span(φ)` as a stand-alone surrogate.
 
-### Quadrature Fourier Features (the deterministic alternative to RFF)
+### Lattice-RFF (rank-1 lattices as a QMC frequency set)
+
+Read `references/lattice-rff.md` for the lattice-rule variant of quasi-MC RFF — frequencies from `{s·z/N}` pushed through the spectral inverse-cdf, still an average of cosines and not QFF (no quadrature weights involved). Covers why the textbook lattice-accuracy theory doesn't transfer for free once a non-periodic inverse-cdf is involved, the generating-vector choices that matter (Korobov, CBC, extensible `N=2^L`), why a random shift is needed to keep the kernel estimator unbiased, and why `s=0` has to be dropped before it explodes through `Φ⁻¹`. `scripts/cbc_lattice.py` implements the CBC construction (product-weight `P2`, optional SE-spectrum mapping) referenced there.
+
+### GP Kernels (the actual scientific claim under BO and GP-TS)
 
 Read `references/gp-kernels.md` before trusting any EI, LCB, or Thompson-path result — the kernel is the prior on functions, and no acquisition function can repair a wrong one. Covers what a kernel actually asserts (lengthscale, smoothness via Matérn `ν`, amplitude, stationarity), why pinned ARD lengthscales at high `D`/low `n` are usually a fitting failure rather than a real relevance finding, building structure through sums/products/additive kernels, and MAP-over-Type-II-MLE as the grown-up default when `n ≲ 30`. Never put a Euclidean RBF on one-hot categorical encodings, and never swap kernel families week to week just to chase last night's acquisition result.
 
