@@ -1,6 +1,6 @@
 # Critical Chain (CCPM)
 
-Critical Chain is not CPM with a different badge. Do not use this file's terminology (chain, buffer, fever chart) to describe an ordinary CPM schedule — if there's no resource-leveled chain and no buffers, it's still CPM; use `references/cpm.md` instead.
+Critical Chain is Theory of Constraints (`references/theory-of-constraints.md`) applied to a project network — the chain is the constraint, the buffers are how it's protected, and "no new scope on a Red fever chart" is subordination in practice. It is not CPM with a different badge. Do not use this file's terminology (chain, buffer, fever chart) to describe an ordinary CPM schedule — if there's no resource-leveled chain and no buffers, it's still CPM; use `references/cpm.md` instead.
 
 ## The idea
 

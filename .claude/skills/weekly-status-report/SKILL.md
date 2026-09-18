@@ -128,6 +128,10 @@ If the project has a real logic-linked schedule network, read `references/cpm.md
 
 If the project runs on a resource-leveled Critical Chain plan (buffers, not just float), read `references/critical-chain.md` instead of treating it as CPM with different labels — it covers how the chain is built (resource leveling, stripped durations, project/feeding/resource buffers), how work should actually run week to week (relay-race starts, why "waiting on a busy resource" counts as delay), and the buffer-burn-vs-progress fever chart that drives schedule RAG here instead of task float. Only use this file's vocabulary (chain, buffer, fever chart) when there's an actual leveled chain and real buffers behind it.
 
+### Theory of Constraints (the rule underneath Critical Chain)
+
+Read `references/theory-of-constraints.md` when the conversation is about *why* something is the bottleneck, not just what its float or buffer number is — it covers Goldratt's five focusing steps (identify, exploit, subordinate, elevate, repeat), where a constraint typically lives (resource, policy, market, chain, portfolio), and Drum-Buffer-Rope. Use it to frame action items around exploiting/subordinating the real constraint before jumping to "hire more people" or "add a tool," which are elevation moves and need an explicit decision, not a default reach.
+
 ## Action items
 
 | ID | Action | Owner | Due | Status | Notes |
