@@ -4,6 +4,8 @@ Bayesian optimization is sequential design (`references/sequential-design.md`) f
 
 Same loop shape as sequential Bayesian experimental design (`references/sequential-bayesian-design.md`). **Different object.** No Fisher information. No declared quadratic.
 
+See `references/acquisition-functions.md` for the full survey across every acquisition family below (improvement, bonus, sampling, look-ahead) and a short chooser table.
+
 ## The loop
 
 1. Prior over functions (kernel + mean) and a noise model

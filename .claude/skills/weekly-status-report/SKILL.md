@@ -200,6 +200,10 @@ Read `references/sequential-design.md` before calling anything "sequential [X]-o
 
 Read `references/bayesian-optimization.md` when the target is a good `x*` for an expensive black-box `f(x)` — no mean function anyone is willing to write down, so there's no `θ` and no Fisher information at all. Same loop shape as sequential Bayesian design but a different object: a surrogate (usually a GP) replaces the declared model, and an acquisition function (EI, LCB/UCB, Thompson, PES/KG) replaces expected-utility-over-θ. Covers kernel choice as the real scientific claim, batch acquisitions for plate/weekly-calendar runs, multi-objective Pareto handling, and exactly where this stops making sense — vanilla GPs rot once dimension climbs and evaluations should instead go through RSM (an interpretable surface) or parametric sequential Bayes (a precise `θ`) depending on which one the report actually needs.
 
+### Acquisition Functions — the survey (don't erase the differences)
+
+Read `references/acquisition-functions.md` before writing up any BO result — it maps the four families (improvement: PI/EI; bonus: LCB/UCB; sampling: Thompson; look-ahead: KG/PES/MES) against each other and against the individual reference files below. The single most important line in it: KG looks ahead at the recommendation, EI looks ahead at this sample, and calling both "one-step look-ahead" erases exactly the distinction that matters. Also states plainly that kernel misspecification (`references/gp-kernels.md`) beats acquisition choice — swapping EI for MES on a kernel with pinned lengthscales is theater.
+
 ### Thompson Sampling (probability matching, finite arms or GP-TS)
 
 Read `references/thompson-sampling.md` for the policy underneath any "Thompson" row above — draw one world from the posterior, act optimally in that world, update. Covers the clean conjugate finite-arm cases (Beta-Bernoulli, Normal-Normal, etc.), the continuous GP-TS extension used in Bayesian optimization (drawing a whole posterior function via pathwise/Matheron updates or random Fourier features — never per-point independent Normals), batching by drawing multiple independent worlds, and the regret guarantees that say it isn't reckless without saying it picked your kernel or prior for you. A never-played arm after many rounds is a prior problem, not bad luck — check the prior predictive before round one.
@@ -215,6 +219,14 @@ Read `references/qkg.md` when a whole batch of `q` points returns together and t
 ### Fantasy-Average Batch Scheduling (the general greedy-batch pattern)
 
 Read `references/fantasy-average.md` for the batch scheduler underneath most "batch KG" or "batch EI" claims — pick one point on the real posterior, pretend the GP has seen it, pick the next on that fantasy posterior, repeat. Covers the single-lie plug-ins (kriging believer, constant liar, sample liar) versus the true fantasy-average (`T` fantasies, properly averaged), what each does to the rest of the batch's exploration, and which base acquisition it pairs well with. This is not joint batch optimization and should never be reported as if it were — it never un-picks the first point once chosen.
+
+### Kriging Believer (the industrial-default scheduler, in full)
+
+Read `references/kriging-believer.md` for the full state/loop mechanics behind the most common batch scheduler in practice — the working-copy GP, the rank-1 update algebra that freezes the mean and deflates covariance around the fake point, and why it can only stamp "already measured" onto a neighborhood rather than ever discovering a better basin. Publish whether the fantasy noise was 0 (classic KB) or `σ²_obs` (noisy KB) — the two behave differently. Never leave the fake `(z, μ(z))` pair sitting in the real training set once the batch ships.
+
+### qKG Alternatives (what's actually being given up)
+
+Read `references/qkg-alternatives.md` when joint qKG (`references/qkg.md`) is too expensive and a substitute is needed — it maps every option (greedy/fantasy-average KG, qEI, batch MES/PES, qTS, KB+EI, local penalization, hard min-distance/DPP) against what each one keeps versus discards from the full joint object. States plainly that KB+EI is the industrial default and also the thing most often mislabeled qKG, and that giving up the joint form always costs the value of informational sites and the true batch correlation — whatever else is kept.
 
 ### qTS (batch Thompson Sampling)
 
