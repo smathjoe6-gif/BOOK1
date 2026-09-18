@@ -124,6 +124,10 @@ If the project tracks PV/EV/AC (or the user gives you a week's numbers), read `r
 
 If the project has a real logic-linked schedule network, read `references/cpm.md` too — it covers total/free float, the ordered critical and near-critical ID paths, how weekly progress updates should actually work (and the fake-update patterns to catch), and how to color schedule from the driving path's float rather than a blended SPI. It also explains how CPM, Earned Schedule, and classic SPI/CPI answer three different questions and should never be averaged together when they disagree.
 
+### Critical chain (CCPM)
+
+If the project runs on a resource-leveled Critical Chain plan (buffers, not just float), read `references/critical-chain.md` instead of treating it as CPM with different labels — it covers how the chain is built (resource leveling, stripped durations, project/feeding/resource buffers), how work should actually run week to week (relay-race starts, why "waiting on a busy resource" counts as delay), and the buffer-burn-vs-progress fever chart that drives schedule RAG here instead of task float. Only use this file's vocabulary (chain, buffer, fever chart) when there's an actual leveled chain and real buffers behind it.
+
 ## Action items
 
 | ID | Action | Owner | Due | Status | Notes |
