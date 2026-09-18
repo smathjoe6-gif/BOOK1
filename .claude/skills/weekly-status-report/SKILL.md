@@ -226,7 +226,7 @@ Read `references/kriging-believer.md` for the full state/loop mechanics behind t
 
 ### Fantasy-Average Greedy KG (the KG-specific slot mechanics)
 
-Read `references/fa-greedy-kg.md` for the full two-expectation structure behind FA-greedy-KG specifically — an outer fantasy average over the still-random prefix outcomes, and an inner real-KG computation on each fantasy GP. Covers the per-slot procedure, why the same outer fantasy draws must be reused across every candidate in a slot, the cost split between outer `T` and inner `T_in`, and how it differs from both KB-greedy-KG (`T=1`, a lie instead of a real average) and joint qKG (which never freezes a prefix at all).
+Read `references/fa-greedy-kg.md` for the full two-expectation structure behind FA-greedy-KG specifically — an outer fantasy average over the still-random prefix outcomes, and an inner real-KG computation on each fantasy GP. Covers the per-slot procedure, why the same outer fantasy draws must be reused across every candidate in a slot, the cost split between outer `T` and inner `T_in`, how it differs from both KB-greedy-KG (`T=1`, a lie instead of a real average) and joint qKG (which never freezes a prefix at all), and a full side-by-side against joint qKG showing exactly where the two methods pick different points (two live basins at small `q`, asymmetric operability costs, and error accumulation as `q` grows).
 
 ### qKG Alternatives (what's actually being given up)
 

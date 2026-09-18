@@ -26,7 +26,7 @@ The inner min's candidate set must contain `argmin μn`, high-`σ` sites, the pr
 
 ## Approximations people actually run
 
-See `references/fantasy-average.md` for the general batch-scheduler pattern these approximations belong to — it's the same skeleton whether the base acquisition is KG, EI, or LCB.
+See `references/fantasy-average.md` for the general batch-scheduler pattern these approximations belong to — it's the same skeleton whether the base acquisition is KG, EI, or LCB. See `references/fa-greedy-kg.md` for the full side-by-side against FA-greedy-KG specifically — same utility family (expected drop in `min μ`), but disagreeing about which variables are free when that drop gets computed.
 
 **Sequential greedy.** `z1 = argmax KG`. Then pick `z2` as KG on a GP that has already "seen" `z1`, and so on. How the still-unseen `y1` gets faked:
 

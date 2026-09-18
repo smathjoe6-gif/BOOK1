@@ -59,6 +59,64 @@ KB is FA with `T=1` and `ỹ` replaced by the posterior mean (`references/krigin
 
 qTS (`references/qts.md`) still doesn't belong anywhere in this table: it never computes KG at all.
 
+## Joint qKG versus FA-greedy-KG, in full
+
+Both target the same utility family — expected drop in `min μ` (`references/qkg.md`) — and disagree about which variables are free when that drop is computed.
+
+**Joint qKG** is one expectation with the whole set `Z` free at once:
+
+```
+qKGn(Z) = E_{y(1:q) | Z,Dn}[ min μn - min μ(n+q)(· | Z,y(1:q)) ]
+```
+
+A site can exist purely to split two basins. Correlation among all `q` predictive `y`'s sits inside the definition itself.
+
+**FA-greedy-KG** is `q` separate searches. Slot 1 is ordinary KG; slot `i+1` freezes the prefix `Zi` and maximizes `K̄G(z)` as above, with `z(i+2:q)` invisible to that choice and `z1` never revised. **FA is a Monte Carlo estimate of expected next myopic KG after a frozen prefix — it is not a Monte Carlo estimate of `qKG(Z)`.** That distinction is the whole point of this comparison.
+
+### Side-by-side
+
+| | Joint qKG | FA-greedy-KG |
+|---|---|---|
+| Decision after the week | `argmin μ(n+q)` | Same intent, not guaranteed |
+| Free variables | All of `Z` | Only the current slot |
+| Look-ahead depth | `q` outcomes at once | 1 outcome on top of a fantasy prefix |
+| Informational site in slot 1 | Yes, if it helps the set | Only if it wins one-point KG right now |
+| Prefix `y` | Integrated jointly with future `z`'s | Integrated, but future `z`'s absent |
+| Correlation of all `q` `y`'s | Yes | Only among the prefix, plus one more |
+| Typical `q` if honest | 2–4 (joint MC) | 2–8 (greedy) |
+| Cost shape | Optimize over `X^q` × `T_joint` inner mins | `Σi T_out·T_in` on a shortlist |
+| Revises `z1` | Yes, in principle | Never |
+
+### Where they pick different points
+
+- **One basin, small noise.** Both clone or near-clone. Shrink `q` — neither method is at fault here.
+- **Two basins, `q=2`.** Joint qKG may put one point in each basin, or one in a basin and one on a ridge that splits them, because the *set's* `Δ min μ` is the score. FA-greedy sends `z1` to the 1-KG winner (usually the leading basin); slot 2 then averages 1-KG on fantasies of that first site — often the second basin, sometimes a near-duplicate if the fantasies collapse `σ` the way KB does. It will not move `z1` onto the ridge if 1-KG alone never wanted the ridge.
+- **Asymmetric costs / operability.** Joint can trade "slightly worse `z1`" for a legal pair. Greedy cannot — `z1` is already locked in.
+- **Larger `q`.** Greedy error accumulates: early 1-KG greed locks in a story, and later slots only ever condition on that story. Joint, if it could actually be run, would rebalance the whole set instead.
+
+### Cost is not a small factor
+
+Joint: optimize in `X^q`, each trial `Z` paying `T` fantasies × an inner `min μ`. Honest at `q=2–4`.
+
+FA-greedy: `q` ordinary-sized searches. Prefix GPs are built `T` times per slot and reused across every candidate `z` in that slot — that's exactly why this ships at `q=6` when joint does not.
+
+KB-greedy-KG is cheaper still (`T=1`, `ỹ=μ`) and is **not** FA — see the table above for why the two-basin case tells them apart.
+
+### What number is actually allowed on the page
+
+After picking `Z_FA`, `q̂KG(Z_FA)` can be evaluated with a *separate* joint Monte Carlo run — as a score of the set that was obtained, never as proof that qKG was maximized. Compare that score against `q̂KG` of a qTS set or a KB set computed on the same `T` — that's an honest bake-off. **Comparing `K̄G(zq)` to `qKG(Z)` directly is mixing units** and should never appear in the same table as if they were the same number.
+
+### When to prefer which
+
+| Situation | Prefer |
+|---|---|
+| `q=2–3`, last expensive week, care about `argmin μ` | Joint qKG |
+| `q=4–8`, same object, can't search `X^q` | FA-greedy-KG |
+| Need an audit trail this afternoon | KB+KG or KB+EI, labeled as exactly that |
+| Posterior already one-basin | Shrink `q`; stop comparing methods |
+
+**Usual confusion:** publishing FA-greedy points under the heading "qKG"; using `T=1` and `ỹ=μ` while calling it fantasy average; scoring FA by best raw `y` and joint qKG by `Δ min μ` in the same comparison table.
+
 ## Failure modes
 
 Inner set missing `argmin μ^(t)`; `T=1` billed as fantasy average when it's really sample-liar or KB; mixing KB working copies together with FA in the same batch (double fiction stacked on itself); one local max of `K̄G` sitting right at `zi`; fantasy pairs left in `Dn` after the batch ships.
