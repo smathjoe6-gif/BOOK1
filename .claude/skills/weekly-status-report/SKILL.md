@@ -116,6 +116,10 @@ Avoid:
 - Green overall sitting over a Red critical milestone (the roll-up rule above exists specifically to prevent this)
 - Coloring people instead of the plan (the status describes the work's trajectory, never a judgment on who's behind)
 
+### Earned value (PV / EV / AC)
+
+If the project tracks PV/EV/AC (or the user gives you a week's numbers), read `references/evm.md` before writing the RAG line — it covers variances (SV/CV), indices (SPI/CPI) with weekly bands, the EAC/ETC/VAC forecasts (and which one to default to), the TCPI honesty check, Earned Schedule for late-stage projects, and exactly how each of those should move the RAG color. Healthy cost performance never overrides a missed critical date — check that file rather than eyeballing an index. If PV/EV/AC don't exist for this project, skip it; don't invent an earning rule to force the math.
+
 ## Action items
 
 | ID | Action | Owner | Due | Status | Notes |
