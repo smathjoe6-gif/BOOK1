@@ -22,7 +22,7 @@ A Gaussian process is the default: at each `x`, `μn(x)` and `σn²(x)` come out
 
 Kernel choice is the scientific claim being made — see `references/gp-kernels.md` for the full family (Matérn `ν` choices, ARD, sums/products/additive structure, and fitting). Matérn 5/2 is the usual engineering default; squared-exponential is smoother than most plant behavior actually is; Matérn 3/2 is rougher. Put a nugget on plant data — it's never noiseless. ARD lengthscales (one per dimension) should be watched: pinned at their bounds means bad input scaling or the wrong kernel family, not a finished fit. Always recode `x` into a unit box before fitting.
 
-When `n` leaves the few-hundreds, move to sparse GPs. When `x` mixes discrete and continuous factors, TPE or a forest-based surrogate often lies less than a kernel forced onto data it doesn't fit. A Bayesian network is a different inductive bias entirely, not a free upgrade over a GP.
+When `n` leaves the few-hundreds, move to sparse GPs (`references/sparse-gps.md`). When `x` mixes discrete and continuous factors, TPE or a forest-based surrogate often lies less than a kernel forced onto data it doesn't fit. A Bayesian network is a different inductive bias entirely, not a free upgrade over a GP.
 
 ## The algorithms people name are acquisitions
 

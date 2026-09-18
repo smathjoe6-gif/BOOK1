@@ -240,9 +240,17 @@ Read `references/qkg-alternatives.md` when joint qKG (`references/qkg.md`) is to
 
 Read `references/qts.md` for the Thompson-flavored batch method — draw `q` independent posterior paths, take each one's minimizer, repair collisions, evaluate. No joint surface, no fantasy `y`, so it's cheaper than qEI/qKG but answers a different question: a Monte Carlo sample of `x*`, not an expected improvement or expected drop in `min μ`. Covers the named repair strategies for when the posterior has fewer distinct stories than `q` (drop-duplicate, nudge, repulsive TS, or just capping `q`), and the collapse index (`unique(Z)/q`) worth logging every batch — a stacked batch is a real result about the posterior, not a bug to quietly patch around.
 
+### Sparse GPs (when `n` is too large for a full GP)
+
+Read `references/sparse-gps.md` when `n` leaves the few-hundreds and factoring `Ky` at `O(n³)` stops being affordable — an inducing system of size `m ≪ n` replaces it, and "sparse GP" is not itself a method name (write VFE, FITC, or SVGP specifically). Covers what each approximation does to the residual variance on the training data (SoR drops it, DTC zeros it only in the likelihood, FITC diagonalizes it and can miscalibrate badly, VFE penalizes it and is usually the best-calibrated regression default), where inducing locations should sit, why train and predict must use the same approximation, and the sparse-Matheron path draw qTS needs on top of it.
+
 ### Matheron's Rule (drawing a posterior GP path cheaply)
 
 Read `references/matheron-rule.md` for the actual mechanics behind "pathwise/Matheron update," referenced everywhere GP-TS or qTS needs a posterior sample — a prior path plus a linear correction that hits the data, factored once on the training set instead of refactored on every optimizer grid move. Covers the identity itself, the noiseless-limit interpolation check, the RFF/inducing options for drawing the prior path, and the specific bug of drawing the prior path as independent marginals (which breaks the identity entirely, not just approximately). This draws `f`, never a fantasy `y` — KG/EI/FA sample observations instead, a different object.
+
+### Random Fourier Features (sparsifying the kernel, not the data)
+
+Read `references/rff.md` for the explicit feature map `φ(x)` that approximates a stationary kernel via Bochner's theorem — the usual way `f0` gets drawn inside a Matheron update (`references/matheron-rule.md`). Distinct from inducing-point sparsity (`references/sparse-gps.md`): RFF sparsifies the kernel operator, not the training data. Covers why the spectrum has to match the actual kernel family (SE frequencies under a Matérn claim make paths too smooth), the two different jobs RFF can do (prior path only, versus a stand-alone surrogate that behaves like SoR and gets over-confident far from data), and why frequencies must stay frozen across all `q` draws within one BO step.
 
 ### GP Kernels (the actual scientific claim under BO and GP-TS)
 

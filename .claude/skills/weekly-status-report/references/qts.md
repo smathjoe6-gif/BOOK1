@@ -34,7 +34,7 @@ The `q` paths *are* independent of each other given `Dn`. Correlation among batc
   f̃(x) = f̃0(x) + k(x,X)(K_X + σ²I)⁻¹ (y - f̃0(X) - ε̃)
   ```
   This gives an explicit `f̃(x)` ready for L-BFGS. Cache the factorization of `K_X + σ²I` across all `q` draws — only `f̃0` and `ε̃` change per draw. Full derivation, the RFF/inducing options for drawing `f̃0` itself, and the linear-algebra checklist: `references/matheron-rule.md`.
-- **Random Fourier features.** Approximate `k` as `φ(x)ᵀφ(x')`, draw prior weights, condition on `y`, get `f̃(x) = wᵀφ(x)`. Cheap to minimize. The bias here is the feature-count truncation — state the feature count used.
+- **Random Fourier features.** Approximate `k` as `φ(x)ᵀφ(x')`, draw prior weights, condition on `y`, get `f̃(x) = wᵀφ(x)`. Cheap to minimize. The bias here is the feature-count truncation — state the feature count used. Full treatment in `references/rff.md`.
 - **Discrete candidate set.** Draw from the joint Normal on a finite set `A`, play ordinary TS on `A`. This is exact TS *on that set*, not a continuous path — valid qTS on `A`, but say plainly that it's restricted to `A`.
 
 Cache posterior factorizations. Drawing `q=8` paths should never mean eight separate Choleskys of the same matrix.

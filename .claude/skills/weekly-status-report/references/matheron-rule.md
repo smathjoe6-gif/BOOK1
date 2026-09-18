@@ -24,8 +24,8 @@ For qTS specifically: one Cholesky of `Ky` per BO step, then `q` independent `(f
 
 ## The remaining piece: drawing `f0`
 
-- **Random Fourier features.** For stationary `k(x,x') ≈ φ(x)ᵀφ(x')`, `f0(x) = m(x) + φ(x)ᵀw`, `w ~ N(0,I)`. Feature count is the bias knob here. Use the spectral density of the *actual* kernel in use — SE frequencies drawn under a Matérn 5/2 prior are simply the wrong prior.
-- **Inducing / decoupled pathwise.** Same correction; the prior sample comes from features or a fixed inducing set instead. When `n` runs into the thousands, `Ky` itself needs to be sparse or approximate — say so explicitly rather than silently approximating.
+- **Random Fourier features.** For stationary `k(x,x') ≈ φ(x)ᵀφ(x')`, `f0(x) = m(x) + φ(x)ᵀw`, `w ~ N(0,I)`. Feature count is the bias knob here. Use the spectral density of the *actual* kernel in use — SE frequencies drawn under a Matérn 5/2 prior are simply the wrong prior. Full treatment (Bochner's theorem, QFF, spectrum-matching, and RFF as a stand-alone surrogate versus RFF as just `f0`): `references/rff.md`.
+- **Inducing / decoupled pathwise.** Same correction; the prior sample comes from features or a fixed inducing set instead. When `n` runs into the thousands, `Ky` itself needs to be sparse or approximate (`references/sparse-gps.md`) — say so explicitly rather than silently approximating.
 
 **Do not draw `f0(x)` as independent `N(m(x), k(x,x))` at query points.** Then `f0(X)` and `f0(x)` are no longer jointly a valid prior sample, and the whole identity above becomes false — this is the same independent-marginal trap that shows up everywhere else in this family (`references/thompson-sampling.md`).
 
