@@ -136,6 +136,10 @@ Read `references/theory-of-constraints.md` when the conversation is about *why* 
 
 When the constraint turns out to be a policy or a standing conflict rather than a scarce resource, read `references/toc-thinking-processes.md` — it covers the full Goldratt logic kit (Current Reality Tree, Evaporating Cloud, Future Reality Tree, Negative Branch Reservation, Prerequisite and Transition Trees) and, critically, what to compress out of all that for the report itself: only the injection, its owner, and one predicted effect checkable by next Friday. Never paste a full tree into the WSR, and never color a policy constraint Green just because tasks moved — it stays Amber until the predicted effect actually shows up.
 
+### TOC applied to supply chain (worked pattern)
+
+If the status touches a multi-echelon supply chain (plant → central warehouse → DCs → customer), read `references/toc-supply-chain.md` — it's a fully worked application of the thinking-process trees to the classic pattern of simultaneous stockouts and excess inventory. Recognize it fast: if a report shows A-items stockout *and* a full warehouse *and* a plant that reschedules daily, this is almost certainly the right lens. It gives the specific CRT spine, the cloud and injection for that pattern, the negative branches to trim, and what to color a weekly report on (buffer trajectory and policy violations — never warehouse utilization).
+
 ## Action items
 
 | ID | Action | Owner | Due | Status | Notes |
