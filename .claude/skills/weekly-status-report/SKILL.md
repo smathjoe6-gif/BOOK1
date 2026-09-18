@@ -160,6 +160,10 @@ Read `references/spc.md` before writing anything cited as "quality" data — it 
 
 Read `references/dmaic.md` for the full detail behind the DMAIC table above — each phase's gate criterion (a specific, checkable bar, not a vibe) and, just as important, the named counterfeit version of that phase to watch for (a charter that's really "improve satisfaction," an Analyze that's a voted fishbone, a pilot skipped straight to a site-wide rollout, a Control-phase binder nobody opens). Color the DMAIC *project*, never the company, from whether a gate was actually earned or just calendared past.
 
+### Measurement Systems Analysis (before trusting any of the above)
+
+Read `references/msa.md` before Analyze, before SPC, and before quoting any capability number — it answers one question: is a given number mostly the process, or mostly the gage? Covers the full set of failure modes Gage R&R alone doesn't catch (bias, linearity, stability, discrimination), the correct study order (resolution → stability → bias/linearity → Gage R&R), the two GR&R denominators (versus process vs. versus tolerance — never mixed), `ndc`, attribute-agreement studies with kappa, and Type I/II error framing. A "stop" verdict here means DMAIC stays in Measure — Analyze on that Y is fiction.
+
 ## Action items
 
 | ID | Action | Owner | Due | Status | Notes |

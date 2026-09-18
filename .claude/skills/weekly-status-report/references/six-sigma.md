@@ -33,7 +33,7 @@ Run DMAIC on a process that doesn't really exist yet and the "Measure" phase col
 
 ## The statistical spine
 
-- **MSA (Measurement Systems Analysis) first.** If the gage itself eats up most of the observed variation, everything in Analyze is fiction built on top of noise.
+- **MSA (Measurement Systems Analysis) first.** If the gage itself eats up most of the observed variation, everything in Analyze is fiction built on top of noise. See `references/msa.md` for the full study design and how to read the result.
 - **Control charts separate common cause from special cause.** Reacting to common-cause variation as if it were special is tampering — this is Deming's point, one Six Sigma borrowed and then frequently forgets in practice. See `references/spc.md` for the full chart mechanics, signal rules, and the capability-ordering rule.
 - **Capability only after stability** is demonstrated on the chart, never before.
 - **Tests and confidence intervals** whenever a before/after claim is made — name the actual test used and the sample it was run on, don't just assert "it improved."

@@ -14,7 +14,7 @@ Leave this phase with a problem specific enough to photograph: what, where, when
 
 ## Measure — make Y honest
 
-Write an operational definition of Y, then run MSA on it. If the gage eats most of the observed variation, stop here — nothing downstream is trustworthy yet. Baseline from a dated sample, never from memory or from "what we generally see." Build a control chart if the data exist for it — stability first, capability later (see `references/spc.md`). Map the as-is process specifically at the step where the defect is actually born, not just the whole process in general. Write down the sampling plan that Analyze will use before Analyze starts.
+Write an operational definition of Y, then run MSA on it (`references/msa.md` for the full study design). If the gage eats most of the observed variation, stop here — nothing downstream is trustworthy yet. Baseline from a dated sample, never from memory or from "what we generally see." Build a control chart if the data exist for it — stability first, capability later (see `references/spc.md`). Map the as-is process specifically at the step where the defect is actually born, not just the whole process in general. Write down the sampling plan that Analyze will use before Analyze starts.
 
 **Gate:** two competent people, looking at the same unit independently, call it the same way. The baseline has an explicit date range and a stated n.
 
