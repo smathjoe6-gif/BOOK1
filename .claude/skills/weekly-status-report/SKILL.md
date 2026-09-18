@@ -140,6 +140,10 @@ When the constraint turns out to be a policy or a standing conflict rather than 
 
 If the status touches a multi-echelon supply chain (plant → central warehouse → DCs → customer), read `references/toc-supply-chain.md` — it's a fully worked application of the thinking-process trees to the classic pattern of simultaneous stockouts and excess inventory. Recognize it fast: if a report shows A-items stockout *and* a full warehouse *and* a plant that reschedules daily, this is almost certainly the right lens. It gives the specific CRT spine, the cloud and injection for that pattern, the negative branches to trim, and what to color a weekly report on (buffer trajectory and policy violations — never warehouse utilization).
 
+### Drum-Buffer-Rope (the daily mechanism)
+
+Read `references/dbr.md` for the actual day-to-day release mechanism behind any of the buffer-based lenses above — the drum (constraint pace), the buffer (time, not a pile of stock), and the rope (the release rule that stops WIP from flooding the floor ahead of the constraint). Covers Traditional DBR vs. S-DBR, the Green/Amber/Red buffer-zone steering rules, and the same drum/buffer/rope pattern worked across plant, distribution, and project (Critical Chain) networks side by side. Color from buffer trajectory and rope integrity — never department busy-ness or local utilization.
+
 ## Action items
 
 | ID | Action | Owner | Due | Status | Notes |

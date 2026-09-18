@@ -38,7 +38,7 @@ A loud delay is not automatically the constraint. Ask what the goal is actually 
 
 ## Drum–Buffer–Rope (DBR)
 
-The factory-floor form of the same idea:
+The factory-floor form of the same idea — see `references/dbr.md` for the full daily mechanism (buffer zones, release math, Traditional vs. S-DBR). In brief:
 
 - **Drum** — the constraint sets the beat everything else has to move to.
 - **Buffer** — time or stock that protects the drum from upstream noise, so a hiccup elsewhere never starves it.
