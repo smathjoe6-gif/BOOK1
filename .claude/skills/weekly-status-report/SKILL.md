@@ -200,6 +200,10 @@ Read `references/sequential-design.md` before calling anything "sequential [X]-o
 
 Read `references/bayesian-optimization.md` when the target is a good `x*` for an expensive black-box `f(x)` — no mean function anyone is willing to write down, so there's no `θ` and no Fisher information at all. Same loop shape as sequential Bayesian design but a different object: a surrogate (usually a GP) replaces the declared model, and an acquisition function (EI, LCB/UCB, Thompson, PES/KG) replaces expected-utility-over-θ. Covers kernel choice as the real scientific claim, batch acquisitions for plate/weekly-calendar runs, multi-objective Pareto handling, and exactly where this stops making sense — vanilla GPs rot once dimension climbs and evaluations should instead go through RSM (an interpretable surface) or parametric sequential Bayes (a precise `θ`) depending on which one the report actually needs.
 
+### Thompson Sampling (probability matching, finite arms or GP-TS)
+
+Read `references/thompson-sampling.md` for the policy underneath any "Thompson" row above — draw one world from the posterior, act optimally in that world, update. Covers the clean conjugate finite-arm cases (Beta-Bernoulli, Normal-Normal, etc.), the continuous GP-TS extension used in Bayesian optimization (drawing a whole posterior function, not per-point independent Normals), batching by drawing multiple independent worlds, and the regret guarantees that say it isn't reckless without saying it picked your kernel or prior for you. A never-played arm after many rounds is a prior problem, not bad luck — check the prior predictive before round one.
+
 ## Action items
 
 | ID | Action | Owner | Due | Status | Notes |

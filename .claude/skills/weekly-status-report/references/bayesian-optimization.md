@@ -31,7 +31,7 @@ Write `f*n` for the incumbent (best observation or best posterior mean — pick 
 | PI | Chance of beating `f*n - ξ` | Exploits; collapses early |
 | EI | Expected improvement over the incumbent | Default; closed form under a GP |
 | LCB/UCB | `μ - κσ` (for minimization) | Exploration is entirely the `κ` schedule |
-| Thompson | Minimize a posterior draw `f̃` | Exploration via samples; natural batches |
+| Thompson | Minimize a posterior draw `f̃` | Exploration via samples; natural batches — see `references/thompson-sampling.md` |
 | PES / MES | Information about `x*` or `f*` | Explores the minimizer, not all of `f` |
 | Knowledge gradient | Expected drop in `min μ` after one `y` | One-step look-ahead on the actual decision |
 

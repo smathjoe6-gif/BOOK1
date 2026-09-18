@@ -15,7 +15,7 @@ A string of OFAT tweaks is not sequential design. Peeking at Y and deleting ugly
 | Sequential local | Next `x` via `θ̂n` | Model form |
 | Pseudo-Bayesian batch | Nothing mid-batch | Prior and model |
 | Sequential Bayesian | `πn`, then `x` | Utility and prior family |
-| Bandit / Thompson | Allocation probabilities | Arm set |
+| Bandit / Thompson | Allocation probabilities | Arm set — see `references/thompson-sampling.md` |
 | Group-sequential trial | Stop / continue / drop arm | Hypothesis and error spend |
 
 If a report says "sequential Bayesian steepest-ascent D-optimal," it has mixed rows from this table into one claim. That sequence cannot be audited — pick the row it actually is.
@@ -43,7 +43,7 @@ Block 1 shouldn't be a single extreme the prior barely supports — use a small 
 ## When the decision isn't a surface
 
 - **Group-sequential trials** spend Type I error across looks. That's a stop/continue design — D-efficiency doesn't apply to the interim p-value.
-- **Bandits** change how often discrete arms get played (cumulative reward, treat-as-you-go). They're a poor map of a continuous response surface — don't borrow bandit logic for an RSM problem.
+- **Bandits** change how often discrete arms get played (cumulative reward, treat-as-you-go) — `references/thompson-sampling.md` covers the probability-matching mechanics (finite arms and the continuous GP-TS extension). They're a poor map of a continuous response surface — don't borrow bandit logic for an RSM problem.
 - **Model-discrimination sequential** picks `x` to drive posterior model odds or expected KL divergence. Combine with estimation only through an explicit hybrid utility, never silently.
 
 ## Rules that keep a sequence honest
