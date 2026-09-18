@@ -24,7 +24,7 @@ Draw `ωs ~ Λ`, `bs ~ Unif[0, 2π]`:
 
 This is unbiased for the kernel itself; Monte Carlo error is `O(1/√S)` in `k`, but that does **not** automatically translate into the same error bound on the posterior `σn(x)`.
 
-Quadrature grids on `Λ` (QFF) cut variance in small `d` and die in high `d`. **Optimizing** `{ωs}` by marginal likelihood turns this into a *sparse-spectrum GP*, not RFF — a genuinely different method, easy to overfit at typical BO budgets.
+Quadrature grids on `Λ` (QFF, `references/qff.md`) cut variance in small `d` and die in high `d`. Low-discrepancy points mapped through `Λ` instead of i.i.d. sampled — quasi-MC RFF (`references/qmc-rff.md`) — sit between the two: still Monte Carlo in spirit, often quieter in practice. **Optimizing** `{ωs}` by marginal likelihood turns this into a *sparse-spectrum GP*, not RFF — a genuinely different method, easy to overfit at typical BO budgets.
 
 ## Do not mix spectra
 

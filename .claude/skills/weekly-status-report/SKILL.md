@@ -252,7 +252,15 @@ Read `references/matheron-rule.md` for the actual mechanics behind "pathwise/Mat
 
 Read `references/rff.md` for the explicit feature map `φ(x)` that approximates a stationary kernel via Bochner's theorem — the usual way `f0` gets drawn inside a Matheron update (`references/matheron-rule.md`). Distinct from inducing-point sparsity (`references/sparse-gps.md`): RFF sparsifies the kernel operator, not the training data. Covers why the spectrum has to match the actual kernel family (SE frequencies under a Matérn claim make paths too smooth), the two different jobs RFF can do (prior path only, versus a stand-alone surrogate that behaves like SoR and gets over-confident far from data), and why frequencies must stay frozen across all `q` draws within one BO step.
 
-### GP Kernels (the actual scientific claim under BO and GP-TS)
+### Quadrature Fourier Features (the deterministic alternative to RFF)
+
+Read `references/qff.md` for the quadrature version of `references/rff.md` — nodes and weights from integrating the spectral measure `Λ` instead of sampling it, giving a fully deterministic `φ` for the same `ℓ, ν, S`. Covers building nodes correctly for the actual kernel family (Gauss-Hermite for SE, a Matérn-matched rule rather than borrowed Hermite nodes), why tensor-grid error falls off a cliff past the frequencies the grid was built for rather than decaying smoothly like RFF's, and why changing `ℓ` invalidates every node and requires a full rebuild, not a cache reuse.
+
+### Quasi-Monte Carlo RFF (low-discrepancy frequencies, still Monte Carlo)
+
+Read `references/qmc-rff.md` for the point in between `references/rff.md` and `references/qff.md` — frequencies come from a low-discrepancy sequence (Sobol' with an Owen scramble is the default) mapped through the spectral measure's inverse-cdf, not sampled i.i.d. and not a quadrature grid. Covers why the inverse-cdf choice *is* the kernel claim (Sobol' through a Gaussian inverse-cdf under a Matérn poster is the same spectrum-mixing mistake as elsewhere in this family), why QMC mainly helps local kernel accuracy rather than far lags, and why it still doesn't restore residual variance outside `span(φ)` as a stand-alone surrogate.
+
+### Quadrature Fourier Features (the deterministic alternative to RFF)
 
 Read `references/gp-kernels.md` before trusting any EI, LCB, or Thompson-path result — the kernel is the prior on functions, and no acquisition function can repair a wrong one. Covers what a kernel actually asserts (lengthscale, smoothness via Matérn `ν`, amplitude, stationarity), why pinned ARD lengthscales at high `D`/low `n` are usually a fitting failure rather than a real relevance finding, building structure through sums/products/additive kernels, and MAP-over-Type-II-MLE as the grown-up default when `n ≲ 30`. Never put a Euclidean RBF on one-hot categorical encodings, and never swap kernel families week to week just to chase last night's acquisition result.
 
