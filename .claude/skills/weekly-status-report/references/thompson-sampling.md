@@ -38,7 +38,7 @@ GP-TS needs a draw from the full `GP(μn, kn)` — the whole correlated function
   ```
   f̃(x) = f̃0(x) + k(x,X) (K_X + σ²I)⁻¹ (y - f̃0(X) - ε̃)
   ```
-  This gives an explicit function that can be handed to L-BFGS. This is the usual scalable GP-TS approach.
+  This gives an explicit function that can be handed to L-BFGS. This is the usual scalable GP-TS approach. Full derivation, the RFF/inducing options for drawing `f̃0`, and the linear-algebra checklist: `references/matheron-rule.md`.
 - **Random Fourier features.** Approximate the prior kernel as `φ(x)ᵀφ(x')`, draw the feature weights from the prior, then condition those weights on `y`. Again produces an explicit `f̃(x)`.
 - **Discrete candidate set.** Evaluate the joint posterior on a finite set and run ordinary finite-arm TS there. Cheaper — but say plainly that it's not a full function sample, since it isn't.
 

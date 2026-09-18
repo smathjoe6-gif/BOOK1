@@ -1,6 +1,6 @@
 # Kriging Believer (KB)
 
-Kriging Believer is a **scheduler**, not an acquisition (see `references/fantasy-average.md` for the general pattern it belongs to). The acquisition `a(·)` stays exactly what was already chosen — EI, KG, LCB, whatever. KB only changes the posterior that slot `i+1` is allowed to see.
+Kriging Believer is a **policy for filling a batch** — a scheduler, not an acquisition and not a model of `f` (see `references/fantasy-average.md` for the general pattern it belongs to; neighbors: `references/qts.md`). The acquisition `a(·)` stays exactly what was already chosen — EI, KG, LCB, whatever. KB only changes the posterior that slot `i+1` is allowed to see.
 
 ## State and loop
 
@@ -45,6 +45,58 @@ After that deflation:
 So `z(i+1)` gets pushed out of the lengthscale ball around `zi`. That's the feature, compared to `q` independent one-point maxima, which would otherwise all stack on the incumbent.
 
 It's also the limitation. Joint qKG (`references/qkg.md`) can buy a point that will never itself be recommended, because that point splits two stories apart. Fantasy average (`references/fantasy-average.md`) keeps several possible `y`'s alive at once. KB commits to exactly one story — the current mean — and plans the rest of the week's batch as if that story were already confirmed data.
+
+## What the policy is committing to
+
+By construction the residual is zero, so `μ̃ ← μ̃` (unchanged) while `k` deflates along `z`'s kernel column. **Mean frozen. Uncertainty around `zi` declared spent.**
+
+The policy's implicit beliefs:
+
+- The current `μ` is a good enough *story* to plan the rest of the week inside.
+- The thing that must not happen is measuring twice in the same lengthscale ball.
+- There's no willingness to pay for a look-ahead over unrealized `y`.
+
+That's rational when (a) `q` separated plant runs are needed this calendar step, (b) joint qKG/qEI (`references/qkg.md`) is too heavy to run, and (c) it's accepted that a wrong `μn` poisons the whole batch if it turns out to be wrong.
+
+It is **not** rational as a stand-in for "expected drop in `min μ` after the set." That object is qKG. KB never computes it, no matter how it gets described in a writeup.
+
+## What it optimizes (and doesn't)
+
+| Policy | One-step object | Batch object |
+|---|---|---|
+| 1-EI / 1-KG / 1-LCB | Their usual scalar `a(x)` | — |
+| KB + that `a` | Same `a` on a `σ`-deflated GP | Greedy separation, not a set utility |
+| FA-greedy-KG | Expected 1-KG after a random prefix `y` | Still greedy |
+| Joint qKG | — | `E[Δ min μ]` after `Z` |
+| qTS | — | Sample of `x*` |
+
+KB is closest to "run my one-point policy `q` times with an exclusion zone induced by the kernel." That exclusion zone isn't an extra Lipschitz penalty bolted on — it's the GP's own `k(·,z)` doing the work.
+
+## Behavior as a policy
+
+**Versus `q` independent maxima of `a`.** Those all stack on the incumbent. KB pushes `z(i+1)` out because EI/LCB/KG all die where `σ̃ ≈ 0`. That's the feature.
+
+**Versus qTS** (`references/qts.md`). qTS *reports* how many stories `πn` still has, via its collapse index. KB *forces* `q` separated sites even when every world wants the same `x*`. Use KB when the week must return `q` distinct runs regardless. Use qTS when the batch should reveal posterior collapse instead of hiding it.
+
+**Versus FA-greedy-KG** (`references/fa-greedy-kg.md`). FA averages 1-KG over prefix worlds, so `μ` is allowed to move in some fantasies. KB never moves `μ` at all. With two basins present: FA can still value the second one; KB plans only inside whichever basin the current mean already favors.
+
+**Versus joint qKG.** Joint can sit `z1` on an informational ridge and revise the whole set afterward. KB cannot buy a ridge that loses on one-point `a`, and can never revise `z1` once picked.
+
+## Failure modes of the policy
+
+- **Wrong-mean lock-in.** If `z1` sits in a bogus basin of `μn`, every later `z` becomes a satellite of that same bad basin.
+- **Noiseless KB + large real `σ²`.** Pretending `f(zi)` was learned completely makes the rest of the batch overconfident. Prefer noisy-KB whenever real `σ²` is non-trivial.
+- **Soft KB + single-start `a`.** `z(i+1)` just re-proposes `zi`.
+- **`q` larger than the number of basins `μn` actually has.** The result is a ring of points around one bump, spaced by `ℓ` — that's exploration of the *kernel*, not exploration of `f`.
+- **Labeling.** Shipping KB+EI under the heading "qKG."
+
+## When the policy is the right one
+
+Ship KB+EI (or KB+LCB) when an auditable, cheap, separated batch is needed this afternoon, and there's no pretense that the set maximized `Δ min μ`.
+
+Publish: classic vs. noisy KB; the base `a`; `q`; `σ²_fant`; minimum coded pairwise distance; `unique(Z)/q` (here this is a **spacing** index, not a TS collapse index — the two look similar but mean opposite things).
+
+If the leftover doubt in `μ` still matters, step up to FA-greedy. If the set needs to genuinely be a sample of `x*`, use qTS instead. If informational sites matter and `q ≤ 4`, pay for joint qKG. KB is the policy that remains once those three bills are declined and clones are still refused.
 
 ## Order, search, cost
 
