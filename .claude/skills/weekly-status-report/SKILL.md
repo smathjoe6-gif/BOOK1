@@ -132,6 +132,10 @@ If the project runs on a resource-leveled Critical Chain plan (buffers, not just
 
 Read `references/theory-of-constraints.md` when the conversation is about *why* something is the bottleneck, not just what its float or buffer number is — it covers Goldratt's five focusing steps (identify, exploit, subordinate, elevate, repeat), where a constraint typically lives (resource, policy, market, chain, portfolio), and Drum-Buffer-Rope. Use it to frame action items around exploiting/subordinating the real constraint before jumping to "hire more people" or "add a tool," which are elevation moves and need an explicit decision, not a default reach.
 
+### TOC Thinking Processes (when the constraint is a policy)
+
+When the constraint turns out to be a policy or a standing conflict rather than a scarce resource, read `references/toc-thinking-processes.md` — it covers the full Goldratt logic kit (Current Reality Tree, Evaporating Cloud, Future Reality Tree, Negative Branch Reservation, Prerequisite and Transition Trees) and, critically, what to compress out of all that for the report itself: only the injection, its owner, and one predicted effect checkable by next Friday. Never paste a full tree into the WSR, and never color a policy constraint Green just because tasks moved — it stays Amber until the predicted effect actually shows up.
+
 ## Action items
 
 | ID | Action | Owner | Due | Status | Notes |

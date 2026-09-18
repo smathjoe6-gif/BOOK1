@@ -46,7 +46,7 @@ The factory-floor form of the same idea:
 
 Critical Chain is DBR mapped onto a task network: the chain is the drum, the project and feeding buffers are the buffers, and "no new scope while the fever chart is Red" is the rope.
 
-When the limit turns out to be a *policy* rather than a person or a machine, Goldratt's thinking processes (Current Reality Tree, Evaporating Cloud, Future Reality Tree) are the right tool — but those belong in a dedicated problem-solving session, not in the body of a weekly status report.
+When the limit turns out to be a *policy* rather than a person or a machine, Goldratt's thinking processes (Current Reality Tree, Evaporating Cloud, Future Reality Tree, and the rest) are the right tool — see `references/toc-thinking-processes.md`. The full trees are built in a dedicated working session, not in the report itself; the WSR only ever receives the compressed result (the injection, its owner, and one checkable predicted effect).
 
 ## How this should change a status report
 
