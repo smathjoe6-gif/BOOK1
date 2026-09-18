@@ -1,6 +1,6 @@
 # Theory of Constraints (TOC)
 
-Theory of Constraints is Goldratt's rule for any system that has a goal: throughput is set by **one constraint at a time**. Everything else is commentary. Critical Chain (`references/critical-chain.md`) is that same rule applied specifically to a project network — the chain is the constraint made visible on a schedule.
+Theory of Constraints is Goldratt's claim that a system's results are set by **one constraint at a time**, and that most "improvements" are local optimizations that never actually touch that constraint. Everything else in the toolkit — the five focusing steps, Drum-Buffer-Rope, Critical Chain, replenishment, the Thinking Processes — is that one claim turned into an operating method. Critical Chain (`references/critical-chain.md`) is the claim applied specifically to a project network — the chain is the constraint made visible on a schedule.
 
 ## The goal and the three numbers
 
@@ -47,6 +47,26 @@ The factory-floor form of the same idea — see `references/dbr.md` for the full
 Critical Chain is DBR mapped onto a task network: the chain is the drum, the project and feeding buffers are the buffers, and "no new scope while the fever chart is Red" is the rope.
 
 When the limit turns out to be a *policy* rather than a person or a machine, Goldratt's thinking processes (Current Reality Tree, Evaporating Cloud, Future Reality Tree, and the rest) are the right tool — see `references/toc-thinking-processes.md`. The full trees are built in a dedicated working session, not in the report itself; the WSR only ever receives the compressed result (the injection, its owner, and one checkable predicted effect).
+
+## What TOC is good at
+
+- Stopping the organization from treating every queue as its own separate crisis.
+- Making subordination explicit — idle non-constraint time can be genuinely healthy, not a problem to solve.
+- Giving operations, projects, and supply chains the *same* control signal: buffer versus progress, rather than a different local metric for each.
+- Forcing the question "did throughput actually move?" instead of "were we busy?"
+
+That's why it sits cleanly next to the other schedule lenses in this skill: CPM says whether the logic still reaches the date; EVM and Earned Schedule say how efficiently money and time are being earned; TOC says whether the thing that actually gates the goal is protected.
+
+## Where it is weak or misused
+
+- **Identifying the wrong constraint.** The loudest delay is not always the constraint. A policy (batching, a utilization target, forecast-push) is easy to miss entirely because it just looks like "how we work" rather than a decision someone made.
+- **Religion around 50% estimates and exact buffer formulas.** The sizes are a starting policy, not physics — you're meant to manage by penetration afterward and adjust from evidence. Treating the first cut as a fixed, correct number is cargo-cult TOC.
+- **One-project zeal in a pipeline.** Running CCPM on a single project without staggering the shared scarce resource across the portfolio just paints a fever chart on top of an already-overloaded drum — it looks like discipline while changing nothing.
+- **Ignoring cash, quality, and regulation.** Throughput defined as "money now" can be abused to justify starving quality or compliance work just because it isn't sitting on today's drum. Elevate is sometimes mandatory on day one — a constraint that's actually a safety or compliance gate doesn't wait for steps 2 and 3.
+- **Software theater.** A fever-chart tool bolted onto a schedule that still scores people on task due dates and department utilization KPIs is not TOC — the tool changed, the incentives didn't.
+- **People.** "Subordinate" heard as "your work doesn't matter" will be resisted, and the predictable result is the rope getting cut through unofficial, informal queues that never show up on the official buffer chart.
+
+TOC does not replace a cost system, a quality system, or a market strategy — it says those systems should not be the ones setting the pace of the constraint.
 
 ## How this should change a status report
 
