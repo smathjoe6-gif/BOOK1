@@ -59,5 +59,6 @@ Write the adaptation rule *before* Y arrives: what may change, when, who signs o
 - Expensive runs, mechanistic `θ` → myopic sequential Bayes.
 - Rival mechanisms → hybrid discrimination.
 - Discrete arms, treat-as-you-go → bandit.
+- Expensive black-box, no mean function anyone will write down → Bayesian optimization (`references/bayesian-optimization.md`).
 
 **Usual fakes:** OFAT billed as steepest ascent with no plane actually fitted; an MLE plug-in billed as Bayesian; dropping terms mid-CCD while still quoting the old design's efficiency; changing the utility function mid-stream because the current one is losing; stopping on a posterior that finally looks pretty and skipping confirmation runs.

@@ -196,6 +196,10 @@ Read `references/nested-monte-carlo-utility.md` for the mechanics behind `Un(x)`
 
 Read `references/sequential-design.md` before calling anything "sequential [X]-optimal" — sequential design is a family of strategies that each hold different things fixed (region, model, criterion, or posterior), not one algorithm with adjectives stacked on it. Covers the classical path (screen → factorial + centers → ascent or quadratic), where D/I augmentation and Bayesian sequential design sit relative to it, and why group-sequential trials and bandits are different problems entirely that shouldn't borrow DOE vocabulary. Use its chooser table to name which row a given week's design actually is before writing it up.
 
+### Bayesian Optimization (tuning an expensive black box, not fitting a believed model)
+
+Read `references/bayesian-optimization.md` when the target is a good `x*` for an expensive black-box `f(x)` — no mean function anyone is willing to write down, so there's no `θ` and no Fisher information at all. Same loop shape as sequential Bayesian design but a different object: a surrogate (usually a GP) replaces the declared model, and an acquisition function (EI, LCB/UCB, Thompson, PES/KG) replaces expected-utility-over-θ. Covers kernel choice as the real scientific claim, batch acquisitions for plate/weekly-calendar runs, multi-objective Pareto handling, and exactly where this stops making sense — vanilla GPs rot once dimension climbs and evaluations should instead go through RSM (an interpretable surface) or parametric sequential Bayes (a precise `θ`) depending on which one the report actually needs.
+
 ## Action items
 
 | ID | Action | Owner | Due | Status | Notes |
