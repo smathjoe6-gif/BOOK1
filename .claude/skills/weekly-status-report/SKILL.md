@@ -212,6 +212,10 @@ Read `references/knowledge-gradient.md` when the last few runs are expensive, al
 
 Read `references/qkg.md` when a whole batch of `q` points returns together and the object is next week's recommendation, not just the best observed `y` in the set. Covers why the joint form (not greedy, not one-shot) is the actual definition, how greedy approximations fake the unseen fantasy outcomes (kriging believer, constant liar, fantasy average), and why honest joint Monte Carlo stops being credible much past `q=4` unless the search space is tiny. Never let an inner minimum be taken only over the proposed batch `Z` — it has to range over the whole space or it isn't computing KG at all.
 
+### Fantasy-Average Batch Scheduling (the general greedy-batch pattern)
+
+Read `references/fantasy-average.md` for the batch scheduler underneath most "batch KG" or "batch EI" claims — pick one point on the real posterior, pretend the GP has seen it, pick the next on that fantasy posterior, repeat. Covers the single-lie plug-ins (kriging believer, constant liar, sample liar) versus the true fantasy-average (`T` fantasies, properly averaged), what each does to the rest of the batch's exploration, and which base acquisition it pairs well with. This is not joint batch optimization and should never be reported as if it were — it never un-picks the first point once chosen.
+
 ## Action items
 
 | ID | Action | Owner | Due | Status | Notes |
