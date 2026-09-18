@@ -33,7 +33,7 @@ On a continuous box, `min_x μ(n+1)` has no closed form. Two practical routes:
 
 A 20-point inner set that forgot to include the current incumbent understates KG systematically — always name the inner set used, since the number depends on it.
 
-`qKG` is the same expectation after a batch `z(1:q)` — see `references/qkg.md` for the joint form and its approximations. The fantasy `y` there is `q`-dimensional; joint qKG is heavy, so greedy sequential addition of points is the usual approximation people actually ship.
+`qKG` is the same expectation after a batch `z(1:q)` — see `references/qkg.md` for the joint form and its approximations. The fantasy `y` there is `q`-dimensional; joint qKG is heavy, so greedy sequential addition of points is the usual approximation people actually ship — see `references/fa-greedy-kg.md` for the fantasy-averaged version of that greedy loop specifically.
 
 ## Versus EI and GP-TS
 

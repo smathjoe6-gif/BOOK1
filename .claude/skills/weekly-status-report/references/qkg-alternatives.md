@@ -5,7 +5,7 @@ qKG (`references/qkg.md`) scores a batch by the expected drop in `min μ` after 
 ## Stay in the KG family (cheaper)
 
 - **Greedy 1-KG:** pick `z1` by ordinary KG (`references/knowledge-gradient.md`), update a working GP, pick `z2`, and so on.
-- **Fantasy-average greedy KG:** same, but the next KG is averaged over `T` predictive `y`'s of the prefix (`references/fantasy-average.md`).
+- **Fantasy-average greedy KG:** same, but the next KG is averaged over `T` predictive `y`'s of the prefix (`references/fantasy-average.md`) — see `references/fa-greedy-kg.md` for the full slot mechanics and cost accounting.
 - **One-shot / stochastic-gradient qKG:** optimize the joint set approximately, rather than exactly.
 
 These still aim at (a relaxation of) "better `argmin μ`." They never un-pick `z1` once chosen. Use this family when the KG goal is wanted but joint MC can't be run.

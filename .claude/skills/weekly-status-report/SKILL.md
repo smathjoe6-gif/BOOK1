@@ -224,6 +224,10 @@ Read `references/fantasy-average.md` for the batch scheduler underneath most "ba
 
 Read `references/kriging-believer.md` for the full state/loop mechanics behind the most common batch scheduler in practice — the working-copy GP, the rank-1 update algebra that freezes the mean and deflates covariance around the fake point, and why it can only stamp "already measured" onto a neighborhood rather than ever discovering a better basin. Publish whether the fantasy noise was 0 (classic KB) or `σ²_obs` (noisy KB) — the two behave differently. Never leave the fake `(z, μ(z))` pair sitting in the real training set once the batch ships.
 
+### Fantasy-Average Greedy KG (the KG-specific slot mechanics)
+
+Read `references/fa-greedy-kg.md` for the full two-expectation structure behind FA-greedy-KG specifically — an outer fantasy average over the still-random prefix outcomes, and an inner real-KG computation on each fantasy GP. Covers the per-slot procedure, why the same outer fantasy draws must be reused across every candidate in a slot, the cost split between outer `T` and inner `T_in`, and how it differs from both KB-greedy-KG (`T=1`, a lie instead of a real average) and joint qKG (which never freezes a prefix at all).
+
 ### qKG Alternatives (what's actually being given up)
 
 Read `references/qkg-alternatives.md` when joint qKG (`references/qkg.md`) is too expensive and a substitute is needed — it maps every option (greedy/fantasy-average KG, qEI, batch MES/PES, qTS, KB+EI, local penalization, hard min-distance/DPP) against what each one keeps versus discards from the full joint object. States plainly that KB+EI is the industrial default and also the thing most often mislabeled qKG, and that giving up the joint form always costs the value of informational sites and the true batch correlation — whatever else is kept.
