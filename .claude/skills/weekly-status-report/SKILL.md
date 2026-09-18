@@ -202,7 +202,15 @@ Read `references/bayesian-optimization.md` when the target is a good `x*` for an
 
 ### Thompson Sampling (probability matching, finite arms or GP-TS)
 
-Read `references/thompson-sampling.md` for the policy underneath any "Thompson" row above — draw one world from the posterior, act optimally in that world, update. Covers the clean conjugate finite-arm cases (Beta-Bernoulli, Normal-Normal, etc.), the continuous GP-TS extension used in Bayesian optimization (drawing a whole posterior function, not per-point independent Normals), batching by drawing multiple independent worlds, and the regret guarantees that say it isn't reckless without saying it picked your kernel or prior for you. A never-played arm after many rounds is a prior problem, not bad luck — check the prior predictive before round one.
+Read `references/thompson-sampling.md` for the policy underneath any "Thompson" row above — draw one world from the posterior, act optimally in that world, update. Covers the clean conjugate finite-arm cases (Beta-Bernoulli, Normal-Normal, etc.), the continuous GP-TS extension used in Bayesian optimization (drawing a whole posterior function via pathwise/Matheron updates or random Fourier features — never per-point independent Normals), batching by drawing multiple independent worlds, and the regret guarantees that say it isn't reckless without saying it picked your kernel or prior for you. A never-played arm after many rounds is a prior problem, not bad luck — check the prior predictive before round one.
+
+### Knowledge Gradient (look-ahead on the recommendation, not the sample)
+
+Read `references/knowledge-gradient.md` when the last few runs are expensive, alternatives are discrete, or noise has already made EI-on-best-observation dishonest — KG values a measurement by how much it's expected to move `argmin μ` itself, which can land on a completely different `x` than the one just measured. Covers the discrete closed form versus the continuous fantasy-based approximation, why an inner set that forgets the current incumbent understates KG, and why it's not the weekly default on a cheap simulator where the compute cost isn't earning its keep. See `references/qkg.md` for the batch version.
+
+### qKG (batch Knowledge Gradient)
+
+Read `references/qkg.md` when a whole batch of `q` points returns together and the object is next week's recommendation, not just the best observed `y` in the set. Covers why the joint form (not greedy, not one-shot) is the actual definition, how greedy approximations fake the unseen fantasy outcomes (kriging believer, constant liar, fantasy average), and why honest joint Monte Carlo stops being credible much past `q=4` unless the search space is tiny. Never let an inner minimum be taken only over the proposed batch `Z` — it has to range over the whole space or it isn't computing KG at all.
 
 ## Action items
 
