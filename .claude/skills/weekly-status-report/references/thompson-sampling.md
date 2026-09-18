@@ -75,7 +75,7 @@ Discrete or mixed `x`: treat it as a bandit on the finite set, or use a kernel t
 | Parametric sequential Bayes | Expected utility of `π(θ\|y)` for a named mean (`references/sequential-bayesian-design.md`) |
 | Independent-marginal "TS" | Fake paths — not GP-TS at all |
 
-GP-TS wants a good `x*` for a black-box `f`. It does not estimate a mechanistic `θ`, and it does not hand back an interpretable quadratic. Kernel and scaling *are* the prior here: Matérn 5/2 in a unit box with a real nugget is the boring, correct starting point. EI computed on raw engineering units and independent-marginal draws are the two standard ways people fake this algorithm.
+GP-TS wants a good `x*` for a black-box `f`. It does not estimate a mechanistic `θ`, and it does not hand back an interpretable quadratic. Kernel and scaling *are* the prior here (`references/gp-kernels.md`): Matérn 5/2 in a unit box with a real nugget is the boring, correct starting point. EI computed on raw engineering units and independent-marginal draws are the two standard ways people fake this algorithm.
 
 ## What the theory is buying
 

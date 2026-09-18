@@ -220,6 +220,10 @@ Read `references/fantasy-average.md` for the batch scheduler underneath most "ba
 
 Read `references/qts.md` for the Thompson-flavored batch method — draw `q` independent posterior paths, take each one's minimizer, repair collisions, evaluate. No joint surface, no fantasy `y`, so it's cheaper than qEI/qKG but answers a different question: a Monte Carlo sample of `x*`, not an expected improvement or expected drop in `min μ`. Covers the named repair strategies for when the posterior has fewer distinct stories than `q` (drop-duplicate, nudge, repulsive TS, or just capping `q`), and the collapse index (`unique(Z)/q`) worth logging every batch — a stacked batch is a real result about the posterior, not a bug to quietly patch around.
 
+### GP Kernels (the actual scientific claim under BO and GP-TS)
+
+Read `references/gp-kernels.md` before trusting any EI, LCB, or Thompson-path result — the kernel is the prior on functions, and no acquisition function can repair a wrong one. Covers what a kernel actually asserts (lengthscale, smoothness via Matérn `ν`, amplitude, stationarity), why pinned ARD lengthscales at high `D`/low `n` are usually a fitting failure rather than a real relevance finding, building structure through sums/products/additive kernels, and MAP-over-Type-II-MLE as the grown-up default when `n ≲ 30`. Never put a Euclidean RBF on one-hot categorical encodings, and never swap kernel families week to week just to chase last night's acquisition result.
+
 ## Action items
 
 | ID | Action | Owner | Due | Status | Notes |
