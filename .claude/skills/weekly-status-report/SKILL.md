@@ -262,7 +262,31 @@ Read `references/qmc-rff.md` for the point in between `references/rff.md` and `r
 
 ### Lattice-RFF (rank-1 lattices as a QMC frequency set)
 
-Read `references/lattice-rff.md` for the lattice-rule variant of quasi-MC RFF — frequencies from `{s·z/N}` pushed through the spectral inverse-cdf, still an average of cosines and not QFF (no quadrature weights involved). Covers why the textbook lattice-accuracy theory doesn't transfer for free once a non-periodic inverse-cdf is involved, the generating-vector choices that matter (Korobov, CBC, extensible `N=2^L`), why a random shift is needed to keep the kernel estimator unbiased, and why `s=0` has to be dropped before it explodes through `Φ⁻¹`. `scripts/cbc_lattice.py` implements the CBC construction (product-weight `P2`, optional SE-spectrum mapping) referenced there.
+Read `references/lattice-rff.md` for the lattice-rule variant of quasi-MC RFF — frequencies from `{s·z/N}` pushed through the spectral inverse-cdf, still an average of cosines and not QFF (no quadrature weights involved). Covers why the textbook lattice-accuracy theory doesn't transfer for free once a non-periodic inverse-cdf is involved, the generating-vector choices that matter (Korobov, CBC, extensible `N=2^L`), why a random shift is needed to keep the kernel estimator unbiased, and why `s=0` has to be dropped before it explodes through `Φ⁻¹`. `scripts/cbc_lattice.py` implements the direct CBC construction (product-weight `P2`, optional SE-spectrum mapping); `scripts/cbc_fft.py` builds the identical figure for prime `N` in `O(p·N log N)` via the cyclic structure of `(ℤ/Nℤ)ˣ` — verified to agree with the direct search to floating precision.
+
+### Walsh Digital Nets (the other harmonic language entirely)
+
+Read `references/walsh-digital-nets.md` before scoring or building a Sobol'-style point set — digital nets run on **Walsh** characters (addition of digits in base `b`), not the **Fourier** characters lattice `P2` measures, and the two figures of merit are not interchangeable. Covers generating matrices `Cj`, the dual net and `t`-value, the Walsh `P_α` figure of merit, scrambles, a base-2 construction checklist, and exactly what not to mix (Fourier `P2` scored against a digital net, or vice versa).
+
+### Walsh Functions (the characters themselves)
+
+Read `references/walsh-functions.md` for the harmonic-analysis foundation underneath every digital-net claim — Paley-ordered Walsh functions as characters of the dyadic group, their group-multiplication algebra (why a digital shift preserves the dual exactly while an Owen scramble only preserves it in expectation), orthogonality and digit-decay as the Walsh analogue of smoothness, the ANOVA-style product-structure reading of `t`-values, the Fast Walsh (Hadamard) Transform, and the Rademacher/Haar relationships. The core warning: neither Walsh `P_α` nor Fourier `P2` is actual Bochner/RFF error — both are cheap proxies in their own language.
+
+### Joe-Kuo Sobol' Direction Numbers (the standard published digital net)
+
+Read `references/joe-kuo.md` for the practical entry point to Sobol' sequences — the free odd direction numbers plus a primitive polynomial per coordinate that Joe and Kuo searched to keep Property A (1-D) and, in the 2008 tables, 2-D `t`-values small. Covers what the two published table generations (2003 TOMS, 2008 SISC) actually optimized, how to use a table for QMC-RFF correctly (freeze it, digital-shift it, never rescore it with Fourier `P2`), and why dimension 21201 in the table buys nothing for a 6-D GP spectrum.
+
+### Polynomial Lattices (Walsh CBC's natural home)
+
+Read `references/polynomial-lattices.md` for the digital net built from a ratio of polynomials over `𝔽b[x]/(P)` rather than Sobol' recurrences or an integer `z` — the natural target for Walsh CBC with explicit product weights, since (unlike free Sobol' seeds) the generators `qj` actually form a group. Covers the Hankel-matrix construction, why `P` needs to be irreducible for CBC to be valid, extensibility, and when to prefer this over a published Joe-Kuo table or an integer lattice.
+
+### Walsh CBC (component-by-component in the Walsh group)
+
+Read `references/walsh-cbc.md` for the Walsh-figure analogue of `scripts/cbc_lattice.py` / `scripts/cbc_fft.py` — the same one-coordinate-at-a-time greedy search, run over `𝔽b[x]/(P)` against a Walsh `P_α` instead of over `ℤ/Nℤ` against Fourier `P2`. Covers the greedy loop, where the FFT-over-a-finite-field speedup comes from, and the specific reuse mistakes to avoid (borrowing `B2` as the Walsh kernel, using an integer primitive root as the indexing group, or treating Joe-Kuo's `m(k,j)` as valid CBC candidates).
+
+### Digital Shift (the cheap, correct scramble for digital nets)
+
+Read `references/digital-shift.md` for the Walsh-group scramble — XOR a random digit vector onto each coordinate, which preserves the net's `t`-value exactly and is the right way to move Sobol'/Joe-Kuo/polynomial-lattice points off degenerate points like the origin before `F_Λ⁻¹`. Explicitly distinct from a lattice-style `{x+Δ} mod 1` shift (wrong group) and from an Owen scramble (randomizes whole digit trees, only preserves `t` in expectation). Covers why independent shifts per coordinate matter and why the shift must be frozen across all `q` Matheron draws in one BO step.
 
 ### GP Kernels (the actual scientific claim under BO and GP-TS)
 
