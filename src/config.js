@@ -91,4 +91,14 @@ export const config = {
   pinterestClientSecret: process.env.PINTEREST_CLIENT_SECRET || '',
   pinterestBoardId: process.env.PINTEREST_BOARD_ID || '987484724485476675',
   pinterestDailyLimit: Number(process.env.PINTEREST_DAILY_LIMIT || 2),
+  // X (Twitter) posting for GK_TERMINAL videos -- a 6th platform alongside
+  // YouTube/TikTok, same videos, no separate rollout cap (unlike Pinterest's
+  // trial-access limit above). These four are OAuth 1.0a "user context"
+  // credentials copied directly from the app's Keys and tokens page at
+  // developer.x.com -- no interactive login flow needed. Leave xApiKey
+  // blank to skip X entirely; everything else still works without it.
+  xApiKey: process.env.X_API_KEY || '',
+  xApiSecret: process.env.X_API_SECRET || '',
+  xAccessToken: process.env.X_ACCESS_TOKEN || '',
+  xAccessTokenSecret: process.env.X_ACCESS_TOKEN_SECRET || '',
 };

@@ -12,6 +12,7 @@ import { uploadToTikTok } from './tiktok.js';
 import { loadTikTokToken } from './tiktokAuth.js';
 import { uploadToPinterest } from './pinterest.js';
 import { loadPinterestToken } from './pinterestAuth.js';
+import { uploadToTwitter } from './twitter.js';
 import { maybeAutoGenerateVideo } from './autoGenerate.js';
 import { ensureVerticalVideo } from './aspectRatio.js';
 
@@ -190,6 +191,23 @@ async function processVideoOnce(file) {
         } catch (err) {
           console.error('Pinterest upload failed (other posts above still stand):', err.message);
         }
+      }
+    }
+  }
+
+  // X (Twitter) -- a 6th platform for the same GK_TERMINAL videos, no daily
+  // cap (unlike Pinterest's trial-access rollout above). A failure here
+  // never blocks anything else or stops the move-to-done below.
+  if (youtubePosted) {
+    if (!config.xApiKey) {
+      console.log('X (Twitter) is not configured yet — skipping (set X_API_KEY etc. in .env).');
+    } else {
+      console.log('Posting to X (Twitter)...');
+      try {
+        const tweet = await uploadToTwitter({ filePath: localPath, caption });
+        console.log(`X: posted, tweet id ${tweet.tweetId}`);
+      } catch (err) {
+        console.error('X upload failed (other posts above still stand):', err.message);
       }
     }
   }
