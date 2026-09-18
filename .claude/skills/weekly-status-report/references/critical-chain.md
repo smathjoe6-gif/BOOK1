@@ -2,6 +2,16 @@
 
 Critical Chain is Theory of Constraints (`references/theory-of-constraints.md`) applied to a project network — the chain is the constraint, the buffers are how it's protected, and "no new scope on a Red fever chart" is subordination in practice. It is not CPM with a different badge. Do not use this file's terminology (chain, buffer, fever chart) to describe an ordinary CPM schedule — if there's no resource-leveled chain and no buffers, it's still CPM; use `references/cpm.md` instead.
 
+## The problem it is solving
+
+Padded task dates fail for three boring, predictable reasons:
+
+- **Student syndrome** — the safety time was hidden inside the estimate, so work simply starts late; the padding gets absorbed by procrastination, not by genuine risk.
+- **Parkinson's law** — an early finish is essentially never handed back to the project; the task just expands to fill the window it was given.
+- **Bad multi-tasking** — every project looks "active" at once, and none of them actually finish, because attention is sliced across all of them instead of committed to one.
+
+Add a project buffer on top of this and leave the old padding sitting in every task anyway, and the result is double safety and a fake Green — the schedule looks protected twice over while actually being no more honest than before. Keep scoring individual people on task due dates, and student syndrome comes right back; the buffer becomes theater rather than a real management tool.
+
 ## The idea
 
 CPM finds the longest logic path and hides safety inside every task's own duration estimate. Critical Chain (CCPM, Goldratt) does three other things instead:
@@ -34,6 +44,7 @@ A relay race, not a timetable:
 - The moment the predecessor is done *and* the resource is free, start — holding a chain task for its "planned" Monday start date is student syndrome (the classic behavior CCPM exists to defeat), not discipline.
 - Waiting on a resource that's busy elsewhere is chain delay, even when every logic predecessor has technically finished.
 - Multi-tasking across chain work counts as delay, not as coverage — a resource splitting attention between two chain tasks is slower on both than doing them in sequence, even though it looks like more is "in progress."
+- Do not raid a feeding buffer so a non-chain team can look busy while the chain itself is hungry — that buffer exists to protect the chain, not to fund unrelated activity on a slow week.
 
 ## What you actually manage each week
 
@@ -54,6 +65,14 @@ PB consumed %    = buffer used / buffer original
 
 If `remaining buffer / recent slip rate` is shorter than the remaining chain length, the schedule is Red even if this week's calendar still technically "fits" — the fever chart is a leading indicator specifically so this gets caught before the calendar confirms it.
 
+## Pipeline (multi-project) CCPM
+
+Across a portfolio, the constraint is usually a shared scarce skill, not any single project's own chain. Projects are deliberately staggered so that scarce resource becomes the drum for the whole pipeline — see `references/dbr.md` for the drum/buffer/rope mechanics this borrows directly.
+
+The rope here is simple: **do not launch the next project just because non-constraint people look idle while existing fever charts are Red and the drum already has a queue.** That's the exact same rope-cut as releasing every work order on Monday morning in plant DBR — it feels productive and quietly floods the one resource that actually limits the whole portfolio.
+
+Each project still keeps its own project buffer. The portfolio level watches the drum's queue *plus* every project's individual fever zone — not utilization anywhere else. "Start another project so the team stays at 100%" is the pipeline version of the same mistake plant DBR exists to prevent.
+
 ## How this sits next to the other lenses
 
 | Lens | Trust it for |
@@ -67,9 +86,16 @@ A task can carry positive CPM float and still sit on the critical chain once res
 
 See `references/cpm.md` for total/free float mechanics, and `references/evm.md` for Earned Schedule and CPI/SPI.
 
-## Weekly Critical Chain strip
+## Meetings and the weekly strip
 
-Keep this small on the weekly page:
+The chain meeting is not a WBS tour. In priority order, it covers:
+
+1. Red project buffers and Red feeding buffers
+2. Resource-buffer alerts on the chain (the next chain resource about to be needed)
+3. Decisions that would idle the chain if left unresolved
+4. Everything else waits
+
+Keep the actual status-page strip small:
 
 - Chain task IDs and the resource each depends on
 - Chain remaining (unpadded)
