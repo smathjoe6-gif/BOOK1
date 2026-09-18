@@ -48,7 +48,7 @@ Greedy is not joint-optimal. It's the version that actually ships in practice.
 | Informational sites (never meant to win) | Yes | Rare | Only if a path happens to sit there |
 | Uses correlation inside the batch | Yes | Yes (`q`-d EI integral) | No — separate worlds entirely |
 
-Use qKG when the week returns a small batch and the object that matters is *next week's recommendation*. Use qTS (`references/thompson-sampling.md`) when a simple batch is enough and joint value isn't worth the compute. Use qEI when the goal is improvement of the observed `y`, not of `argmin μ`.
+Use qKG when the week returns a small batch and the object that matters is *next week's recommendation*. Use qTS (`references/qts.md`) when a simple batch is enough and joint value isn't worth the compute — it takes the opposite attitude toward a collapsed posterior, reporting honestly that every sampled world wants the same point rather than forcing separation the way Kriging Believer does. Use qEI when the goal is improvement of the observed `y`, not of `argmin μ`.
 
 Honest joint MC is plausible at `q=2–4`. At `q=16` it's theater unless `X` is tiny. When only one basin is left in the posterior, qKG and qEI both degenerate to cloning the incumbent — shrink `q` rather than trusting the batch diversity to appear on its own.
 

@@ -216,6 +216,10 @@ Read `references/qkg.md` when a whole batch of `q` points returns together and t
 
 Read `references/fantasy-average.md` for the batch scheduler underneath most "batch KG" or "batch EI" claims — pick one point on the real posterior, pretend the GP has seen it, pick the next on that fantasy posterior, repeat. Covers the single-lie plug-ins (kriging believer, constant liar, sample liar) versus the true fantasy-average (`T` fantasies, properly averaged), what each does to the rest of the batch's exploration, and which base acquisition it pairs well with. This is not joint batch optimization and should never be reported as if it were — it never un-picks the first point once chosen.
 
+### qTS (batch Thompson Sampling)
+
+Read `references/qts.md` for the Thompson-flavored batch method — draw `q` independent posterior paths, take each one's minimizer, repair collisions, evaluate. No joint surface, no fantasy `y`, so it's cheaper than qEI/qKG but answers a different question: a Monte Carlo sample of `x*`, not an expected improvement or expected drop in `min μ`. Covers the named repair strategies for when the posterior has fewer distinct stories than `q` (drop-duplicate, nudge, repulsive TS, or just capping `q`), and the collapse index (`unique(Z)/q`) worth logging every batch — a stacked batch is a real result about the posterior, not a bug to quietly patch around.
+
 ## Action items
 
 | ID | Action | Owner | Due | Status | Notes |

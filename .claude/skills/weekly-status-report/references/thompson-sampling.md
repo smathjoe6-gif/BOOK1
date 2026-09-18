@@ -56,7 +56,7 @@ Exploration here is not a `κ` schedule. Early on, posterior paths still disagre
 
 ## Batches
 
-Need `q` points this week: draw `q` independent posterior paths, take each one's minimizer, reject or jitter duplicates. Diversity comes from different sampled worlds, not from a joint qEI surface.
+Need `q` points this week: draw `q` independent posterior paths, take each one's minimizer, reject or jitter duplicates. Diversity comes from different sampled worlds, not from a joint qEI surface. See `references/qts.md` for the full repair-strategy detail (drop-duplicate vs. nudge vs. repulsive TS vs. capping `q`) and the collapse index worth logging every batch.
 
 If `q` is larger than the number of genuinely distinct stories the posterior still entertains, clones show up — that's a diagnostic that the posterior has narrowed that much, not a rounding error to patch around.
 
