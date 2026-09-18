@@ -2,7 +2,11 @@
 
 qTS builds a batch by sampling the posterior on the minimizer: draw `q` functions from the GP, take each function's argmin, repair collisions, evaluate the real `f`. There's no joint surface here and no fantasy `y` — it's a fundamentally different kind of batch method than qEI, qKG (`references/qkg.md`), or Kriging Believer (`references/fantasy-average.md`).
 
-It's a policy that returns a set. It is not qEI, not qKG, and not Kriging Believer, however similar the acronym looks.
+It's a policy that returns a set. It is not qEI, not qKG, and not Kriging Believer, however similar the acronym looks. qTS is often listed next to qEI and qKG as a "batch acquisition" — it isn't one, strictly speaking. An acquisition is a scalar `a_n(x)` (or `a_n(Z)`) that gets maximized. qTS has no joint score of the set at all; it just draws `q` worlds and takes each one's minimizer.
+
+### Why people still call it an acquisition anyway
+
+It occupies the same slot in the BO loop: posterior → next `X` → evaluate. On a leaderboard, terminal `y` or simple regret can be compared against qEI's. That doesn't make the underlying objects equal — one is an expectation being maximized, the other is a sampling procedure with no scalar objective behind it at all.
 
 ## Mechanics
 
@@ -51,6 +55,12 @@ It does not maximize expected improvement of the set, expected drop in `min μ`,
 | One basin left | Stacks | Stacks | Stacks | Pushes away by killing `σ` |
 
 Kriging Believer forces separation between batch points on purpose (`references/fantasy-average.md`). qTS instead reports honestly that every sampled world wants the same point — opposite attitudes toward a posterior that's already collapsed onto one basin, and neither is wrong, they're just answering different questions.
+
+## How to discuss it in a report
+
+Write: policy = qTS; draw method; `q` requested / unique after repair; repair rule; collapse index; kernel and nugget.
+
+**Do not write a `qTS(Z)` number next to `q̂KG(Z)` as if they were the same utility** — they aren't. A qTS set may still be *scored* afterward with a post-hoc `q̂KG` or best-raw-`y` number in a bake-off; label that score as the bake-off metric, never as "the qTS acquisition value."
 
 ## Weekly strip
 
