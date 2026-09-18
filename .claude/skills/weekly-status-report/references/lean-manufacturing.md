@@ -61,7 +61,7 @@ On a weekly page, **do not average the two colors** — report both lenses separ
 
 OEE pushed on a non-bottleneck resource is usually a demand to overproduce — which makes it anti-Lean and anti-TOC at exactly the same time, for the same underlying reason.
 
-See `references/six-sigma.md` for the third leg of this stool: Six Sigma attacks variation against a spec, which is a different enemy again from Lean's waste/unevenness/overburden and TOC's starved constraint — they stack well together and rot together in predictable ways.
+See `references/six-sigma.md` for the third leg of this stool: Six Sigma attacks variation against a spec, which is a different enemy again from Lean's waste/unevenness/overburden and TOC's starved constraint — they stack well together and rot together in predictable ways. When Lean and DMAIC are meant to run as one project rather than two parallel initiatives, see `references/lean-six-sigma-dmaic.md` for exactly how the two divide labor at each gate.
 
 ## How Lean decays
 

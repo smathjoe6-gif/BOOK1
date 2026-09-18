@@ -164,6 +164,10 @@ Read `references/dmaic.md` for the full detail behind the DMAIC table above — 
 
 Read `references/msa.md` before Analyze, before SPC, and before quoting any capability number — it answers one question: is a given number mostly the process, or mostly the gage? Covers the full set of failure modes Gage R&R alone doesn't catch (bias, linearity, stability, discrimination), the correct study order (resolution → stability → bias/linearity → Gage R&R), the two GR&R denominators (versus process vs. versus tolerance — never mixed), `ndc`, attribute-agreement studies with kappa, and Type I/II error framing. A "stop" verdict here means DMAIC stays in Measure — Analyze on that Y is fiction.
 
+### Lean Six Sigma (when Lean and DMAIC run as one path, not two offices)
+
+Read `references/lean-six-sigma-dmaic.md` when a project genuinely needs both — a measurable defect or delay sitting on a visible stream, where it isn't yet clear whether the lever is variation, waste, or both. It maps exactly which questions Lean answers and which DMAIC answers at each of the five gates (Lean proposes candidate Xs from the value stream; Six Sigma decides with evidence which ones actually move Y), and names how the hybrid decays in practice (belt count as the KPI, a VSM drawn once and never measured again, "Improve" quietly meaning tidy the area). Never average a Lean "flow Green" with a Six Sigma "p-value Green" into one blended color.
+
 ## Action items
 
 | ID | Action | Owner | Due | Status | Notes |
