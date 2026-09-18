@@ -172,6 +172,10 @@ Read `references/lean-six-sigma-dmaic.md` when a project genuinely needs both �
 
 Read `references/doe.md` when Analyze or Improve needs to test several plausible Xs together rather than one at a time — one-factor-at-a-time experimentation systematically misses interactions between factors. Covers the design ladder (screening → factorial → response surface → mixture → confirmation), what resolution actually costs (never treat a Resolution III "optimum" as trustworthy), why noise and a marginal gage can baptize chatter as a real effect, and reading the result (residuals, effect Pareto, curved center points, and confirming on fresh runs — never on the data that built the model).
 
+### Response Surface Methodology (mapping curvature, once it's found)
+
+Read `references/rsm.md` once a factorial's center points show real curvature and the goal shifts from "which Xs matter" to mapping a local peak, floor, or ridge — it covers the CCD and Box-Behnken designs, the quadratic model and what each term means (slope, twist, curvature), classifying the stationary point from its eigenvalues (max / min / saddle / ridge), why lack-of-fit beats R² as the real gate, and why a stationary point outside the design's actual box is a rumor, not a result to put in an SOP.
+
 ## Action items
 
 | ID | Action | Owner | Due | Status | Notes |
