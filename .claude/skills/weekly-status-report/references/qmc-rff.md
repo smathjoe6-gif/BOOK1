@@ -18,7 +18,7 @@ In the best case, for a smooth integrand on the unit cube, error can look like `
 
 ## Mapping `v → ω`
 
-Default point set: **Sobol' with an Owen scramble** (or a digital shift). Scrambles keep the low discrepancy while giving a crude RMSE estimate if `R` independent scrambles are run. Halton is fine at low index and gets correlated at high index — avoid it once dimension climbs. A rank-1 lattice is the other common choice, with its own generating-vector discipline: `references/lattice-rff.md`.
+Default point set: **Sobol' with an Owen scramble** (or a digital shift). Scrambles keep the low discrepancy while giving a crude RMSE estimate if `R` independent scrambles are run. Halton is fine at low index and gets correlated at high index — avoid it once dimension climbs past `~8–10` (full generation and scrambling details: `references/halton-generation.md`). A rank-1 lattice is the other common choice, with its own generating-vector discipline: `references/lattice-rff.md`.
 
 Dimension of `v`:
 

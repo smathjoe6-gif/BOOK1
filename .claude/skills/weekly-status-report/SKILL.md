@@ -276,6 +276,10 @@ Read `references/walsh-functions.md` for the harmonic-analysis foundation undern
 
 Read `references/joe-kuo.md` for the practical entry point to Sobol' sequences — the free odd direction numbers plus a primitive polynomial per coordinate that Joe and Kuo searched to keep Property A (1-D) and, in the 2008 tables, 2-D `t`-values small. Covers what the two published table generations (2003 TOMS, 2008 SISC) actually optimized, how to use a table for QMC-RFF correctly (freeze it, digital-shift it, never rescore it with Fourier `P2`), and why dimension 21201 in the table buys nothing for a 6-D GP spectrum.
 
+### Halton Generation (radical-inverse sequences, one base per axis)
+
+Read `references/halton-generation.md` for the simplest of the three low-discrepancy families — one radical-inverse sequence per coordinate in pairwise coprime bases, not a Sobol' net and not a rank-1 lattice. Covers the generation formula, why a base-2 digital shift is the wrong scramble on every axis but the first (per-base digit permutation or shift is needed instead), and why large-prime axes correlate once dimension climbs past roughly 8-10 — the textbook cautionary case being unscrambled Halton striping on primes 47 and 53 in dimension 20. Fine and low-machinery for a 6-D Matérn spectrum; reach for Joe-Kuo instead once dimension climbs further.
+
 ### Sobol' Generation (the algebra behind the Joe-Kuo table)
 
 Read `references/sobol-generation.md` for what actually turns a Joe-Kuo seed table into points — the recurrence that fills out direction vectors from the free seeds, the Gray-code XOR loop that's the standard implementation (one bit flip, one XOR, per new point), and the resolution `L` needed for the index range in use. Covers a worked micro-example and the exact stack order for QMC-RFF (table → recurrence → Gray loop → digital shift → drop zero → inverse-cdf → RFF/Matheron).
