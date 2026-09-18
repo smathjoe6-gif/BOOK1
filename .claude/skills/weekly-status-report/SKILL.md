@@ -70,6 +70,32 @@ Copy structure from `assets/wsr-template.md`. Do not skip required sections; wri
 
 State the reason next to the color in one clause.
 
+### Roll-up (this is where most reports lie)
+
+Color the streams and baselined milestones first, then roll up.
+
+- Overall = the worst color on the critical path, not an average across streams. Averaging is how a report ends up calling a project "mostly green" while the one thing the deadline depends on is on fire.
+- A Red side-quest does not force overall Red unless it hits the actual commitment — a failing stream that isn't on the critical path is a Red *stream*, not a Red *project*.
+- Several Ambers sharing one root cause on the critical path → consider rolling the overall up to Red. Three independent-looking Ambers that all trace back to the same vendor delay are one real problem wearing three colors.
+
+Write the overall line as **Color (trend) — driver**, one clause naming the actual cause, not a restatement of the color:
+
+> Amber (worsening) — vendor API freeze consumes remaining slack to 25 Sep checkout.
+
+### Multi-axis view
+
+When the data exists, score these axes separately before rolling up to whatever the audience is actually buying (usually Schedule + contractual Scope) — a single blended color hides which axis is actually the problem.
+
+| Axis | Green | Amber | Red |
+|---|---|---|---|
+| Schedule | Forecast ≤ baseline | Inside last slack | Beyond baseline or missed |
+| Scope | Stable or approved CR | Pressure, not baselined | Silent cut or gold-plate |
+| Cost | Inside plan + contingency | Over, still recoverable | Contingency gone |
+| Risk | Residual inside appetite | Mitigation active | High impact, no funded path |
+| Quality | Exit criteria intact | Defect/test debt rising | Criteria waived to hold date |
+| Dependencies | Confirmed | Soft or one late feeder | Broken feeder on critical path |
+| Capacity | Named owners, load fits | Key-person / overtime | No owner or sustained overload |
+
 ## Action items
 
 | ID | Action | Owner | Due | Status | Notes |
