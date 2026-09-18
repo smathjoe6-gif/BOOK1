@@ -15,7 +15,7 @@ Later `m(k,j)` follow Sobol's XOR recurrence from those seeds. Generation:
 v(k,j) = m(k,j)·2⁻ᵏ,     x(i,j) = i1·v(1,j) ⊕ i2·v(2,j) ⊕ ...
 ```
 
-(Gray code is just the fast traversal form of the same algebra.) Dimension 1 is fixed: all `mk = 1` (plain van der Corput in base 2). Joe-Kuo don't change that algebra — they choose the free seeds and which polynomial sits in which dimension.
+(Gray code is just the fast traversal form of the same algebra.) Dimension 1 is fixed: all `mk = 1` (plain van der Corput in base 2). Joe-Kuo don't change that algebra — they choose the free seeds and which polynomial sits in which dimension. Full generation mechanics (the recurrence, the Gray-code loop, resolution `L`, a worked micro-example): `references/sobol-generation.md`.
 
 ## What they actually optimized
 

@@ -276,6 +276,10 @@ Read `references/walsh-functions.md` for the harmonic-analysis foundation undern
 
 Read `references/joe-kuo.md` for the practical entry point to Sobol' sequences — the free odd direction numbers plus a primitive polynomial per coordinate that Joe and Kuo searched to keep Property A (1-D) and, in the 2008 tables, 2-D `t`-values small. Covers what the two published table generations (2003 TOMS, 2008 SISC) actually optimized, how to use a table for QMC-RFF correctly (freeze it, digital-shift it, never rescore it with Fourier `P2`), and why dimension 21201 in the table buys nothing for a 6-D GP spectrum.
 
+### Sobol' Generation (the algebra behind the Joe-Kuo table)
+
+Read `references/sobol-generation.md` for what actually turns a Joe-Kuo seed table into points — the recurrence that fills out direction vectors from the free seeds, the Gray-code XOR loop that's the standard implementation (one bit flip, one XOR, per new point), and the resolution `L` needed for the index range in use. Covers a worked micro-example and the exact stack order for QMC-RFF (table → recurrence → Gray loop → digital shift → drop zero → inverse-cdf → RFF/Matheron).
+
 ### Polynomial Lattices (Walsh CBC's natural home)
 
 Read `references/polynomial-lattices.md` for the digital net built from a ratio of polynomials over `𝔽b[x]/(P)` rather than Sobol' recurrences or an integer `z` — the natural target for Walsh CBC with explicit product weights, since (unlike free Sobol' seeds) the generators `qj` actually form a group. Covers the Hankel-matrix construction, why `P` needs to be irreducible for CBC to be valid, extensibility, and when to prefer this over a published Joe-Kuo table or an integer lattice.
