@@ -22,7 +22,7 @@ Write an operational definition of Y, then run MSA on it (`references/msa.md` fo
 
 ## Analyze — name the vital few Xs
 
-Candidate Xs come from the process map, not from a show of hands or seniority in the room. Connect each candidate to Y with stratification, multi-vari studies, plots, formal tests, regression, or a screening DOE — not with confident assertion. Write down the hypotheses that got killed along the way, specifically so they don't quietly come back later as folklore ("we tried that already, it didn't work" with no record of why).
+Candidate Xs come from the process map, not from a show of hands or seniority in the room. Connect each candidate to Y with stratification, multi-vari studies, plots, formal tests, regression, or a screening DOE (`references/doe.md`) — not with confident assertion. Write down the hypotheses that got killed along the way, specifically so they don't quietly come back later as folklore ("we tried that already, it didn't work" with no record of why).
 
 **Gate:** you can say "if we change this X, Y should move by about this much," with a stated direction — not just "this X matters."
 

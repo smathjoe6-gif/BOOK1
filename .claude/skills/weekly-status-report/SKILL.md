@@ -168,6 +168,10 @@ Read `references/msa.md` before Analyze, before SPC, and before quoting any capa
 
 Read `references/lean-six-sigma-dmaic.md` when a project genuinely needs both — a measurable defect or delay sitting on a visible stream, where it isn't yet clear whether the lever is variation, waste, or both. It maps exactly which questions Lean answers and which DMAIC answers at each of the five gates (Lean proposes candidate Xs from the value stream; Six Sigma decides with evidence which ones actually move Y), and names how the hybrid decays in practice (belt count as the KPI, a VSM drawn once and never measured again, "Improve" quietly meaning tidy the area). Never average a Lean "flow Green" with a Six Sigma "p-value Green" into one blended color.
 
+### Design of Experiments (moving several Xs at once)
+
+Read `references/doe.md` when Analyze or Improve needs to test several plausible Xs together rather than one at a time — one-factor-at-a-time experimentation systematically misses interactions between factors. Covers the design ladder (screening → factorial → response surface → mixture → confirmation), what resolution actually costs (never treat a Resolution III "optimum" as trustworthy), why noise and a marginal gage can baptize chatter as a real effect, and reading the result (residuals, effect Pareto, curved center points, and confirming on fresh runs — never on the data that built the model).
+
 ## Action items
 
 | ID | Action | Owner | Due | Status | Notes |
