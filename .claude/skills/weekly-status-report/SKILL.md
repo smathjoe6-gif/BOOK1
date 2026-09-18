@@ -176,6 +176,26 @@ Read `references/doe.md` when Analyze or Improve needs to test several plausible
 
 Read `references/rsm.md` once a factorial's center points show real curvature and the goal shifts from "which Xs matter" to mapping a local peak, floor, or ridge — it covers the CCD and Box-Behnken designs, the quadratic model and what each term means (slope, twist, curvature), classifying the stationary point from its eigenvalues (max / min / saddle / ridge), why lack-of-fit beats R² as the real gate, and why a stationary point outside the design's actual box is a rumor, not a result to put in an SOP.
 
+### D-Optimal Design (illegal regions, mixed factors, awkward run counts)
+
+Read `references/d-optimal.md` when the region is constrained, factors mix continuous with categorical, the run budget doesn't match a textbook design's size, or existing data needs augmenting rather than discarding — a computer-generated design built for the declared model, not a shrunk-down factorial. Covers the D-criterion (`det(X'X)`), the other optimality letters (A/I/G/E) and why D isn't automatically the right one for mapping a surface, how the exchange algorithm actually builds the plan, and the checklist to lock (model terms, factor ranges, constraints, `n`, D vs. I) before hitting Generate. Only reach for this over a textbook CCD/Box-Behnken when the textbook design is either illegal or the wrong size — orthogonality is usually gone once it's computer-generated, so analyze with the actual `X` run, never a borrowed `2^k` ANOVA table.
+
+### Bayesian Optimal Design (when the model or its parameters aren't known either)
+
+Read `references/bayesian-optimal-design.md` when a nonlinear model's Fisher information depends on parameters that aren't actually known yet (Arrhenius, dose-response, PK/PD) — a locally D-optimal plan built at a guessed `θ0` can be weak at the true `θ`. Covers the three levels (local / pseudo-Bayesian / fully sequential), picking the right utility for the actual decision (D, A, prediction, discrimination, or a single functional like an ED50), and the fakes to watch for (a spike prior relabeled "Bayesian," prior mass sitting outside operable settings). If nobody can write down `π(θ)`, this isn't a Bayesian design yet.
+
+### Sequential Bayesian Design (the update-then-pick loop)
+
+Read `references/sequential-bayesian-design.md` when the design genuinely runs as a loop — form the posterior, pick the next `x` by expected utility, observe, repeat — rather than a single Bayesian-flavored batch. Covers myopic vs. look-ahead vs. batch-sequential, the posterior engines that make it work (Laplace, MCMC, SMC, variational) and where each breaks, and the predeclared stopping rules that keep it from being "peeking" with better math. Recomputing local D at the latest MLE every round is sequential *local* design, not this.
+
+### Nested Monte Carlo for Expected Utility (what's actually being computed each round)
+
+Read `references/nested-monte-carlo-utility.md` for the mechanics behind `Un(x)` in the sequential Bayesian loop above, whenever the utility depends on the *updated* posterior (entropy drop, posterior odds, `log det` of updated precision) rather than only on `(x,θ)`. Covers the outer/inner draw structure, where bias actually lives (the inner posterior approximation), the variance-decomposition rule for deciding whether to spend more draws on `S` or on `T`, and why common random numbers across candidates are not optional. Never declare a winning `x` when the top two estimates sit inside their standard error.
+
+### Sequential Design — the family map (don't mix rows)
+
+Read `references/sequential-design.md` before calling anything "sequential [X]-optimal" — sequential design is a family of strategies that each hold different things fixed (region, model, criterion, or posterior), not one algorithm with adjectives stacked on it. Covers the classical path (screen → factorial + centers → ascent or quadratic), where D/I augmentation and Bayesian sequential design sit relative to it, and why group-sequential trials and bandits are different problems entirely that shouldn't borrow DOE vocabulary. Use its chooser table to name which row a given week's design actually is before writing it up.
+
 ## Action items
 
 | ID | Action | Owner | Due | Status | Notes |

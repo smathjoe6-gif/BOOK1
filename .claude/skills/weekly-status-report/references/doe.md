@@ -24,6 +24,7 @@ Convenient run order (running all of level A, then all of level B) is usually a 
 | Main effects + two-factor interactions | Full `2^k`, or a high-resolution fraction |
 | A local optimum / curvature | Response surface (CCD, Box-Behnken) — see `references/rsm.md` |
 | Components that must sum to 1 | Mixture design |
+| Illegal region, mixed factor types, an awkward fixed run count, or augmenting existing data | Computer-generated optimal design — see `references/d-optimal.md` |
 | Prove the claimed setting actually works | Fresh confirmation runs |
 
 **Resolution is the price paid for running a fraction instead of the full design:**

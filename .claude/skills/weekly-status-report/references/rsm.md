@@ -24,7 +24,7 @@ Linear terms are slope. Cross terms are twist (interaction). Square terms are cu
 
 **Box-Behnken** — three levels, with no true cube-corner combinations at all. Fewer brutal (all-extreme) combinations to run. A natural fit at three factors. Do not use it for two — the design doesn't have enough structure at that dimensionality.
 
-Irregular feasible regions, or combinations that are physically forbidden, are a real reason to leave the textbook designs behind and use a computer-generated optimal design instead — say explicitly why that step was taken.
+Irregular feasible regions, or combinations that are physically forbidden, are a real reason to leave the textbook designs behind and use a computer-generated optimal design instead (`references/d-optimal.md`) — say explicitly why that step was taken.
 
 A CCD can be run **sequentially**: factorial plus centers this week, axial points added later — but only if the blocking was planned for from the start. A new material lot arriving between those two pieces of the design is a block, not a new factor; treat it as one or the model will silently confound it with the real effects.
 
