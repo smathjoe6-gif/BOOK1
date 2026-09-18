@@ -52,7 +52,7 @@ async function processVideo(file) {
   if (!row) {
     if (isLikelyDuplicateVariant(file.name)) {
       console.log(`"${file.name}" looks like an extra copy of another video (ends in _2/_3/etc) — skipping so it doesn't post twice. Add a spreadsheet row for it if it's actually different content.`);
-      return;
+      return 'skipped';
     }
     const generated = await generateCaption(file.name);
     console.log(`No spreadsheet entry for "${file.name}" — auto-writing one: "${generated.title}"`);
@@ -250,14 +250,25 @@ async function checkOnce() {
   } else {
     // Post only the oldest one this cycle -- the rest wait for their own
     // future check, so posts land one per poll interval instead of all
-    // bunching up together.
+    // bunching up together. But a video processVideo() permanently skips
+    // (a duplicate-looking filename with no spreadsheet row) never gets
+    // removed from the folder, so it would otherwise stay "the oldest" and
+    // block every video behind it forever -- this happened for real on
+    // 17 Sep 2026, when one such file jammed 3 videos for hours. So we walk
+    // forward past any skipped files within this same cycle, and still stop
+    // (posting at most one) the moment a file is actually attempted.
     if (files.length > 1) {
       console.log(`Found ${files.length} videos waiting -- posting the oldest one now, the rest will follow on future checks.`);
     }
-    try {
-      await processVideo(files[0]);
-    } catch (err) {
-      console.error(`Failed to process "${files[0].name}":`, err.message);
+    for (const file of files) {
+      let outcome;
+      try {
+        outcome = await processVideo(file);
+      } catch (err) {
+        console.error(`Failed to process "${file.name}":`, err.message);
+        break;
+      }
+      if (outcome !== 'skipped') break;
     }
   }
 
