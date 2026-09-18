@@ -144,6 +144,10 @@ If the status touches a multi-echelon supply chain (plant → central warehouse 
 
 Read `references/dbr.md` for the actual day-to-day release mechanism behind any of the buffer-based lenses above — the drum (constraint pace), the buffer (time, not a pile of stock), and the rope (the release rule that stops WIP from flooding the floor ahead of the constraint). Covers Traditional DBR vs. S-DBR, the Green/Amber/Red buffer-zone steering rules, and the same drum/buffer/rope pattern worked across plant, distribution, and project (Critical Chain) networks side by side. Color from buffer trajectory and rope integrity — never department busy-ness or local utilization.
 
+### Lean manufacturing (when it's a factory floor, not a project)
+
+Read `references/lean-manufacturing.md` for the five Lean principles (value, value stream, flow, pull, perfection), the JIT/Jidoka mechanisms (takt, kanban, heijunka, andon, SMED), and the muda/mura/muri waste framing. It also covers exactly where Lean and TOC rhyme (pull ≈ rope, takt ≈ drum, supermarket ≈ buffer) and where they actively fight (a WIP cap sized wrong can starve the real constraint; OEE pushed on a non-bottleneck is anti-Lean and anti-TOC at once) — report the two as separate modes on a weekly page, never averaged into one color.
+
 ## Action items
 
 | ID | Action | Owner | Due | Status | Notes |
