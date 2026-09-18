@@ -152,6 +152,10 @@ Read `references/lean-manufacturing.md` for the five Lean principles (value, val
 
 Read `references/six-sigma.md` for DMAIC vs. DFSS/DMADV (improving an existing process versus designing capability before volume), the statistical spine (MSA before Analyze, stability before capability, named tests for before/after claims), and belts as org design rather than a badge — the status line is phase and next gate, never belt color. It also covers how Six Sigma stacks with Lean and TOC (Lean shows the stream, TOC names the drum, Six Sigma attacks the high-variation step that's actually stealing drum time) and how they rot together (a belt project per department for the appearance of activity; a perfect DMAIC on a step nowhere near the constraint). Never color the enterprise Green because a belt project moved while the drum is Red or the rope is cut.
 
+### Statistical Process Control (before quoting any capability number)
+
+Read `references/spc.md` before writing anything cited as "quality" data — it covers common vs. special cause (and why treating common cause as special is tampering, per Deming), what a control chart actually is (limits from the process's own behavior, not the spec), which chart fits which situation, a sane default signal-rule set, and the two capability formulas with the ordering rule that matters most: never compute `Cp`/`Cpk` before the chart is demonstrated stable. Also covers the two bad stories that look like good news — "in control but incapable" (stable junk) and "in spec this week but out of control" (a lucky streak, not a Green).
+
 ## Action items
 
 | ID | Action | Owner | Due | Status | Notes |
