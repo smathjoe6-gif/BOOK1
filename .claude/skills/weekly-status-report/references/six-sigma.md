@@ -17,7 +17,7 @@ If the mean is still wandering, don't publish a `Cpk`. There isn't a process yet
 
 ## Two shapes — do not mix them
 
-**DMAIC** improves a process that already exists:
+**DMAIC** improves a process that already exists — see `references/dmaic.md` for the full detail on each phase's gate criteria and the specific counterfeit version of each phase to watch for:
 
 | Phase | Job | Gate |
 |---|---|---|

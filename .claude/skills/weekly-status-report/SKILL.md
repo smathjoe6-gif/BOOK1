@@ -156,6 +156,10 @@ Read `references/six-sigma.md` for DMAIC vs. DFSS/DMADV (improving an existing p
 
 Read `references/spc.md` before writing anything cited as "quality" data — it covers common vs. special cause (and why treating common cause as special is tampering, per Deming), what a control chart actually is (limits from the process's own behavior, not the spec), which chart fits which situation, a sane default signal-rule set, and the two capability formulas with the ordering rule that matters most: never compute `Cp`/`Cpk` before the chart is demonstrated stable. Also covers the two bad stories that look like good news — "in control but incapable" (stable junk) and "in spec this week but out of control" (a lucky streak, not a Green).
 
+### DMAIC in detail (gates and their counterfeits)
+
+Read `references/dmaic.md` for the full detail behind the DMAIC table above — each phase's gate criterion (a specific, checkable bar, not a vibe) and, just as important, the named counterfeit version of that phase to watch for (a charter that's really "improve satisfaction," an Analyze that's a voted fishbone, a pilot skipped straight to a site-wide rollout, a Control-phase binder nobody opens). Color the DMAIC *project*, never the company, from whether a gate was actually earned or just calendared past.
+
 ## Action items
 
 | ID | Action | Owner | Due | Status | Notes |
