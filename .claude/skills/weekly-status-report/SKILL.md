@@ -282,7 +282,7 @@ Read `references/polynomial-lattices.md` for the digital net built from a ratio 
 
 ### Walsh CBC (component-by-component in the Walsh group)
 
-Read `references/walsh-cbc.md` for the Walsh-figure analogue of `scripts/cbc_lattice.py` / `scripts/cbc_fft.py` — the same one-coordinate-at-a-time greedy search, run over `𝔽b[x]/(P)` against a Walsh `P_α` instead of over `ℤ/Nℤ` against Fourier `P2`. Covers the greedy loop, where the FFT-over-a-finite-field speedup comes from, and the specific reuse mistakes to avoid (borrowing `B2` as the Walsh kernel, using an integer primitive root as the indexing group, or treating Joe-Kuo's `m(k,j)` as valid CBC candidates).
+Read `references/walsh-cbc.md` for the whole family of Walsh-figure analogues to `scripts/cbc_lattice.py` / `scripts/cbc_fft.py` — six methods sharing one greedy skeleton (product-weight polynomial-lattice CBC, POD weights for known interaction order, matrix CBC for the best raw `t`-value, reduced CBC for huge `p`, higher-order digital CBC, and projection-aware CBC for when 2-D spectral slices matter most), plus where the finite-field FFT speedup actually comes from and a chooser table. Covers the specific reuse mistakes to avoid (borrowing `B2` as the Walsh kernel, using an integer primitive root as the indexing group, or treating Joe-Kuo's `m(k,j)` as valid CBC candidates).
 
 ### Digital Shift (the cheap, correct scramble for digital nets)
 
