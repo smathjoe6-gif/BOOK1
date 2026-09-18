@@ -148,6 +148,10 @@ Read `references/dbr.md` for the actual day-to-day release mechanism behind any 
 
 Read `references/lean-manufacturing.md` for the five Lean principles (value, value stream, flow, pull, perfection), the JIT/Jidoka mechanisms (takt, kanban, heijunka, andon, SMED), and the muda/mura/muri waste framing. It also covers exactly where Lean and TOC rhyme (pull ≈ rope, takt ≈ drum, supermarket ≈ buffer) and where they actively fight (a WIP cap sized wrong can starve the real constraint; OEE pushed on a non-bottleneck is anti-Lean and anti-TOC at once) — report the two as separate modes on a weekly page, never averaged into one color.
 
+### Six Sigma (when the enemy is variation against a spec)
+
+Read `references/six-sigma.md` for DMAIC vs. DFSS/DMADV (improving an existing process versus designing capability before volume), the statistical spine (MSA before Analyze, stability before capability, named tests for before/after claims), and belts as org design rather than a badge — the status line is phase and next gate, never belt color. It also covers how Six Sigma stacks with Lean and TOC (Lean shows the stream, TOC names the drum, Six Sigma attacks the high-variation step that's actually stealing drum time) and how they rot together (a belt project per department for the appearance of activity; a perfect DMAIC on a step nowhere near the constraint). Never color the enterprise Green because a belt project moved while the drum is Red or the rope is cut.
+
 ## Action items
 
 | ID | Action | Owner | Due | Status | Notes |
