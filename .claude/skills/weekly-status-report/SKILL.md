@@ -96,6 +96,26 @@ When the data exists, score these axes separately before rolling up to whatever 
 | Dependencies | Confirmed | Soft or one late feeder | Broken feeder on critical path |
 | Capacity | Named owners, load fits | Key-person / overtime | No owner or sustained overload |
 
+### Trend and decision latency
+
+- Pair every color with improving / stable / worsening whenever a prior week's report exists — a bare color with no trend tells the reader nothing about direction.
+- Do not jump Red → Green in one week. The path is Red → Amber → Green, and only after a closed action *and* a new forecast confirm it — a status color is a claim about the forecast, not a reward for effort.
+- A decision that's still being framed, due in more than 2 weeks: no color yet.
+- Due this week or next: Amber on that stream.
+- Past its needed-by date and work is waiting on it: Red.
+
+### Evidence and anti-patterns
+
+Color from forecast vs. baseline, slack days, blocker age, decision age, and real spend or defect trend — not from how the week felt. Adjectives ("challenging," "productive") are not evidence. If the forecast itself is missing, that's Amber or Grey, never Green by default.
+
+Avoid:
+- Rainbow dashboards (every stream a different color for its own sake, signal drowned in noise)
+- Hope-Green (Green because it's supposed to turn out fine, not because the forecast says so)
+- Permanent Amber with the same sentence week after week (a stream that never resolves either way is being managed by the color, not the plan)
+- Red with no ask (a Red status that doesn't come with a specific decision or help requested is just an alarm nobody can act on)
+- Green overall sitting over a Red critical milestone (the roll-up rule above exists specifically to prevent this)
+- Coloring people instead of the plan (the status describes the work's trajectory, never a judgment on who's behind)
+
 ## Action items
 
 | ID | Action | Owner | Due | Status | Notes |
