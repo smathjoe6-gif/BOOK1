@@ -195,7 +195,21 @@ export async function mirrorNewVideos(auth) {
   // could never find an eligible file and silently mirrored nothing, ever.
   const ownMirrorCandidates = [...own, ...ownDone];
   for (const file of ownMirrorCandidates) {
-    if (mirrorNames.has(file.name) || mirroredNames.has(file.name)) continue;
+    if (mirroredNames.has(file.name)) continue;
+    // Already sitting in GK_JING or GK_JING_DONE -- no need to copy it, but
+    // remember that permanently too, not just this cycle's skip. Make's own
+    // move-to-done step fails silently sometimes, so a video that already
+    // posted can later vanish from GK_JING_DONE's live listing with no trace
+    // left anywhere -- without recording it here the moment we first see it
+    // present, the very next cycle would see no live copy, find nothing in
+    // mirroredNames either (since a plain skip never touched it), and mirror
+    // the same already-posted video back in from the ever-growing
+    // GK_TERMINAL_DONE archive. This closes that gap.
+    if (mirrorNames.has(file.name)) {
+      mirroredNames.add(file.name);
+      saveMirroredNames(mirroredNames);
+      continue;
+    }
     // Don't mirror a GK_TERMINAL video into GK_JING until it already has its
     // caption + Pinterest cover row written. Make polls independently and
     // can pick the video up the moment it appears in GK_JING -- if that
@@ -227,7 +241,12 @@ export async function mirrorNewVideos(auth) {
     }
   }
   for (const file of mirror) {
-    if (ownNames.has(file.name) || mirroredNames.has(file.name)) continue;
+    if (mirroredNames.has(file.name)) continue;
+    if (ownNames.has(file.name)) {
+      mirroredNames.add(file.name);
+      saveMirroredNames(mirroredNames);
+      continue;
+    }
     try {
       await drive.files.copy(
         {
