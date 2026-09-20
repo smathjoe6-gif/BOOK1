@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { config } from './config.js';
 import { loadOAuthClient } from './googleAuth.js';
-import { listNewVideos, listVideosInFolder, downloadFile, moveToDone, mirrorNewVideos } from './drive.js';
+import { listNewVideos, listVideosInFolder, downloadFile, moveToDone, mirrorNewVideos, syncLogToDrive } from './drive.js';
 import { findRowForFile, appendGeneratedRow, updateCoverImage } from './sheets.js';
 import { uploadToYouTube, postEngagementComment } from './youtube.js';
 import { generateCaption, isLikelyDuplicateVariant } from './autoCaption.js';
@@ -366,6 +366,15 @@ async function checkOnce() {
     await maybeAutoGenerateVideo(auth);
   } catch (err) {
     console.error('Auto video generation failed (will retry next cycle):', err.message);
+  }
+
+  // Last step in the cycle so the synced snapshot includes everything just
+  // logged above -- lets the log be checked from the cloud without needing
+  // a Terminal screenshot.
+  try {
+    await syncLogToDrive(auth);
+  } catch (err) {
+    console.error('Could not sync automation.log to Drive (will retry next cycle):', err.message);
   }
 }
 

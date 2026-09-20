@@ -108,4 +108,8 @@ export const config = {
   xApiSecret: process.env.X_API_SECRET || '',
   xAccessToken: process.env.X_ACCESS_TOKEN || '',
   xAccessTokenSecret: process.env.X_ACCESS_TOKEN_SECRET || '',
+  // Optional: uploads the tail of automation.log to this Drive file's ID
+  // every check cycle, so the log is readable from the cloud without
+  // screenshotting the Terminal. Leave blank to skip this entirely.
+  logSyncFileId: process.env.LOG_SYNC_FILE_ID || '',
 };

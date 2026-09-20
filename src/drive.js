@@ -314,3 +314,30 @@ export async function moveToDone(auth, fileId) {
     { timeout: API_TIMEOUT_MS }
   );
 }
+
+// Uploads the last ~500 lines of automation.log to a fixed Drive file every
+// cycle, so the log is readable from the cloud (Google Drive) without Joe
+// having to screenshot the Terminal every time something needs checking.
+// Set LOG_SYNC_FILE_ID in .env to a Drive text file's ID to enable this --
+// leave it blank to skip, no effect on anything else.
+export async function syncLogToDrive(auth) {
+  if (!config.logSyncFileId) return;
+  const logPath = path.join(process.cwd(), 'automation.log');
+  let content;
+  try {
+    content = fs.readFileSync(logPath, 'utf8');
+  } catch {
+    return;
+  }
+  const tail = content.split('\n').slice(-500).join('\n');
+  const tmpPath = path.join(os.tmpdir(), 'gk-automation-log-snapshot.txt');
+  fs.writeFileSync(tmpPath, tail);
+  const drive = google.drive({ version: 'v3', auth });
+  await drive.files.update(
+    {
+      fileId: config.logSyncFileId,
+      media: { mimeType: 'text/plain', body: fs.createReadStream(tmpPath) },
+    },
+    { timeout: 60000 }
+  );
+}
