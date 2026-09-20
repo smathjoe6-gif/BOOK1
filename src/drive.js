@@ -146,33 +146,46 @@ export async function mirrorNewVideos(auth) {
   const drive = google.drive({ version: 'v3', auth });
   const mirroredNames = loadMirroredNames();
 
-  const listVideos = (folderId) =>
-    folderId
-      ? drive.files.list(
-          {
-            q: `'${folderId}' in parents and mimeType contains 'video/' and trashed = false`,
-            fields: 'files(id, name)',
-            pageSize: 50,
-          },
-          { timeout: API_TIMEOUT_MS }
-        )
-      : Promise.resolve({ data: { files: [] } });
+  // Done folders in particular can easily hold 100+ videos after a few weeks
+  // -- a single unpaginated page (there used to be a flat pageSize:50 here)
+  // silently hid anything past the first page from the "already done" check
+  // below, making an old, already-posted video look brand new again and get
+  // copied right back in. This was a real, confirmed source of videos
+  // reposting (20 Sep 2026), not just theoretical -- always page through the
+  // full folder.
+  const listVideos = async (folderId) => {
+    if (!folderId) return [];
+    const files = [];
+    let pageToken;
+    do {
+      const res = await drive.files.list(
+        {
+          q: `'${folderId}' in parents and mimeType contains 'video/' and trashed = false`,
+          fields: 'nextPageToken, files(id, name)',
+          pageSize: 1000,
+          pageToken,
+        },
+        { timeout: API_TIMEOUT_MS }
+      );
+      files.push(...(res.data.files || []));
+      pageToken = res.data.nextPageToken;
+    } while (pageToken);
+    return files;
+  };
 
-  const [ownRes, mirrorRes, ownDoneRes, mirrorDoneRes] = await Promise.all([
+  const [own, mirror, ownDone, mirrorDone] = await Promise.all([
     listVideos(config.driveFolderId),
     listVideos(config.mirrorFolderId),
     listVideos(config.doneFolderId),
     listVideos(config.mirrorDoneFolderId),
   ]);
 
-  const own = ownRes.data.files || [];
-  const mirror = mirrorRes.data.files || [];
   // A video already sitting in either side's DONE folder counts as "already
   // there" too -- otherwise a video that's finished on one side but still
   // pending on the other looks "missing" and gets copied right back,
   // reposting it a second time once the still-pending side processes it.
-  const ownNames = new Set([...own, ...(ownDoneRes.data.files || [])].map((f) => f.name));
-  const mirrorNames = new Set([...mirror, ...(mirrorDoneRes.data.files || [])].map((f) => f.name));
+  const ownNames = new Set([...own, ...ownDone].map((f) => f.name));
+  const mirrorNames = new Set([...mirror, ...mirrorDone].map((f) => f.name));
 
   // Candidates for the GK_TERMINAL -> GK_JING direction include GK_TERMINAL's
   // own DONE folder, not just its current contents -- processVideo() writes
@@ -180,7 +193,7 @@ export async function mirrorNewVideos(auth) {
   // YouTube succeeds), so a video is never simultaneously "still in
   // GK_TERMINAL" and "has a row." Checking only `own` meant this direction
   // could never find an eligible file and silently mirrored nothing, ever.
-  const ownMirrorCandidates = [...own, ...(ownDoneRes.data.files || [])];
+  const ownMirrorCandidates = [...own, ...ownDone];
   for (const file of ownMirrorCandidates) {
     if (mirrorNames.has(file.name) || mirroredNames.has(file.name)) continue;
     // Don't mirror a GK_TERMINAL video into GK_JING until it already has its
