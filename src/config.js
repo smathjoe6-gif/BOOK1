@@ -90,6 +90,13 @@ export const config = {
   pinterestClientId: process.env.PINTEREST_CLIENT_ID || '',
   pinterestClientSecret: process.env.PINTEREST_CLIENT_SECRET || '',
   pinterestBoardId: process.env.PINTEREST_BOARD_ID || '987484724485476675',
+  // Pinterest requires apps with Trial access to hit its separate sandbox API
+  // (api-sandbox.pinterest.com) -- calling api.pinterest.com with a
+  // Trial-access app fails outright ("Apps with Trial access must create
+  // Pins in production... use API Sandbox instead", confirmed 20 Sep 2026).
+  // Switch this to https://api.pinterest.com/v5 once Joe's app is approved
+  // for Standard access.
+  pinterestApiBase: process.env.PINTEREST_API_BASE || 'https://api-sandbox.pinterest.com/v5',
   pinterestDailyLimit: Number(process.env.PINTEREST_DAILY_LIMIT || 2),
   // X (Twitter) posting for GK_TERMINAL videos -- a 6th platform alongside
   // YouTube/TikTok, same videos, no separate rollout cap (unlike Pinterest's

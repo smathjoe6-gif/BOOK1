@@ -4,11 +4,17 @@ import { config } from './config.js';
 import { loadPinterestToken, savePinterestToken } from './pinterestAuth.js';
 import { fetchWithTimeout } from './fetchWithTimeout.js';
 
-const API_BASE = 'https://api.pinterest.com/v5';
+// Pin/media/board endpoints go through the Trial-access sandbox base (see
+// config.pinterestApiBase) -- but OAuth token exchange/refresh stays on
+// production api.pinterest.com regardless, matching pinterestAuth.js's own
+// TOKEN_URL, since Pinterest's Trial-access restriction (confirmed 20 Sep
+// 2026) was specifically about creating Pins, not about token refresh.
+const API_BASE = config.pinterestApiBase;
+const TOKEN_URL = 'https://api.pinterest.com/v5/oauth/token';
 
 async function refreshAccessToken(refreshToken) {
   const basic = Buffer.from(`${config.pinterestClientId}:${config.pinterestClientSecret}`).toString('base64');
-  const res = await fetchWithTimeout(`${API_BASE}/oauth/token`, {
+  const res = await fetchWithTimeout(TOKEN_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
