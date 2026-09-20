@@ -5,6 +5,36 @@ import path from 'node:path';
 import { config } from './config.js';
 import { findRowForFile } from './sheets.js';
 
+// Once a filename has been mirrored one way, it must never be mirrored again --
+// even if it briefly vanishes from the destination folder's live listing (Make's
+// move-to-done step silently fails sometimes, or something else moves/relabels
+// it for a moment). Without this, mirrorNewVideos() re-derives "already mirrored"
+// purely from a live folder scan every cycle, and GK_TERMINAL_DONE never gets
+// cleaned out -- it only grows -- so EVERY video ever posted stays a permanent
+// mirror candidate. Any gap, however brief, in the destination folder's listing
+// re-copies it right back in, posting an already-finished video again. This was
+// the actual cause of videos "reappearing" repeatedly (confirmed 20 Sep 2026 --
+// several already-posted videos got re-mirrored into GK_JING within seconds of
+// the very first checkOnce() after a token refresh, straight from the ever-
+// growing GK_TERMINAL_DONE archive).
+const MIRRORED_STATE_PATH = path.join(process.cwd(), 'mirrored-state.json');
+
+function loadMirroredNames() {
+  try {
+    return new Set(JSON.parse(fs.readFileSync(MIRRORED_STATE_PATH, 'utf8')));
+  } catch {
+    return new Set();
+  }
+}
+
+function saveMirroredNames(names) {
+  try {
+    fs.writeFileSync(MIRRORED_STATE_PATH, JSON.stringify([...names]));
+  } catch (err) {
+    console.error('Could not persist mirrored-file state:', err.message);
+  }
+}
+
 // No timeout on any of these Drive API calls used to mean a stalled request
 // could hang the whole check cycle forever -- some of these (listing files)
 // run at the very start of every single cycle, so a hang here blocked
@@ -114,6 +144,7 @@ export async function uploadFile(auth, localPath, fileName) {
 export async function mirrorNewVideos(auth) {
   if (!config.mirrorFolderId) return;
   const drive = google.drive({ version: 'v3', auth });
+  const mirroredNames = loadMirroredNames();
 
   const listVideos = (folderId) =>
     folderId
@@ -151,7 +182,7 @@ export async function mirrorNewVideos(auth) {
   // could never find an eligible file and silently mirrored nothing, ever.
   const ownMirrorCandidates = [...own, ...(ownDoneRes.data.files || [])];
   for (const file of ownMirrorCandidates) {
-    if (mirrorNames.has(file.name)) continue;
+    if (mirrorNames.has(file.name) || mirroredNames.has(file.name)) continue;
     // Don't mirror a GK_TERMINAL video into GK_JING until it already has its
     // caption + Pinterest cover row written. Make polls independently and
     // can pick the video up the moment it appears in GK_JING -- if that
@@ -175,13 +206,15 @@ export async function mirrorNewVideos(auth) {
         },
         { timeout: 4 * 60 * 1000 }
       );
+      mirroredNames.add(file.name);
+      saveMirroredNames(mirroredNames);
       console.log(`Mirrored "${file.name}" into the other folder so it posts everywhere.`);
     } catch (err) {
       console.error(`Could not mirror "${file.name}" into GK_JING (skipping it, other files still mirrored):`, err.message);
     }
   }
   for (const file of mirror) {
-    if (ownNames.has(file.name)) continue;
+    if (ownNames.has(file.name) || mirroredNames.has(file.name)) continue;
     try {
       await drive.files.copy(
         {
@@ -190,6 +223,8 @@ export async function mirrorNewVideos(auth) {
         },
         { timeout: 4 * 60 * 1000 }
       );
+      mirroredNames.add(file.name);
+      saveMirroredNames(mirroredNames);
       console.log(`Mirrored "${file.name}" into the other folder so it posts everywhere.`);
     } catch (err) {
       console.error(`Could not mirror "${file.name}" into GK_TERMINAL (skipping it, other files still mirrored):`, err.message);
