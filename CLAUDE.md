@@ -149,8 +149,23 @@ side has worked reliably.
   silently blocks TikTok too.
 - **`TIKTOK_USE_SANDBOX=true`** forces every TikTok post to `SELF_ONLY`
   (private, visible only to Joe's own account) — this is a TikTok
-  requirement for unaudited apps, not a bug. If TikTok posts aren't showing
-  up publicly, check this first before assuming something's broken.
+  requirement for unaudited apps, not a bug.
+- **TikTok posting now goes through Buffer, not TikTok's own API** (as of
+  21 Sep 2026) — `src/bufferTikTok.js`, wired into `processVideo()` in
+  `src/index.js` ahead of the old direct-API path. TikTok's Production app
+  review is still pending, so the direct integration (`src/tiktok.js` /
+  `src/tiktokAuth.js`, still present but no longer called) is stuck posting
+  `SELF_ONLY` per the sandbox note above; Buffer's own TikTok connection
+  (`kamaldii1` account, "Buffer #2" in Zapier) is already approved and posts
+  publicly, confirmed with a real live test post. Controlled by
+  `BUFFER_ACCESS_TOKEN` / `BUFFER_TIKTOK_PROFILE_ID` in `.env` — if either is
+  blank the script falls back to the old direct TikTok path automatically.
+  Buffer needs a public URL to fetch the video from, so this briefly flips
+  the source Drive file's sharing to "anyone with the link" (same pattern
+  `uploadPublicImage()` already uses for cover images) and leaves it that
+  way afterward — fine since the same video is about to be public on
+  YouTube/Twitter/Pinterest anyway. If TikTok posts stop showing up, check
+  Buffer's own dashboard/connection status before assuming the script died.
 - The script must actually be **running** to do anything — it's a
   `launchd` background process on Joe's Mac, not something living in the
   cloud. If videos pile up and nothing posts to YouTube/TikTok, the first
