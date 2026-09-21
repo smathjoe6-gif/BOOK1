@@ -5,7 +5,7 @@ import { loadOAuthClient } from './googleAuth.js';
 import { listNewVideos, listVideosInFolder, downloadFile, moveToDone, mirrorNewVideos, syncLogToDrive } from './drive.js';
 import { findRowForFile, appendGeneratedRow, updateCoverImage } from './sheets.js';
 import { uploadToYouTube, postEngagementComment } from './youtube.js';
-import { generateCaption, isLikelyDuplicateVariant } from './autoCaption.js';
+import { generateCaption, isLikelyDuplicateVariant, stripCollisionSuffix } from './autoCaption.js';
 import { getCoverImage } from './coverImage.js';
 import { replyToNewComments } from './comments.js';
 import { uploadToTikTok } from './tiktok.js';
@@ -79,12 +79,25 @@ async function processVideoOnce(file) {
   console.log(`\n--- Found: ${file.name} ---`);
 
   let row = await findRowForFile(auth, file.name);
+  const collisionBaseName = stripCollisionSuffix(file.name);
+  if (!row && collisionBaseName !== file.name) {
+    // Drive/macOS append " (1)", " (2)" etc whenever a file lands with the
+    // same base name as one already there -- not proof this is a repost of
+    // the same content, just a name collision. Only treat it as a genuine
+    // duplicate (and skip it) if a caption row already exists under the
+    // real name -- otherwise it's a brand-new video that happens to have a
+    // collision-renamed filename, and gets captioned/posted like any other.
+    row = await findRowForFile(auth, collisionBaseName);
+    if (row) {
+      console.log(`"${file.name}" already has a caption row under "${collisionBaseName}" — treating as an already-known video, not brand new.`);
+    }
+  }
   if (!row) {
     if (isLikelyDuplicateVariant(file.name)) {
       console.log(`"${file.name}" looks like an extra copy of another video (ends in _2/_3/etc) — skipping so it doesn't post twice. Add a spreadsheet row for it if it's actually different content.`);
       return 'skipped';
     }
-    const generated = await generateCaption(file.name);
+    const generated = await generateCaption(collisionBaseName);
     console.log(`No spreadsheet entry for "${file.name}" — auto-writing one: "${generated.title}"`);
     row = { title: generated.title, capture: generated.capture, hashtag: generated.hashtag };
 
@@ -281,7 +294,17 @@ async function backfillGkJingCaptions() {
   const files = await listVideosInFolder(auth, config.gkJingFolderId);
   for (const file of files) {
     try {
-      const row = await findRowForFile(auth, file.name);
+      let row = await findRowForFile(auth, file.name);
+      const collisionBaseName = stripCollisionSuffix(file.name);
+      if (!row && collisionBaseName !== file.name) {
+        // Same Drive/macOS " (1)"/" (2)" collision-suffix issue as
+        // processVideoOnce() -- check for a row under the real base name
+        // before treating this as a brand-new (or duplicate) video.
+        row = await findRowForFile(auth, collisionBaseName);
+        if (row) {
+          console.log(`GK_JING: "${file.name}" already has a caption row under "${collisionBaseName}" — treating as an already-known video, not brand new.`);
+        }
+      }
 
       if (row) {
         // A caption already exists (written here or by the hourly Claude Code backfill
@@ -305,7 +328,7 @@ async function backfillGkJingCaptions() {
 
       if (isLikelyDuplicateVariant(file.name)) continue;
 
-      const generated = await generateCaption(file.name);
+      const generated = await generateCaption(collisionBaseName);
 
       let coverImageUrl = '';
       try {

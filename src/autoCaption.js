@@ -117,10 +117,29 @@ function isTooGenericForTitle(cleanedTitle) {
 }
 
 export function isLikelyDuplicateVariant(filename) {
-  // "_2.mp4" etc is how Joe names an intentional extra copy; " (1).mp4" etc
-  // is what Google Drive/macOS append automatically when a file with the
-  // same name already exists -- both mean "don't treat this as brand new."
-  return /_\d{1,2}\.[a-zA-Z0-9]+$/.test(filename) || / \(\d{1,2}\)\.[a-zA-Z0-9]+$/.test(filename);
+  // "_2.mp4" etc is how Joe himself names an intentional extra copy of a
+  // video he doesn't want auto-captioned as new content -- that's a
+  // deliberate signal, safe to always skip.
+  //
+  // " (1).mp4" etc used to be treated the same way, but that was wrong: it's
+  // just what Google Drive/macOS append automatically whenever two files
+  // land with the same base name, which happens routinely for entirely
+  // different videos (Grok's own generated filenames collide by chance, or
+  // a video gets mirrored between GK_TERMINAL/GK_JING and re-lands under
+  // that name) -- not a reliable "this is a duplicate" signal at all.
+  // Treating it as skip-forever silently ate several genuinely new videos
+  // before this was caught (recurred repeatedly through 17-21 Sep 2026,
+  // each time requiring someone to notice and manually rename the file).
+  // See stripCollisionSuffix() below for how these are handled instead.
+  return /_\d{1,2}\.[a-zA-Z0-9]+$/.test(filename);
+}
+
+// Strips a Drive/macOS auto-appended " (1)", " (2)" etc collision suffix, so
+// callers can look up (or generate) a caption under the file's real name
+// instead of one that's cosmetically different only because of a filename
+// collision. Returns the filename unchanged if it has no such suffix.
+export function stripCollisionSuffix(filename) {
+  return filename.replace(/ \(\d{1,2}\)(\.[a-zA-Z0-9]+)$/, '$1');
 }
 
 export function randomThemedCaption() {
