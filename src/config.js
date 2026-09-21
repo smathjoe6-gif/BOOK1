@@ -55,6 +55,13 @@ export const config = {
   tiktokClientSecret: process.env.TIKTOK_USE_SANDBOX === 'true'
     ? (process.env.TIKTOK_SANDBOX_CLIENT_SECRET || '')
     : (process.env.TIKTOK_CLIENT_SECRET || ''),
+  // TikTok posting via Buffer (src/bufferTikTok.js) -- replaces the direct
+  // TikTok API integration above (src/tiktok.js) as of 21 Sep 2026, since
+  // that one is stuck posting SELF_ONLY/private under TIKTOK_USE_SANDBOX
+  // while Buffer's own TikTok connection posts publicly. Leave
+  // BUFFER_ACCESS_TOKEN blank to fall back to the direct TikTok API instead.
+  bufferAccessToken: process.env.BUFFER_ACCESS_TOKEN || '',
+  bufferTikTokProfileId: process.env.BUFFER_TIKTOK_PROFILE_ID || '',
   xaiApiKey: process.env.XAI_API_KEY || '',
   // API key for the local OmniRoute AI gateway (http://localhost:20128) --
   // copy it from OmniRoute's Dashboard -> Endpoints after connecting a

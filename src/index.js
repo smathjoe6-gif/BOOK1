@@ -10,6 +10,7 @@ import { getCoverImage } from './coverImage.js';
 import { replyToNewComments } from './comments.js';
 import { uploadToTikTok } from './tiktok.js';
 import { loadTikTokToken } from './tiktokAuth.js';
+import { uploadToTikTokViaBuffer } from './bufferTikTok.js';
 import { uploadToPinterest } from './pinterest.js';
 import { loadPinterestToken } from './pinterestAuth.js';
 import { uploadToTwitter } from './twitter.js';
@@ -147,7 +148,15 @@ async function processVideoOnce(file) {
   // upload would still get moved to DONE and never retried, while a video
   // that succeeds on retry could end up posted to TikTok twice.
   if (youtubePosted) {
-    if (loadTikTokToken()) {
+    if (config.bufferAccessToken && config.bufferTikTokProfileId) {
+      console.log('Posting to TikTok via Buffer...');
+      try {
+        const tk = await uploadToTikTokViaBuffer(auth, { fileId: file.id, caption });
+        console.log(`TikTok (via Buffer): posted, update id ${tk.updateId}`);
+      } catch (err) {
+        console.error('TikTok (via Buffer) upload failed (other posts above still stand):', err.message);
+      }
+    } else if (loadTikTokToken()) {
       console.log('Posting to TikTok...');
       try {
         const tk = await uploadToTikTok({ filePath: localPath, caption });
