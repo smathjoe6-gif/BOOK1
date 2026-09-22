@@ -119,13 +119,17 @@ batch Joe drops in.
 
 **Make's scenario reads column G too** (the "Create Pinterest Video Pin"
 step's `cover_image_url` field, both the main path and its retry twin) —
-`{{ifempty(<row>.`7`; <4-image day-of-month rotation>)}}`. So: a unique
+`{{ifempty(<row>.`6`; <4-image day-of-month rotation>)}}`. So: a unique
 cover if column G has one, otherwise the generic rotation as a fallback.
-**This field literally broke once already** (it was pointing at field `6`
-— the Hashtag column — instead of field `7`, so it silently never found a
-real cover and always fell back to the generic rotation even when a cover
-existed). Fixed 15 Sep 2026 — if Pinterest covers ever look wrong/repetitive
-again, check this field first before assuming the bug is back.
+**Make's sheet columns are numbered from 0**: A=`0`, D Title=`3`,
+E Capture=`4`, F Hashtag=`5`, **G Cover=`6`** — check the caption fields in
+the same scenario, which use `3`/`4`/`5`, if in doubt. On 15 Sep 2026 this
+field was wrongly "fixed" from `6` to `7` (the empty column H), so every
+pin silently fell back to the generic "Somali culture" rotation cover even
+though column G was full of unique covers — Joe saw the same cover night
+after night. Corrected back to `6` on 22 Sep 2026. **Do not change it to
+`7` again.** If Pinterest covers look repetitive, first check column G in
+the sheet has a link, then check this field says `6`.
 
 If neither source has anything available, `getCoverImage()` returns an empty
 string and everything above is a no-op — Pinterest pins just use the
