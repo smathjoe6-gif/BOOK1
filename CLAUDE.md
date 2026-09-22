@@ -166,6 +166,13 @@ side has worked reliably.
   way afterward — fine since the same video is about to be public on
   YouTube/Twitter/Pinterest anyway. If TikTok posts stop showing up, check
   Buffer's own dashboard/connection status before assuming the script died.
+  **Uses Buffer's GraphQL API (`https://api.buffer.com`), not the old REST
+  API** — Joe's `BUFFER_ACCESS_TOKEN` is a new-style Buffer API key, which
+  the REST API rejects with "Public API tokens are not accepted for REST API
+  access" (this broke the very first real post on 22 Sep 2026). The script
+  looks up the TikTok channel on the Buffer account by itself, so
+  `BUFFER_TIKTOK_PROFILE_ID` is optional now (used only if it matches a real
+  channel id).
 - The script must actually be **running** to do anything — it's a
   `launchd` background process on Joe's Mac, not something living in the
   cloud. If videos pile up and nothing posts to YouTube/TikTok, the first
