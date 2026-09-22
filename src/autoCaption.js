@@ -11,8 +11,20 @@ const HASHTAG_BANK = [
   '#StudioVault', '#ViralMoment', '#LegendRises', '#SoulOfTheStory',
 ];
 
-function pickRandomHashtags(count) {
-  const shuffled = [...HASHTAG_BANK].sort(() => Math.random() - 0.5);
+// Used only for the blind fallback path below (THEME_BANK / cleaned-filename
+// captions), where there's no real understanding of what the video actually
+// shows -- no heritage/culture-specific tags here, since randomly attaching
+// #SomaliHeritage etc. to content we know nothing about is exactly what made
+// TikTok/Pinterest look repetitive and mismatched (diagnosed 22 Sep 2026).
+// The AI caption path (writeCaptionWithAI) picks its own content-matched
+// hashtags instead of drawing from either bank.
+const NEUTRAL_HASHTAG_BANK = [
+  '#GKLegend', '#GKLegendStudio', '#ViralVideo', '#MustWatch', '#TrendingNow',
+  '#RealStory', '#WatchThis', '#StudioVault', '#ViralMoment', '#StudioSound',
+];
+
+function pickRandomHashtags(count, bank = HASHTAG_BANK) {
+  const shuffled = [...bank].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count).join(' ');
 }
 
@@ -144,27 +156,31 @@ export function stripCollisionSuffix(filename) {
 
 export function randomThemedCaption() {
   const pick = pickUnusedTheme();
-  return { title: pick.title, capture: pick.capture, hashtag: pickRandomHashtags(6) };
+  return { title: pick.title, capture: pick.capture, hashtag: pickRandomHashtags(6, NEUTRAL_HASHTAG_BANK) };
 }
 
 export async function generateCaption(filename) {
-  const hashtag = pickRandomHashtags(6);
-
   try {
     const ai = await writeCaptionWithAI(filename);
     console.log(`AI-written caption used for "${filename}"`);
+    // The AI now picks hashtags matching the actual content in the same
+    // call -- fall back to a random pick only if it didn't return any.
+    const hashtag = ai.hashtag || pickRandomHashtags(6);
     return { title: ai.title, capture: ai.capture, hashtag };
   } catch (err) {
     console.log(`OmniRoute unavailable, using template caption instead: ${err.message}`);
   }
 
+  // Everything below this point has zero real understanding of the video's
+  // actual content (no AI available), so it sticks to the neutral hashtag
+  // bank rather than guessing at heritage/culture tags that may not fit.
   if (isGenericIdFilename(filename)) {
-    return { ...randomThemedCaption(), hashtag };
+    return randomThemedCaption();
   }
 
   const cleaned = cleanFilenameToTitle(filename);
   if (isTooGenericForTitle(cleaned)) {
-    return { ...randomThemedCaption(), hashtag };
+    return randomThemedCaption();
   }
 
   // The filename itself has real descriptive words worth keeping (e.g. "Two
@@ -175,5 +191,5 @@ export async function generateCaption(filename) {
   const tail = pickOne(CAPTION_TAIL_BANK);
   const title = `${cleaned} ${emoji}`;
   const capture = `${emoji} ${cleaned} — ${tail}`;
-  return { title, capture, hashtag };
+  return { title, capture, hashtag: pickRandomHashtags(6, NEUTRAL_HASHTAG_BANK) };
 }

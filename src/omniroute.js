@@ -121,24 +121,34 @@ async function askAI(systemPrompt, userPrompt) {
   throw lastErr;
 }
 
-const CAPTION_SYSTEM_PROMPT = `You are the social media voice of "GK Legend Studio," a brand celebrating Somali heritage and culture through short videos. Write warm, punchy, on-brand copy with real emotion -- one or two emoji, never robotic or repetitive-sounding. Never include hashtags in your response.`;
+const CAPTION_SYSTEM_PROMPT = `You are the social media voice of "GK Legend Studio," a brand celebrating Somali heritage and culture through short videos -- but not every video is heritage content, so never force that framing where it doesn't fit. Write warm, punchy, on-brand copy with real emotion -- one or two emoji, never robotic or repetitive-sounding. Also pick exactly 6 hashtags that actually match this specific video's content -- always include #GKLegend and #GKLegendStudio, but only include heritage/culture tags (e.g. #SomaliHeritage, #CulturalPride, #HeritageReimagined) when the content genuinely is about Somali heritage or culture, never as a default. For unrelated content (comedy, animals, tech gags, etc.) pick hashtags that actually fit that content instead.`;
 
+// Hashtags used to always come from a fixed random pool regardless of what
+// the caption said -- meaning even a good, unique AI caption on an unrelated
+// video (a comedy clip, an animal gag) still got tagged #SomaliHeritage
+// purely by chance, and that mismatched tag is what was most visible to
+// viewers scrolling TikTok/Pinterest (diagnosed 22 Sep 2026: Joe noticed
+// nearly every post reading as "Somali culture" even when unrelated). Now
+// the AI picks hashtags matching the actual content in the same call.
 export async function writeCaptionWithAI(filenameHint) {
-  const userPrompt = `Write a short YouTube title (under 60 characters, include 1 emoji) and a 1-2 sentence caption for a short video from GK Legend Studio. This filename hint may or may not be meaningful, ignore it if it looks like a random ID: "${filenameHint}".
+  const userPrompt = `Write a short YouTube title (under 60 characters, include 1 emoji), a 1-2 sentence caption, and 6 matching hashtags for a short video from GK Legend Studio. This filename hint may or may not be meaningful, ignore it if it looks like a random ID: "${filenameHint}".
 
 Respond in exactly this format, nothing else:
 TITLE: <title here>
-CAPTION: <caption here>`;
+CAPTION: <caption here>
+HASHTAGS: <6 hashtags separated by spaces>`;
 
   const text = await askAI(CAPTION_SYSTEM_PROMPT, userPrompt);
   const titleMatch = text.match(/TITLE:\s*(.+)/i);
-  const captionMatch = text.match(/CAPTION:\s*([\s\S]+)/i);
+  const captionMatch = text.match(/CAPTION:\s*([\s\S]+?)(?:\nHASHTAGS:|$)/i);
+  const hashtagMatch = text.match(/HASHTAGS:\s*(.+)/i);
   if (!titleMatch || !captionMatch) {
     throw new Error('Could not parse AI response into title/caption');
   }
   return {
     title: titleMatch[1].trim(),
     capture: captionMatch[1].trim(),
+    hashtag: hashtagMatch ? hashtagMatch[1].trim() : undefined,
   };
 }
 
