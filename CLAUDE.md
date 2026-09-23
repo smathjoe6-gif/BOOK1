@@ -37,11 +37,12 @@ one built and started over with a different approach. Rules:
 | YouTube comment replies | `replyToNewComments()` | runs every cycle |
 
 ### ⚠️ Known broken / not set up (not blocking posting)
-- **X (Twitter):** log says "X is not configured yet" on every video. Root
-  cause found 23 Sep: the 4 keys were typed at the Terminal prompt on 20 Sep
-  (not saved to any file). Fix = add the same 4 lines to
-  `~/gk-automation/.env`, then restart. Keys are in Joe's Drive "MY Memory"
-  folder → "Terminal Saved Output.txt".
+- **X (Twitter):** FIXED 23 Sep ~03:30 — the 4 keys had been typed at the
+  Terminal prompt (saves nothing) and `.env` had them EMPTY; now written
+  into `.env` (verified "has a value" x4). Awaiting first real X post on
+  the next video — confirm in the live log, then move X to ✅ Working.
+  Lesson: Joe's ⌘S in Terminal opens "Save Output", which does NOT edit
+  `.env`; give him one-line commands that write the file directly.
 - **Mac script's own Pinterest post:** "Authentication failed" — harmless, Make already posts Pinterest. Could be switched off.
 - **OmniRoute (local AI):** returns 502 → captions use built-in templates, not AI-written.
 - **Grok auto video generation:** 403 from xAI every cycle, even though Joe
@@ -57,6 +58,7 @@ one built and started over with a different approach. Rules:
 4. Fix OmniRoute so captions are AI-written again.
 
 ### 📅 Log
+- **23 Sep 2026 ~03:30:** X keys written into the Mac's `.env` (were empty). Batch done: YouTube 20/20, TikTok 18/20 (2 failed before the Buffer fix), Make finishing last 9 by ~06:30.
 - **23 Sep 2026 (later):** tonight's work merged into `desktop-script` (PR #1). Grok errors now show xAI's reason. X keys: Joe says saved, script still sees none — checking names/file.
 - **22-23 Sep 2026:** TikTok via Buffer fixed (REST → GraphQL; every Buffer post had failed with 401 since 21 Sep). Pinterest cover field fixed `7`→`6`. 20-video batch posted one at a time. Comment-reply plan recorded. Status board created.
 
