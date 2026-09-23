@@ -8,12 +8,19 @@ import { pipeWithTimeout } from './drive.js';
 
 const API_BASE = 'https://api.canva.com/rest/v1';
 
+// Canva's error bodies are { code, message } at the top level (not nested
+// under "error"), so without this every failure only showed the HTTP status.
+function canvaError(data, res) {
+  const detail = data?.message || data?.error?.message || data?.code;
+  return detail ? `${res.status} -- ${detail}` : `${res.status}`;
+}
+
 async function pollJob(url, headers, extractStatus, extractResult, label) {
   for (let attempt = 0; attempt < 30; attempt++) {
     const res = await fetchWithTimeout(url, { headers });
     const data = await res.json();
     if (!res.ok) {
-      throw new Error(`Canva ${label} check failed: ${data.error?.message || res.status}`);
+      throw new Error(`Canva ${label} check failed: ${canvaError(data, res)}`);
     }
     const status = extractStatus(data);
     if (status === 'success') return extractResult(data);
@@ -30,7 +37,10 @@ async function pollJob(url, headers, extractStatus, extractResult, label) {
 // asset ID.
 async function uploadAsset(localPath, authHeader) {
   const fileBuffer = fs.readFileSync(localPath);
-  const metadata = Buffer.from(JSON.stringify({ name: `pool-cover-${Date.now()}` })).toString('base64');
+  // Canva expects this header to be JSON with the file name base64-encoded
+  // inside it: {"name_base64": "..."}. It used to be base64 of the whole
+  // JSON, which Canva rejected with a 400 on every upload (23 Sep 2026).
+  const metadata = JSON.stringify({ name_base64: Buffer.from(`pool-cover-${Date.now()}`).toString('base64') });
 
   const res = await fetchWithTimeout(`${API_BASE}/asset-uploads`, {
     method: 'POST',
@@ -43,7 +53,7 @@ async function uploadAsset(localPath, authHeader) {
   }, 60000);
   const data = await res.json();
   if (!res.ok) {
-    throw new Error(`Canva asset upload failed: ${data.error?.message || res.status}`);
+    throw new Error(`Canva asset upload failed: ${canvaError(data, res)}`);
   }
 
   return pollJob(
@@ -94,7 +104,7 @@ export async function generateCoverImage(title, sourceImagePath) {
   });
   const autofillData = await autofillRes.json();
   if (!autofillRes.ok) {
-    throw new Error(`Canva autofill request failed: ${autofillData.error?.message || autofillRes.status}`);
+    throw new Error(`Canva autofill request failed: ${canvaError(autofillData, autofillRes)}`);
   }
 
   const designId = await pollJob(
@@ -112,7 +122,7 @@ export async function generateCoverImage(title, sourceImagePath) {
   });
   const exportData = await exportRes.json();
   if (!exportRes.ok) {
-    throw new Error(`Canva export request failed: ${exportData.error?.message || exportRes.status}`);
+    throw new Error(`Canva export request failed: ${canvaError(exportData, exportRes)}`);
   }
 
   const downloadUrl = await pollJob(
