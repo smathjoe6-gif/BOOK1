@@ -16,6 +16,11 @@ const SCOPES = [
   'asset:read', 'asset:write',
   'brandtemplate:content:read', 'brandtemplate:content:write',
   'design:content:read', 'design:content:write',
+  // Needed to check an autofill job's status (Canva: "Missing scopes:
+  // [design:meta:read]", 23 Sep 2026). Must also be ticked on the
+  // integration's Scopes page at canva.com/developers, then run
+  // `npm run canva-auth` once more.
+  'design:meta:read',
 ].join(' ');
 
 function base64url(buffer) {
