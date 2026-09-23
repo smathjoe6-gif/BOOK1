@@ -6,6 +6,52 @@ drops a finished video into `GK_JING` (or `GK_TERMINAL`) in Google Drive and
 it posts everywhere on its own — no explanation needed each time.** This file
 is that explanation, written down once.
 
+## ⭐ STATUS BOARD — read this first, update it last
+
+**Every session: read this board before doing anything, and update it
+before ending.** Joe has lost weeks to sessions that forgot what the last
+one built and started over with a different approach. Rules:
+
+1. **One branch: `desktop-script`.** It is what runs on Joe's Mac. Every
+   fix lands there (via a PR from a `claude/...` branch, merged the same
+   night). `claude/domain-list-8ikox6` is an OLD 17-Sep copy — superseded,
+   don't build on it or copy from it.
+2. **Fix what's on the board, don't redesign.** If something here is
+   "working", don't swap its tool/approach unless Joe asks. Tools are
+   decided: Mac script + Buffer API (YouTube/TikTok/X), Make.com
+   (IG/FB/Pinterest), Manychat (DMs). **No Zapier.**
+3. **Verify, don't assume.** Check the live log (Drive file
+   `gk-automation-log-live.txt`, id `1Kyh87FahJHv7GkmC7zI_TWiKqhi4HdZs`),
+   Make executions, and the sheet before claiming something works/broke.
+4. **Update the board** (date + what changed) at the end of every session.
+
+### ✅ Working (verified 22-23 Sep 2026)
+| What | How | Proof |
+|---|---|---|
+| YouTube posting | Mac script, 1 video / 15 min | live log, 20 videos posted 22-23 Sep |
+| TikTok posting | Mac script → Buffer GraphQL API (`src/bufferTikTok.js`) | live log "TikTok (via Buffer): posted" every video since 22 Sep 22:03 |
+| Instagram + Facebook | Make scenario 9696465, 1 video / 25 min | Make executions all status 1 (success) |
+| Pinterest posting | Make scenario 9696465 | same |
+| Pinterest unique covers | cover pool photo → sheet column G → Make field `6` | fixed 22 Sep (was reading `7`); Joe to confirm on new pins |
+| Order | YouTube+TikTok first; video mirrors to GK_JING only after its caption row exists; then Make | `mirrorNewVideos()` in `src/drive.js` |
+| YouTube comment replies | `replyToNewComments()` | runs every cycle |
+
+### ⚠️ Known broken / not set up (not blocking posting)
+- **X (Twitter):** keys not in the Mac's `.env` ("X is not configured yet" in log).
+- **Mac script's own Pinterest post:** "Authentication failed" — harmless, Make already posts Pinterest. Could be switched off.
+- **OmniRoute (local AI):** returns 502 → captions use built-in templates, not AI-written.
+- **Grok auto video generation:** 403 every cycle.
+- **ffmpeg missing on Mac:** horizontal videos aren't converted to 9:16 (`brew install ffmpeg`).
+
+### 🔜 Next (in order, only when Joe asks)
+1. Joe confirms new Pinterest pins show folder-photo covers (field `6` fix).
+2. TikTok comment auto-replies via Buffer API — **blocked**: Buffer has no comment endpoints yet (see Known quirks).
+3. Add X keys to `.env` on the Mac.
+4. Fix OmniRoute so captions are AI-written again.
+
+### 📅 Log
+- **22-23 Sep 2026:** TikTok via Buffer fixed (REST → GraphQL; every Buffer post had failed with 401 since 21 Sep). Pinterest cover field fixed `7`→`6`. 20-video batch posted one at a time. Comment-reply plan recorded. Status board created.
+
 ## The one thing to remember
 
 Two separate systems each own half the platforms. Both watch a pair of
