@@ -29,7 +29,7 @@ one built and started over with a different approach. Rules:
 | What | How | Proof |
 |---|---|---|
 | YouTube posting | Mac script, 1 video / 15 min | live log, 20 videos posted 22-23 Sep |
-| TikTok posting | Mac script → Buffer GraphQL API (`src/bufferTikTok.js`) | live log "TikTok (via Buffer): posted" every video since 22 Sep 22:03 |
+| TikTok posting | Mac script → queue (`src/tiktokQueue.js`, max `TIKTOK_DAILY_LIMIT`=10/day) → Buffer GraphQL API (`src/bufferTikTok.js`) | first 20 posted 22-23 Sep; see TikTok daily limit below |
 | Instagram + Facebook | Make scenario 9696465, 1 video / 25 min | Make executions all status 1 (success) |
 | Pinterest posting | Make scenario 9696465 | same |
 | Pinterest unique covers | cover pool photo → sheet column G → Make field `6` | fixed 22 Sep (was reading `7`); Joe to confirm on new pins |
@@ -50,19 +50,44 @@ one built and started over with a different approach. Rules:
   `.env`; give him one-line commands that write the file directly.
 - **Mac script's own Pinterest post:** "Authentication failed" — harmless, Make already posts Pinterest. Could be switched off.
 - **OmniRoute (local AI):** returns 502 → captions use built-in templates, not AI-written.
-- **Grok auto video generation:** 403 from xAI every cycle, even though Joe
-  bought $10 of xAI credit. Until 23 Sep the log only said "403"; the error
-  now includes xAI's reason (`src/grokVideo.js`). Usual causes: credits on a
-  different xAI team than the API key, or the key restricted to other models.
+- **TikTok daily limit (23 Sep):** ~30 posts in 24h → Buffer accepted all
+  (log said "posted") but TikTok rejected the last ~12: "TikTok has detected
+  a large number of posts published through the API for this channel. Wait
+  24 hours". Fix built: `src/tiktokQueue.js` queues every video and sends at
+  most `TIKTOK_DAILY_LIMIT` (default 10) per day, one per cycle; extras wait
+  for tomorrow (`tiktok-queue.json`). Joe posted the 12 failed ones by hand,
+  so delete them in Buffer instead of pressing "Retry Now" (would duplicate).
+  Note: "posted" in the log only means Buffer accepted it — TikTok can still
+  reject later; check Buffer's Sent/Errors if TikTok looks missing.
+- **Grok auto video generation:** runs at `AUTO_GENERATE_HOURS=13` (1pm),
+  1/day (Joe's `.env`; not 8am). xAI's real reason (23 Sep 13:01): "403 --
+  Your team 3d338612-… has either used all available credits or reached its
+  monthly spending limit". So the $10 isn't usable by the team the API key
+  belongs to. Fix (Joe, console.x.ai): open team `3d338612…` → Billing →
+  check credits are on THIS team and raise the monthly spending limit above
+  $0. `autogen-state.json` last success: 17 Sep. Retries every 15 min until
+  it works, then 1/day.
+- **Pinterest covers not designed:** pins show the raw pool photo, because
+  the Canva step isn't set up. Checked 23 Sep via Canva: Joe has brand
+  templates (incl. "Cinematic Documentary-Style Pin Cover" `EAHVCdKpybI`,
+  "Pinterest Pin - Elderly Man Speaking" `EAHVCThTlF0`) but **none has
+  autofill data fields** (both return an empty dataset). To finish: in Canva
+  open the pin template → Apps → Bulk create → connect the headline text as
+  a data field named `title` and the photo frame as an image field named
+  `photo` → republish template; then in `.env`: `CANVA_BRAND_TEMPLATE_ID=
+  EAHVCdKpybI`, `CANVA_IMAGE_FIELD=photo` (+ `CANVA_CLIENT_ID/SECRET`, then
+  `npm run canva-auth` once) → restart. No code change needed.
 - **ffmpeg missing on Mac:** horizontal videos aren't converted to 9:16 (`brew install ffmpeg`).
 
 ### 🔜 Next (in order, only when Joe asks)
-1. Joe confirms new Pinterest pins show folder-photo covers (field `6` fix).
+1. Canva pin template data fields + `.env` (see "Pinterest covers not designed").
+1b. Joe: xAI credits/spending limit on team `3d338612…`; X token regenerate.
 2. TikTok comment auto-replies via Buffer API — **blocked**: Buffer has no comment endpoints yet (see Known quirks).
 3. Add X keys to `.env` on the Mac.
 4. Fix OmniRoute so captions are AI-written again.
 
 ### 📅 Log
+- **23 Sep 2026 ~15:40:** Joe's screenshots: TikTok rejected ~12 posts (daily API limit) → built TikTok queue, 10/day (`src/tiktokQueue.js`, PR #2). Grok reason found: xAI team out of credits / spending limit (runs 1pm, `AUTO_GENERATE_HOURS=13`). Pinterest pins show raw photos, not Canva designs — Canva templates lack data fields (steps above). Make field `6` confirmed working (pins have unique photos).
 - **23 Sep 2026 ~11:20:** Make batch 2 done: GK_JING empty, every Make run 05:47–09:32Z succeeded. Grok: the log has NO auto-generate line at all since the 03:16 restart (not even a failure), and the 8am slot passed silently. The code can only skip silently if `AUTO_GENERATE_VIDEOS` isn't `true` in `.env` or `autogen-state.json` already lists today's slots. Asked Joe to run the check below. The `grok-video-<id>.mp4` files posted overnight were Joe's own downloads; auto-made ones are named `grok-auto-<time>.mp4`. X is still waiting on a regenerated token.
   Mac check: `cd ~/gk-automation && grep -E '^AUTO_GENERATE' .env; cat autogen-state.json`
 - **23 Sep 2026 ~06:45:** 2nd batch (9 + 1 extra from GK_JING) all posted to YouTube + TikTok by 05:50. X failed every one ("Invalid or expired token") — Joe still needs to regenerate the X access token. Make: all runs success; 10 videos queued in GK_JING, done ~11:00. No Grok attempt logged since the restart yet.
