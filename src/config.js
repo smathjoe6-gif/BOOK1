@@ -105,8 +105,14 @@ export const config = {
   // for Standard access.
   pinterestApiBase: process.env.PINTEREST_API_BASE || 'https://api-sandbox.pinterest.com/v5',
   // Most TikTok posts per day sent through Buffer (see src/tiktokQueue.js).
-  // TikTok blocked the account for 24h after ~20 API posts in a day (23 Sep).
-  tiktokDailyLimit: Number(process.env.TIKTOK_DAILY_LIMIT || 15),
+  // TikTok blocked the account for 24h after ~20 API posts in a day (23 Sep),
+  // and again the same evening when posting resumed too soon.
+  tiktokDailyLimit: Number(process.env.TIKTOK_DAILY_LIMIT || 8),
+  // Minimum minutes between two TikTok posts (bursts get the account blocked).
+  tiktokMinGapMinutes: Number(process.env.TIKTOK_MIN_GAP_MINUTES || 60),
+  // Optional: hold all TikTok posts until this time (ISO, e.g.
+  // 2026-09-24T19:00:00+01:00) while TikTok's "Wait 24 hours" block runs out.
+  tiktokPauseUntil: process.env.TIKTOK_PAUSE_UNTIL ? new Date(process.env.TIKTOK_PAUSE_UNTIL) : null,
   pinterestDailyLimit: Number(process.env.PINTEREST_DAILY_LIMIT || 2),
   // X (Twitter) posting for GK_TERMINAL videos -- a 6th platform alongside
   // YouTube/TikTok, same videos, no separate rollout cap (unlike Pinterest's
