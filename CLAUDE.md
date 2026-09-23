@@ -79,7 +79,12 @@ one built and started over with a different approach. Rules:
   have connectors attached from here ("connectors parameter not available
   for this organization"). Fix = Joe signs Drive in again at
   claude.ai/customize/connectors and sets its tools to "Always allow".
-  Today's prompts were written by hand and sent to Joe as a file.
+  Today's prompts were written by hand and saved to Drive from the chat
+  session (doc `1Glzq44_edeTi_IuZosSCMLGmD8Tw96IdC8I9Wnq-E7c`). A 4th run
+  (14:58Z, after Joe set Drive to "Always allow") ran 5 min and still had
+  NO Drive tools → the routine itself needs Google Drive added under its
+  own settings (claude.ai → Routines → this routine → Connectors); account
+  -level "Always allow" alone doesn't give it to routine sessions.
 - **Pinterest covers not designed:** pins showed the raw pool photo because
   the Canva step wasn't set up (Joe's older templates had no data fields).
   **23 Sep: built a new brand template `EAHWBiN6j8A`** (1000x1500 pin:
@@ -99,6 +104,7 @@ one built and started over with a different approach. Rules:
 4. Fix OmniRoute so captions are AI-written again.
 
 ### 📅 Log
+- **23 Sep 2026 ~16:10:** PR #2 merged; Joe pulled, set Canva `.env` (template `EAHWBiN6j8A`, client id/secret + `canva-token.json` already present), `AUTO_GENERATE_VIDEOS=false`, restarted. Next: confirm first Canva-designed pin + TikTok queue lines in the live log. Viral-prompt routine still gets no Drive tools (see above).
 - **23 Sep 2026 ~15:50:** Built Canva pin template `EAHWBiN6j8A` (title+photo fields). TikTok limit raised to 15/day (Joe: "no limit" — but the 24h block message is TikTok's own, so a cap stays). Grok: Joe uses Grok Automations, not the paid API; re-fired the daily prompt routine (today's doc was missing).
 - **23 Sep 2026 ~15:40:** Joe's screenshots: TikTok rejected ~12 posts (daily API limit) → built TikTok queue, 10/day (`src/tiktokQueue.js`, PR #2). Grok reason found: xAI team out of credits / spending limit (runs 1pm, `AUTO_GENERATE_HOURS=13`). Pinterest pins show raw photos, not Canva designs — Canva templates lack data fields (steps above). Make field `6` confirmed working (pins have unique photos).
 - **23 Sep 2026 ~11:20:** Make batch 2 done: GK_JING empty, every Make run 05:47–09:32Z succeeded. Grok: the log has NO auto-generate line at all since the 03:16 restart (not even a failure), and the 8am slot passed silently. The code can only skip silently if `AUTO_GENERATE_VIDEOS` isn't `true` in `.env` or `autogen-state.json` already lists today's slots. Asked Joe to run the check below. The `grok-video-<id>.mp4` files posted overnight were Joe's own downloads; auto-made ones are named `grok-auto-<time>.mp4`. X is still waiting on a regenerated token.
