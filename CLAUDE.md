@@ -177,6 +177,17 @@ side has worked reliably.
   looks up the TikTok channel on the Buffer account by itself, so
   `BUFFER_TIKTOK_PROFILE_ID` is optional now (used only if it matches a real
   channel id).
+- **TikTok comment auto-replies: decided plan, not built yet (22-23 Sep
+  2026).** Joe wants the Mac script to thank/welcome TikTok commenters
+  automatically (e.g. sticker/emoji comments get "Thank you for the love 🙏
+  Welcome to the GK Legend family ✨"). **Joe does NOT use Zapier for this —
+  it goes through the Buffer API from this script, same as TikTok posting.**
+  Blocker: Buffer's GraphQL API has no comment endpoints yet (on Buffer's
+  API roadmap as "Community endpoints"), and TikTok's own API doesn't allow
+  comment replies for this app. When Buffer ships them, add a
+  `replyToBufferComments()` step to `checkOnce()` in `src/index.js`, next to
+  `replyToNewComments()` (YouTube). Until then Joe replies by hand in Buffer
+  → Community. Don't propose Zapier/Make/other tools for this again.
 - The script must actually be **running** to do anything — it's a
   `launchd` background process on Joe's Mac, not something living in the
   cloud. If videos pile up and nothing posts to YouTube/TikTok, the first
