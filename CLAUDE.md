@@ -63,6 +63,8 @@ one built and started over with a different approach. Rules:
 4. Fix OmniRoute so captions are AI-written again.
 
 ### 📅 Log
+- **23 Sep 2026 ~11:20:** Make batch 2 done: GK_JING empty, every Make run 05:47–09:32Z succeeded. Grok: the log has NO auto-generate line at all since the 03:16 restart (not even a failure), and the 8am slot passed silently. The code can only skip silently if `AUTO_GENERATE_VIDEOS` isn't `true` in `.env` or `autogen-state.json` already lists today's slots. Asked Joe to run the check below. The `grok-video-<id>.mp4` files posted overnight were Joe's own downloads; auto-made ones are named `grok-auto-<time>.mp4`. X is still waiting on a regenerated token.
+  Mac check: `cd ~/gk-automation && grep -E '^AUTO_GENERATE' .env; cat autogen-state.json`
 - **23 Sep 2026 ~06:45:** 2nd batch (9 + 1 extra from GK_JING) all posted to YouTube + TikTok by 05:50. X failed every one ("Invalid or expired token") — Joe still needs to regenerate the X access token. Make: all runs success; 10 videos queued in GK_JING, done ~11:00. No Grok attempt logged since the restart yet.
 - **23 Sep 2026 ~03:50:** New 9-video batch started; YouTube+TikTok posting fine. X now tries but X rejects the token ("Invalid or expired token") — needs regenerated access token.
 - **23 Sep 2026 ~03:30:** X keys written into the Mac's `.env` (were empty). Batch done: YouTube 20/20, TikTok 18/20 (2 failed before the Buffer fix), Make finishing last 9 by ~06:30.
