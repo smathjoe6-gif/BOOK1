@@ -161,7 +161,7 @@ async function processVideoOnce(file) {
   // upload would still get moved to DONE and never retried, while a video
   // that succeeds on retry could end up posted to TikTok twice.
   if (youtubePosted) {
-    if (config.bufferAccessToken && config.bufferTikTokProfileId) {
+    if (config.bufferAccessToken) {
       console.log('Posting to TikTok via Buffer...');
       try {
         const tk = await uploadToTikTokViaBuffer(auth, { fileId: file.id, caption });

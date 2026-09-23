@@ -6,6 +6,52 @@ drops a finished video into `GK_JING` (or `GK_TERMINAL`) in Google Drive and
 it posts everywhere on its own — no explanation needed each time.** This file
 is that explanation, written down once.
 
+## ⭐ STATUS BOARD — read this first, update it last
+
+**Every session: read this board before doing anything, and update it
+before ending.** Joe has lost weeks to sessions that forgot what the last
+one built and started over with a different approach. Rules:
+
+1. **One branch: `desktop-script`.** It is what runs on Joe's Mac. Every
+   fix lands there (via a PR from a `claude/...` branch, merged the same
+   night). `claude/domain-list-8ikox6` is an OLD 17-Sep copy — superseded,
+   don't build on it or copy from it.
+2. **Fix what's on the board, don't redesign.** If something here is
+   "working", don't swap its tool/approach unless Joe asks. Tools are
+   decided: Mac script + Buffer API (YouTube/TikTok/X), Make.com
+   (IG/FB/Pinterest), Manychat (DMs). **No Zapier.**
+3. **Verify, don't assume.** Check the live log (Drive file
+   `gk-automation-log-live.txt`, id `1Kyh87FahJHv7GkmC7zI_TWiKqhi4HdZs`),
+   Make executions, and the sheet before claiming something works/broke.
+4. **Update the board** (date + what changed) at the end of every session.
+
+### ✅ Working (verified 22-23 Sep 2026)
+| What | How | Proof |
+|---|---|---|
+| YouTube posting | Mac script, 1 video / 15 min | live log, 20 videos posted 22-23 Sep |
+| TikTok posting | Mac script → Buffer GraphQL API (`src/bufferTikTok.js`) | live log "TikTok (via Buffer): posted" every video since 22 Sep 22:03 |
+| Instagram + Facebook | Make scenario 9696465, 1 video / 25 min | Make executions all status 1 (success) |
+| Pinterest posting | Make scenario 9696465 | same |
+| Pinterest unique covers | cover pool photo → sheet column G → Make field `6` | fixed 22 Sep (was reading `7`); Joe to confirm on new pins |
+| Order | YouTube+TikTok first; video mirrors to GK_JING only after its caption row exists; then Make | `mirrorNewVideos()` in `src/drive.js` |
+| YouTube comment replies | `replyToNewComments()` | runs every cycle |
+
+### ⚠️ Known broken / not set up (not blocking posting)
+- **X (Twitter):** keys not in the Mac's `.env` ("X is not configured yet" in log).
+- **Mac script's own Pinterest post:** "Authentication failed" — harmless, Make already posts Pinterest. Could be switched off.
+- **OmniRoute (local AI):** returns 502 → captions use built-in templates, not AI-written.
+- **Grok auto video generation:** 403 every cycle.
+- **ffmpeg missing on Mac:** horizontal videos aren't converted to 9:16 (`brew install ffmpeg`).
+
+### 🔜 Next (in order, only when Joe asks)
+1. Joe confirms new Pinterest pins show folder-photo covers (field `6` fix).
+2. TikTok comment auto-replies via Buffer API — **blocked**: Buffer has no comment endpoints yet (see Known quirks).
+3. Add X keys to `.env` on the Mac.
+4. Fix OmniRoute so captions are AI-written again.
+
+### 📅 Log
+- **22-23 Sep 2026:** TikTok via Buffer fixed (REST → GraphQL; every Buffer post had failed with 401 since 21 Sep). Pinterest cover field fixed `7`→`6`. 20-video batch posted one at a time. Comment-reply plan recorded. Status board created.
+
 ## The one thing to remember
 
 Two separate systems each own half the platforms. Both watch a pair of
@@ -119,13 +165,17 @@ batch Joe drops in.
 
 **Make's scenario reads column G too** (the "Create Pinterest Video Pin"
 step's `cover_image_url` field, both the main path and its retry twin) —
-`{{ifempty(<row>.`7`; <4-image day-of-month rotation>)}}`. So: a unique
+`{{ifempty(<row>.`6`; <4-image day-of-month rotation>)}}`. So: a unique
 cover if column G has one, otherwise the generic rotation as a fallback.
-**This field literally broke once already** (it was pointing at field `6`
-— the Hashtag column — instead of field `7`, so it silently never found a
-real cover and always fell back to the generic rotation even when a cover
-existed). Fixed 15 Sep 2026 — if Pinterest covers ever look wrong/repetitive
-again, check this field first before assuming the bug is back.
+**Make's sheet columns are numbered from 0**: A=`0`, D Title=`3`,
+E Capture=`4`, F Hashtag=`5`, **G Cover=`6`** — check the caption fields in
+the same scenario, which use `3`/`4`/`5`, if in doubt. On 15 Sep 2026 this
+field was wrongly "fixed" from `6` to `7` (the empty column H), so every
+pin silently fell back to the generic "Somali culture" rotation cover even
+though column G was full of unique covers — Joe saw the same cover night
+after night. Corrected back to `6` on 22 Sep 2026. **Do not change it to
+`7` again.** If Pinterest covers look repetitive, first check column G in
+the sheet has a link, then check this field says `6`.
 
 If neither source has anything available, `getCoverImage()` returns an empty
 string and everything above is a no-op — Pinterest pins just use the
@@ -166,6 +216,24 @@ side has worked reliably.
   way afterward — fine since the same video is about to be public on
   YouTube/Twitter/Pinterest anyway. If TikTok posts stop showing up, check
   Buffer's own dashboard/connection status before assuming the script died.
+  **Uses Buffer's GraphQL API (`https://api.buffer.com`), not the old REST
+  API** — Joe's `BUFFER_ACCESS_TOKEN` is a new-style Buffer API key, which
+  the REST API rejects with "Public API tokens are not accepted for REST API
+  access" (this broke the very first real post on 22 Sep 2026). The script
+  looks up the TikTok channel on the Buffer account by itself, so
+  `BUFFER_TIKTOK_PROFILE_ID` is optional now (used only if it matches a real
+  channel id).
+- **TikTok comment auto-replies: decided plan, not built yet (22-23 Sep
+  2026).** Joe wants the Mac script to thank/welcome TikTok commenters
+  automatically (e.g. sticker/emoji comments get "Thank you for the love 🙏
+  Welcome to the GK Legend family ✨"). **Joe does NOT use Zapier for this —
+  it goes through the Buffer API from this script, same as TikTok posting.**
+  Blocker: Buffer's GraphQL API has no comment endpoints yet (on Buffer's
+  API roadmap as "Community endpoints"), and TikTok's own API doesn't allow
+  comment replies for this app. When Buffer ships them, add a
+  `replyToBufferComments()` step to `checkOnce()` in `src/index.js`, next to
+  `replyToNewComments()` (YouTube). Until then Joe replies by hand in Buffer
+  → Community. Don't propose Zapier/Make/other tools for this again.
 - The script must actually be **running** to do anything — it's a
   `launchd` background process on Joe's Mac, not something living in the
   cloud. If videos pile up and nothing posts to YouTube/TikTok, the first
