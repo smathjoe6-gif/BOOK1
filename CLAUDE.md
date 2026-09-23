@@ -37,10 +37,17 @@ one built and started over with a different approach. Rules:
 | YouTube comment replies | `replyToNewComments()` | runs every cycle |
 
 ### ⚠️ Known broken / not set up (not blocking posting)
-- **X (Twitter):** keys not in the Mac's `.env` ("X is not configured yet" in log).
+- **X (Twitter):** log says "X is not configured yet" on every video. Joe says
+  the keys ARE saved on the Mac (23 Sep) — so they're either in another file
+  (e.g. his desktop "memory" folder) or under different names. The script only
+  reads `X_API_KEY`, `X_API_SECRET`, `X_ACCESS_TOKEN`, `X_ACCESS_TOKEN_SECRET`
+  from `~/gk-automation/.env`, and needs a restart after editing.
 - **Mac script's own Pinterest post:** "Authentication failed" — harmless, Make already posts Pinterest. Could be switched off.
 - **OmniRoute (local AI):** returns 502 → captions use built-in templates, not AI-written.
-- **Grok auto video generation:** 403 every cycle.
+- **Grok auto video generation:** 403 from xAI every cycle, even though Joe
+  bought $10 of xAI credit. Until 23 Sep the log only said "403"; the error
+  now includes xAI's reason (`src/grokVideo.js`). Usual causes: credits on a
+  different xAI team than the API key, or the key restricted to other models.
 - **ffmpeg missing on Mac:** horizontal videos aren't converted to 9:16 (`brew install ffmpeg`).
 
 ### 🔜 Next (in order, only when Joe asks)
@@ -50,6 +57,7 @@ one built and started over with a different approach. Rules:
 4. Fix OmniRoute so captions are AI-written again.
 
 ### 📅 Log
+- **23 Sep 2026 (later):** tonight's work merged into `desktop-script` (PR #1). Grok errors now show xAI's reason. X keys: Joe says saved, script still sees none — checking names/file.
 - **22-23 Sep 2026:** TikTok via Buffer fixed (REST → GraphQL; every Buffer post had failed with 401 since 21 Sep). Pinterest cover field fixed `7`→`6`. 20-video batch posted one at a time. Comment-reply plan recorded. Status board created.
 
 ## The one thing to remember
