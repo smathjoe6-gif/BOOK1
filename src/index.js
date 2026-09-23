@@ -10,7 +10,7 @@ import { getCoverImage } from './coverImage.js';
 import { replyToNewComments } from './comments.js';
 import { uploadToTikTok } from './tiktok.js';
 import { loadTikTokToken } from './tiktokAuth.js';
-import { uploadToTikTokViaBuffer } from './bufferTikTok.js';
+import { queueTikTok, postNextQueuedTikTok } from './tiktokQueue.js';
 import { uploadToPinterest } from './pinterest.js';
 import { loadPinterestToken } from './pinterestAuth.js';
 import { uploadToTwitter } from './twitter.js';
@@ -162,13 +162,9 @@ async function processVideoOnce(file) {
   // that succeeds on retry could end up posted to TikTok twice.
   if (youtubePosted) {
     if (config.bufferAccessToken) {
-      console.log('Posting to TikTok via Buffer...');
-      try {
-        const tk = await uploadToTikTokViaBuffer(auth, { fileId: file.id, caption });
-        console.log(`TikTok (via Buffer): posted, update id ${tk.updateId}`);
-      } catch (err) {
-        console.error('TikTok (via Buffer) upload failed (other posts above still stand):', err.message);
-      }
+      // Queued, not posted here -- postNextQueuedTikTok() in checkOnce()
+      // sends it, keeping TikTok under its daily API post limit.
+      queueTikTok({ fileId: file.id, name: file.name, caption });
     } else if (loadTikTokToken()) {
       console.log('Posting to TikTok...');
       try {
@@ -384,6 +380,14 @@ async function checkOnce() {
         break;
       }
       if (outcome !== 'skipped') break;
+    }
+  }
+
+  if (config.bufferAccessToken) {
+    try {
+      await postNextQueuedTikTok(auth);
+    } catch (err) {
+      console.error('TikTok queue check failed:', err.message);
     }
   }
 

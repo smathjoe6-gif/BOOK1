@@ -29,7 +29,7 @@ one built and started over with a different approach. Rules:
 | What | How | Proof |
 |---|---|---|
 | YouTube posting | Mac script, 1 video / 15 min | live log, 20 videos posted 22-23 Sep |
-| TikTok posting | Mac script → Buffer GraphQL API (`src/bufferTikTok.js`) | live log "TikTok (via Buffer): posted" every video since 22 Sep 22:03 |
+| TikTok posting | Mac script → queue (`src/tiktokQueue.js`, max `TIKTOK_DAILY_LIMIT`=15/day) → Buffer GraphQL API (`src/bufferTikTok.js`) | first 20 posted 22-23 Sep; see TikTok daily limit below |
 | Instagram + Facebook | Make scenario 9696465, 1 video / 25 min | Make executions all status 1 (success) |
 | Pinterest posting | Make scenario 9696465 | same |
 | Pinterest unique covers | cover pool photo → sheet column G → Make field `6` | fixed 22 Sep (was reading `7`); Joe to confirm on new pins |
@@ -37,19 +37,76 @@ one built and started over with a different approach. Rules:
 | YouTube comment replies | `replyToNewComments()` | runs every cycle |
 
 ### ⚠️ Known broken / not set up (not blocking posting)
-- **X (Twitter):** keys not in the Mac's `.env` ("X is not configured yet" in log).
+- **X (Twitter):** FIXED 23 Sep ~03:30 — the 4 keys had been typed at the
+  Terminal prompt (saves nothing) and `.env` had them EMPTY; now written
+  into `.env` (verified "has a value" x4). First real attempts (23 Sep
+  03:31, 03:46) reached X but failed: "X media INIT failed: Invalid or
+  expired token" — the saved access token/secret are no longer valid
+  (regenerated since 20 Sep, or app permissions changed after they were
+  made). Fix: developer.x.com → app → User authentication settings = Read
+  and write → Keys and tokens → regenerate Access Token & Secret → write
+  the new values into `.env` → restart.
+  Lesson: Joe's ⌘S in Terminal opens "Save Output", which does NOT edit
+  `.env`; give him one-line commands that write the file directly.
 - **Mac script's own Pinterest post:** "Authentication failed" — harmless, Make already posts Pinterest. Could be switched off.
 - **OmniRoute (local AI):** returns 502 → captions use built-in templates, not AI-written.
-- **Grok auto video generation:** 403 every cycle.
+- **TikTok daily limit (23 Sep):** ~30 posts in 24h → Buffer accepted all
+  (log said "posted") but TikTok rejected the last ~12: "TikTok has detected
+  a large number of posts published through the API for this channel. Wait
+  24 hours". Fix built: `src/tiktokQueue.js` queues every video and sends at
+  most `TIKTOK_DAILY_LIMIT` (default 15) per day, one per cycle; extras wait
+  for tomorrow (`tiktok-queue.json`). Joe posted the 12 failed ones by hand,
+  so delete them in Buffer instead of pressing "Retry Now" (would duplicate).
+  Note: "posted" in the log only means Buffer accepted it — TikTok can still
+  reject later; check Buffer's Sent/Errors if TikTok looks missing.
+- **Grok auto video generation:** runs at `AUTO_GENERATE_HOURS=13` (1pm),
+  1/day (Joe's `.env`; not 8am). xAI's real reason (23 Sep 13:01): "403 --
+  Your team 3d338612-… has either used all available credits or reached its
+  monthly spending limit". So the $10 isn't usable by the team the API key
+  belongs to. Fix (Joe, console.x.ai): open team `3d338612…` → Billing →
+  check credits are on THIS team and raise the monthly spending limit above
+  $0. `autogen-state.json` last success: 17 Sep. Retries every 15 min until
+  it works, then 1/day. **Joe (23 Sep): doesn't need the paid API video —
+  his real flow is Grok's own "Automations" (grok.com) making videos into
+  his Grok library from the daily prompt doc.** Can't be driven from here
+  (no grok.com access); our side is the daily prompt doc (below).
+  To stop the API retries: set `AUTO_GENERATE_VIDEOS=false` in `.env`.
+- **Daily viral prompt doc (routine `trig_01MwtEhNcLoziffeXBJmEEYM`, 8am
+  UTC → Drive folder `1GLeqzy5IpYbpQtN-xll-LcH-AE3_LK8Q`):** 23 Sep's run
+  ended after 30s with no doc; re-fired twice (14:49Z, 14:51Z) — same.
+  Cause: the routine's sessions get NO Google Drive tools, and at ~14:55Z
+  the Drive connector itself asked to be signed in again. Routines can't
+  have connectors attached from here ("connectors parameter not available
+  for this organization"). Fix = Joe signs Drive in again at
+  claude.ai/customize/connectors and sets its tools to "Always allow".
+  Today's prompts were written by hand and sent to Joe as a file.
+- **Pinterest covers not designed:** pins showed the raw pool photo because
+  the Canva step wasn't set up (Joe's older templates had no data fields).
+  **23 Sep: built a new brand template `EAHWBiN6j8A`** (1000x1500 pin:
+  full-bleed photo, gold serif headline, "GK LEGEND STUDIO", dark gradient)
+  with autofill fields `title` (text) + `photo` (image) — verified with a
+  test autofill. Remaining (Mac `.env`): `CANVA_BRAND_TEMPLATE_ID=EAHWBiN6j8A`,
+  `CANVA_TITLE_FIELD=title`, `CANVA_IMAGE_FIELD=photo`, plus
+  `CANVA_CLIENT_ID/SECRET` and one `npm run canva-auth` if
+  `canva-token.json` is missing → restart. No code change needed.
 - **ffmpeg missing on Mac:** horizontal videos aren't converted to 9:16 (`brew install ffmpeg`).
 
 ### 🔜 Next (in order, only when Joe asks)
-1. Joe confirms new Pinterest pins show folder-photo covers (field `6` fix).
+1. Canva `.env` values on the Mac (template `EAHWBiN6j8A` is ready).
+1b. Joe: xAI credits/spending limit on team `3d338612…`; X token regenerate.
 2. TikTok comment auto-replies via Buffer API — **blocked**: Buffer has no comment endpoints yet (see Known quirks).
 3. Add X keys to `.env` on the Mac.
 4. Fix OmniRoute so captions are AI-written again.
 
 ### 📅 Log
+- **23 Sep 2026 ~15:50:** Built Canva pin template `EAHWBiN6j8A` (title+photo fields). TikTok limit raised to 15/day (Joe: "no limit" — but the 24h block message is TikTok's own, so a cap stays). Grok: Joe uses Grok Automations, not the paid API; re-fired the daily prompt routine (today's doc was missing).
+- **23 Sep 2026 ~15:40:** Joe's screenshots: TikTok rejected ~12 posts (daily API limit) → built TikTok queue, 10/day (`src/tiktokQueue.js`, PR #2). Grok reason found: xAI team out of credits / spending limit (runs 1pm, `AUTO_GENERATE_HOURS=13`). Pinterest pins show raw photos, not Canva designs — Canva templates lack data fields (steps above). Make field `6` confirmed working (pins have unique photos).
+- **23 Sep 2026 ~11:20:** Make batch 2 done: GK_JING empty, every Make run 05:47–09:32Z succeeded. Grok: the log has NO auto-generate line at all since the 03:16 restart (not even a failure), and the 8am slot passed silently. The code can only skip silently if `AUTO_GENERATE_VIDEOS` isn't `true` in `.env` or `autogen-state.json` already lists today's slots. Asked Joe to run the check below. The `grok-video-<id>.mp4` files posted overnight were Joe's own downloads; auto-made ones are named `grok-auto-<time>.mp4`. X is still waiting on a regenerated token.
+  Mac check: `cd ~/gk-automation && grep -E '^AUTO_GENERATE' .env; cat autogen-state.json`
+- **23 Sep 2026 ~06:45:** 2nd batch (9 + 1 extra from GK_JING) all posted to YouTube + TikTok by 05:50. X failed every one ("Invalid or expired token") — Joe still needs to regenerate the X access token. Make: all runs success; 10 videos queued in GK_JING, done ~11:00. No Grok attempt logged since the restart yet.
+- **23 Sep 2026 ~03:50:** New 9-video batch started; YouTube+TikTok posting fine. X now tries but X rejects the token ("Invalid or expired token") — needs regenerated access token.
+- **23 Sep 2026 ~03:30:** X keys written into the Mac's `.env` (were empty). Batch done: YouTube 20/20, TikTok 18/20 (2 failed before the Buffer fix), Make finishing last 9 by ~06:30.
+- **23 Sep 2026 (later):** tonight's work merged into `desktop-script` (PR #1). Grok errors now show xAI's reason. X keys: Joe says saved, script still sees none — checking names/file.
 - **22-23 Sep 2026:** TikTok via Buffer fixed (REST → GraphQL; every Buffer post had failed with 401 since 21 Sep). Pinterest cover field fixed `7`→`6`. 20-video batch posted one at a time. Comment-reply plan recorded. Status board created.
 
 ## The one thing to remember
@@ -67,9 +124,11 @@ Google Drive folders that mirror each other:
   via `X_API_KEY`/`X_API_SECRET`/`X_ACCESS_TOKEN`/`X_ACCESS_TOKEN_SECRET` in
   `.env` (OAuth 1.0a user-context credentials from developer.x.com's "Keys
   and tokens" page — no interactive login flow needed, unlike
-  TikTok/Pinterest). Joe added these directly in Terminal on his Mac on the
-  night of 17-18 Sep 2026; no daily cap on X posting, unlike Pinterest's
-  trial-access limit (see below).
+  TikTok/Pinterest). **They must be lines in the `~/gk-automation/.env`
+  file** — on 20 Sep 2026 they were typed at the Terminal prompt instead
+  (visible in Joe's Drive "MY Memory" → "Terminal Saved Output.txt"), which
+  saves nothing, so X has never actually posted. No daily cap on X posting,
+  unlike Pinterest's trial-access limit (see below).
 
 A background job on each side copies any video that lands in one folder into
 the other (Make does this inside scenario 9696465; the script does it via

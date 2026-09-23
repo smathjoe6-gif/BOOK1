@@ -31,6 +31,27 @@ async function fetchWithTimeout(url, options = {}, timeoutMs = REQUEST_TIMEOUT_M
   }
 }
 
+// xAI's error bodies aren't consistently shaped (sometimes `{error: "..."}`,
+// sometimes `{error: {message}}`, sometimes `{code, error}`), and a bare
+// status code like "403" says nothing about *why* -- no credits on the key's
+// team, a key restricted to other models, a wrong model name. So surface the
+// whole body instead of guessing a field.
+async function readJson(res) {
+  const text = await res.text();
+  try {
+    return { data: JSON.parse(text), text };
+  } catch {
+    return { data: {}, text };
+  }
+}
+
+function describeError(res, data, text) {
+  const detail = typeof data.error === 'string'
+    ? data.error
+    : data.error?.message || data.message || text.slice(0, 500);
+  return `${res.status}${detail ? ` -- ${detail}` : ''}`;
+}
+
 const DONE_STATUSES = ['completed', 'succeeded', 'success', 'done', 'ready'];
 const FAILED_STATUSES = ['failed', 'error', 'cancelled', 'canceled'];
 
@@ -69,9 +90,9 @@ async function startJob(prompt) {
       resolution: '720p',
     }),
   });
-  const data = await res.json();
+  const { data, text } = await readJson(res);
   if (!res.ok) {
-    throw new Error(`Grok video request failed: ${data.error?.message || res.status}`);
+    throw new Error(`Grok video request failed: ${describeError(res, data, text)}`);
   }
   const requestId = data.request_id || data.id;
   if (!requestId) {
@@ -86,9 +107,9 @@ async function pollJob(requestId) {
     const res = await fetchWithTimeout(`${API_BASE}/${requestId}`, {
       headers: { Authorization: `Bearer ${config.xaiApiKey}` },
     });
-    const data = await res.json();
+    const { data, text } = await readJson(res);
     if (!res.ok) {
-      throw new Error(`Grok video status check failed: ${data.error?.message || res.status}`);
+      throw new Error(`Grok video status check failed: ${describeError(res, data, text)}`);
     }
 
     const status = String(extractStatus(data)).toLowerCase();
