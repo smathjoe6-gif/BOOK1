@@ -55,6 +55,20 @@ export async function postNextQueuedTikTok(auth) {
   const state = loadState();
   if (state.queue.length === 0) return;
 
+  // TikTok's "Wait 24 hours" block: Buffer still accepts posts during it,
+  // but TikTok rejects every one (and may extend the block), so hold the
+  // queue until TIKTOK_PAUSE_UNTIL has passed. Videos keep queuing meanwhile.
+  if (config.tiktokPauseUntil && Date.now() < config.tiktokPauseUntil.getTime()) {
+    console.log(`TikTok: paused until ${config.tiktokPauseUntil.toLocaleString()} (TikTok's 24h block) -- ${state.queue.length} video(s) waiting.`);
+    return;
+  }
+
+  // Spread posts out: TikTok flags bursts of API posts, not just the total.
+  const minGapMs = config.tiktokMinGapMinutes * 60 * 1000;
+  if (state.lastPostedAt && Date.now() - state.lastPostedAt < minGapMs) {
+    return;
+  }
+
   if (state.postedToday >= config.tiktokDailyLimit) {
     console.log(`TikTok: today's limit reached (${config.tiktokDailyLimit}/day) -- ${state.queue.length} video(s) waiting for tomorrow.`);
     saveState(state);
@@ -67,6 +81,7 @@ export async function postNextQueuedTikTok(auth) {
     const tk = await uploadToTikTokViaBuffer(auth, { fileId: item.fileId, caption: item.caption });
     state.queue.shift();
     state.postedToday += 1;
+    state.lastPostedAt = Date.now();
     console.log(`TikTok (via Buffer): posted, update id ${tk.updateId} (${state.postedToday}/${config.tiktokDailyLimit} today, ${state.queue.length} still waiting).`);
   } catch (err) {
     item.attempts = (item.attempts || 0) + 1;

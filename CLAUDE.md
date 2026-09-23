@@ -29,7 +29,7 @@ one built and started over with a different approach. Rules:
 | What | How | Proof |
 |---|---|---|
 | YouTube posting | Mac script, 1 video / 15 min | live log, 20 videos posted 22-23 Sep |
-| TikTok posting | Mac script → queue (`src/tiktokQueue.js`, max `TIKTOK_DAILY_LIMIT`=15/day) → Buffer GraphQL API (`src/bufferTikTok.js`) | first 20 posted 22-23 Sep; see TikTok daily limit below |
+| TikTok posting | Mac script → queue (`src/tiktokQueue.js`, max `TIKTOK_DAILY_LIMIT`=8/day, ≥60 min apart, `TIKTOK_PAUSE_UNTIL` to hold) → Buffer GraphQL API (`src/bufferTikTok.js`) | first 20 posted 22-23 Sep; see TikTok daily limit below |
 | Instagram + Facebook | Make scenario 9696465, 1 video / 25 min | Make executions all status 1 (success) |
 | Pinterest posting | Make scenario 9696465 | same |
 | Pinterest unique covers | cover pool photo → sheet column G → Make field `6` | fixed 22 Sep (was reading `7`); Joe to confirm on new pins |
@@ -104,6 +104,7 @@ one built and started over with a different approach. Rules:
 4. Fix OmniRoute so captions are AI-written again.
 
 ### 📅 Log
+- **23 Sep 2026 ~18:40:** Joe's Buffer screenshots: the evening's TikTok posts (17:57, 17:59, 18:14) were ALL rejected with the same "Wait 24 hours" — the block from this morning was still active, so the 15/day cap didn't help. Added to `src/tiktokQueue.js`: `TIKTOK_PAUSE_UNTIL` (hold the whole queue, videos keep queuing), `TIKTOK_MIN_GAP_MINUTES` (default 60, no bursts), default cap lowered 15→8/day. Joe to set `TIKTOK_PAUSE_UNTIL=2026-09-24T19:00:00+01:00`. Failed Buffer posts: don't press Retry until after that time.
 - **23 Sep 2026 ~18:15:** New batch (16 videos) posting since 17:28 local. TikTok queue confirmed working in the live log ("1/15 … 3/15 today"). Canva cover step failed on every video: "Canva asset upload failed: 400" → cause: `Asset-Upload-Metadata` header was base64 of the whole JSON; Canva wants JSON `{"name_base64": "…"}`. Fixed in `src/canvaCover.js` (+ Canva errors now show Canva's message). Until the Mac pulls it, pins use the raw pool photo (fallback).
 - **23 Sep 2026 ~17:15:** Daily viral prompts FIXED another way: old routine `trig_01MwtEhNcLoziffeXBJmEEYM` (no Drive tools in its sessions) is now DISABLED; new routine `trig_01SkYCVsjTMjtRaA3pYeo5RW` (07:00 UTC = 8am London) fires into Joe's main chat session, which has Google Drive, writes + verifies the doc, and tells Joe the link. Joe set all Drive tools to Always allow. Nothing left for Joe to do on this.
 - **23 Sep 2026 ~16:10:** PR #2 merged; Joe pulled, set Canva `.env` (template `EAHWBiN6j8A`, client id/secret + `canva-token.json` already present), `AUTO_GENERATE_VIDEOS=false`, restarted. Next: confirm first Canva-designed pin + TikTok queue lines in the live log. Viral-prompt routine still gets no Drive tools (see above).
