@@ -63,6 +63,7 @@ one built and started over with a different approach. Rules:
 4. Fix OmniRoute so captions are AI-written again.
 
 ### 📅 Log
+- **23 Sep 2026 ~06:45:** 2nd batch (9 + 1 extra from GK_JING) all posted to YouTube + TikTok by 05:50. X failed every one ("Invalid or expired token") — Joe still needs to regenerate the X access token. Make: all runs success; 10 videos queued in GK_JING, done ~11:00. No Grok attempt logged since the restart yet.
 - **23 Sep 2026 ~03:50:** New 9-video batch started; YouTube+TikTok posting fine. X now tries but X rejects the token ("Invalid or expired token") — needs regenerated access token.
 - **23 Sep 2026 ~03:30:** X keys written into the Mac's `.env` (were empty). Batch done: YouTube 20/20, TikTok 18/20 (2 failed before the Buffer fix), Make finishing last 9 by ~06:30.
 - **23 Sep 2026 (later):** tonight's work merged into `desktop-script` (PR #1). Grok errors now show xAI's reason. X keys: Joe says saved, script still sees none — checking names/file.
