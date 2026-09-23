@@ -73,7 +73,13 @@ one built and started over with a different approach. Rules:
   To stop the API retries: set `AUTO_GENERATE_VIDEOS=false` in `.env`.
 - **Daily viral prompt doc (routine `trig_01MwtEhNcLoziffeXBJmEEYM`, 8am
   UTC → Drive folder `1GLeqzy5IpYbpQtN-xll-LcH-AE3_LK8Q`):** 23 Sep's run
-  ended after 30s with no doc; re-fired 14:49Z.
+  ended after 30s with no doc; re-fired twice (14:49Z, 14:51Z) — same.
+  Cause: the routine's sessions get NO Google Drive tools, and at ~14:55Z
+  the Drive connector itself asked to be signed in again. Routines can't
+  have connectors attached from here ("connectors parameter not available
+  for this organization"). Fix = Joe signs Drive in again at
+  claude.ai/customize/connectors and sets its tools to "Always allow".
+  Today's prompts were written by hand and sent to Joe as a file.
 - **Pinterest covers not designed:** pins showed the raw pool photo because
   the Canva step wasn't set up (Joe's older templates had no data fields).
   **23 Sep: built a new brand template `EAHWBiN6j8A`** (1000x1500 pin:
