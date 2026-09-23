@@ -37,11 +37,11 @@ one built and started over with a different approach. Rules:
 | YouTube comment replies | `replyToNewComments()` | runs every cycle |
 
 ### ⚠️ Known broken / not set up (not blocking posting)
-- **X (Twitter):** log says "X is not configured yet" on every video. Joe says
-  the keys ARE saved on the Mac (23 Sep) — so they're either in another file
-  (e.g. his desktop "memory" folder) or under different names. The script only
-  reads `X_API_KEY`, `X_API_SECRET`, `X_ACCESS_TOKEN`, `X_ACCESS_TOKEN_SECRET`
-  from `~/gk-automation/.env`, and needs a restart after editing.
+- **X (Twitter):** log says "X is not configured yet" on every video. Root
+  cause found 23 Sep: the 4 keys were typed at the Terminal prompt on 20 Sep
+  (not saved to any file). Fix = add the same 4 lines to
+  `~/gk-automation/.env`, then restart. Keys are in Joe's Drive "MY Memory"
+  folder → "Terminal Saved Output.txt".
 - **Mac script's own Pinterest post:** "Authentication failed" — harmless, Make already posts Pinterest. Could be switched off.
 - **OmniRoute (local AI):** returns 502 → captions use built-in templates, not AI-written.
 - **Grok auto video generation:** 403 from xAI every cycle, even though Joe
@@ -75,9 +75,11 @@ Google Drive folders that mirror each other:
   via `X_API_KEY`/`X_API_SECRET`/`X_ACCESS_TOKEN`/`X_ACCESS_TOKEN_SECRET` in
   `.env` (OAuth 1.0a user-context credentials from developer.x.com's "Keys
   and tokens" page — no interactive login flow needed, unlike
-  TikTok/Pinterest). Joe added these directly in Terminal on his Mac on the
-  night of 17-18 Sep 2026; no daily cap on X posting, unlike Pinterest's
-  trial-access limit (see below).
+  TikTok/Pinterest). **They must be lines in the `~/gk-automation/.env`
+  file** — on 20 Sep 2026 they were typed at the Terminal prompt instead
+  (visible in Joe's Drive "MY Memory" → "Terminal Saved Output.txt"), which
+  saves nothing, so X has never actually posted. No daily cap on X posting,
+  unlike Pinterest's trial-access limit (see below).
 
 A background job on each side copies any video that lands in one folder into
 the other (Make does this inside scenario 9696465; the script does it via
