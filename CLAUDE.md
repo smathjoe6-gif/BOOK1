@@ -39,8 +39,13 @@ one built and started over with a different approach. Rules:
 ### ⚠️ Known broken / not set up (not blocking posting)
 - **X (Twitter):** FIXED 23 Sep ~03:30 — the 4 keys had been typed at the
   Terminal prompt (saves nothing) and `.env` had them EMPTY; now written
-  into `.env` (verified "has a value" x4). Awaiting first real X post on
-  the next video — confirm in the live log, then move X to ✅ Working.
+  into `.env` (verified "has a value" x4). First real attempts (23 Sep
+  03:31, 03:46) reached X but failed: "X media INIT failed: Invalid or
+  expired token" — the saved access token/secret are no longer valid
+  (regenerated since 20 Sep, or app permissions changed after they were
+  made). Fix: developer.x.com → app → User authentication settings = Read
+  and write → Keys and tokens → regenerate Access Token & Secret → write
+  the new values into `.env` → restart.
   Lesson: Joe's ⌘S in Terminal opens "Save Output", which does NOT edit
   `.env`; give him one-line commands that write the file directly.
 - **Mac script's own Pinterest post:** "Authentication failed" — harmless, Make already posts Pinterest. Could be switched off.
@@ -58,6 +63,7 @@ one built and started over with a different approach. Rules:
 4. Fix OmniRoute so captions are AI-written again.
 
 ### 📅 Log
+- **23 Sep 2026 ~03:50:** New 9-video batch started; YouTube+TikTok posting fine. X now tries but X rejects the token ("Invalid or expired token") — needs regenerated access token.
 - **23 Sep 2026 ~03:30:** X keys written into the Mac's `.env` (were empty). Batch done: YouTube 20/20, TikTok 18/20 (2 failed before the Buffer fix), Make finishing last 9 by ~06:30.
 - **23 Sep 2026 (later):** tonight's work merged into `desktop-script` (PR #1). Grok errors now show xAI's reason. X keys: Joe says saved, script still sees none — checking names/file.
 - **22-23 Sep 2026:** TikTok via Buffer fixed (REST → GraphQL; every Buffer post had failed with 401 since 21 Sep). Pinterest cover field fixed `7`→`6`. 20-video batch posted one at a time. Comment-reply plan recorded. Status board created.
