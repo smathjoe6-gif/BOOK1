@@ -34,7 +34,8 @@ examples (all in Drive folder GK_Viral_Prompts `1GLeqzy5IpYbpQtN-xll-LcH-AE3_LK8
    Drop any claim a source doesn't support (e.g. "coded messages").
 6. **Defensive, not violent.** Mobilisation/defence scenes show unity and
    standing firm — no blood, no fighting shown.
-7. **Don't show real poets' faces** (e.g. Hawa Jibril) — "inspired by" only.
+7. **Platform-safe titles:** words like "Jihaad" (even meaning "struggle") get videos flagged/down-ranked — keep them in the doc, use an English title in public captions, and tell Joe.
+8. **Don't show real poets' faces** (e.g. Hawa Jibril) — "inspired by" only.
 
 ## How a gabay works (check Joe's verse against this)
 
