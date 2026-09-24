@@ -90,6 +90,36 @@ examples (all in Drive folder GK_Viral_Prompts `1GLeqzy5IpYbpQtN-xll-LcH-AE3_LK8
 9. **Log it** on the CLAUDE.md status board (date + doc id) via a
    `claude/…` branch → PR → merge into `desktop-script`.
 
+## Style DNA — the 4 layers (Joe, 24 Sep 2026), house-safe version
+
+Add these layers to every video/image prompt. Where Joe's original wording
+conflicts with what has been shown to work, the house-safe version wins
+(reason noted).
+
+1. **Material & texture** — handwoven Alindi cloth (indigo, crimson, gold
+   geometric patterns), Guntiino drapes, structured Shabal silhouettes,
+   luminous Dirac silk. Name the real garment and its real colours.
+   ⚠️ Say "tailored", "finely made", "premium" — NOT "high-fashion" or
+   "stylized": those words caused visible AI artifacts (see CLAUDE.md).
+2. **Sound & atmosphere** — the Kaban on screen (a modern carbon-fiber
+   Kaban is fine as a future-forward accent), Dhaanto rhythm in the music
+   prompt; real named places and light: sunrise over Bakool or the
+   southern plains, mist on the highlands, deep blue ocean shelf.
+3. **The GK stamp** — metal or embroidered GK logo placed ON something in
+   the scene: hardware, buckle, garment hem, saddle, drum rim, Kaban body.
+   ⚠️ Never an overlaid/"ambient" watermark — brand guide: a signature on
+   the painting, not a watermark slapped on top.
+4. **Technical spec** — 9:16 vertical; anamorphic lens flare; volumetric
+   light (dust, mist or smoke catching the light); high-contrast grade with
+   obsidian blacks, liquid gold and terracotta; ultra-detailed textile
+   texture. (Grok outputs its own resolution — "8K" can stay in the text
+   but doesn't change the file.)
+
+Always keep the realism lines too: "Photorealistic… Accurate anatomy and
+correct proportions, no duplicated limbs or distorted features, natural
+true-to-life skin tones" — the colour grade goes on light and cloth, not
+on skin.
+
 ## Vocabulary Claude may use (real, common words)
 
 | Word | Meaning | | Word | Meaning |
