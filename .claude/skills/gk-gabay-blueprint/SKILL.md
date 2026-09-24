@@ -120,6 +120,27 @@ correct proportions, no duplicated limbs or distorted features, natural
 true-to-life skin tones" — the colour grade goes on light and cloth, not
 on skin.
 
+## Forms catalog — checked 24 Sep 2026 (use only the ✅ ones in captions)
+
+| Form | What it really is | Studio use |
+|---|---|---|
+| ✅ Gabay | Classical, male-voiced, long, weighty; one alliteration sound through the whole poem | Anthems, documentaries |
+| ✅ Geeraar | Classical, short lines, urgent; recited on horseback | Trailers, battle-cry/rally edits |
+| ✅ Jiifto | Classical form, lighter than gabay | Storytelling, travel songs |
+| ✅ Buraanbur | Women's form (sub-forms hoyal, hoobeeyo, sitaat); drum, call-and-answer, dance | Wedding/pride songs |
+| ✅ Hees | Sung "light" poetry: work songs, dance songs, lullabies, camel-watering songs | Pastoral/herding scenes |
+| ✅ Balwo → Heello | Balwo = short love-song form; with the lute it grew into heello, the modern song | Romantic tracks |
+| ✅ Qaraami | Golden-age romantic/nostalgic Kaban ballads | Luxury heritage drops |
+| ✅ Dhaanto | Folk music + dance from the **Somali Region of Ethiopia** (pastoralists, 19th c.); camel-inspired steps, jumps, stomps, claps; revived by the Dervishes, sung on horseback | High-energy dance edits |
+| ✅ Shirib | Southern Somali dance: men in two long lines, a song master (lashin) calls a short verse, the lines chant it back | Short 9:16 chant/drill edits |
+| ✅ Shir | Council/gathering to decide together | Governance/defence scenes |
+| Also real (details not yet checked): wiglo, beercade, afarey, guuraw | Research before use | — |
+
+❌ **Do NOT use (couldn't verify, may be invented):** "Biciidley", "Heyraan",
+"Heedhow", "Masafo". For herding/travel songs say **hees** instead.
+❌ Dhaanto is **not** "from Bay and Bakool" — it comes from the Somali Region
+of Ethiopia (Wikipedia "Dhaanto", Sahan Journal).
+
 ## Vocabulary Claude may use (real, common words)
 
 | Word | Meaning | | Word | Meaning |
@@ -153,6 +174,8 @@ Gobannimo, Gurmad, Gaashaan, Guul, Gacan, Geed, Galbeed.
 - "Soomaaliyeey toosoo" (early 1940s); "Qolobaa Calankeed" (music Abdullahi
   Qarshe; national anthem since 2012). Somali Youth League founded 1943 (not
   1947, not "by women").
+
+Sources (forms): Wikipedia "Somali literature", "Dhaanto", "Balwo", "Music of Somalia"; Sahan Journal on dhaanto; Britannica; City Lore "Poetry from Somalia".
 
 Sources: WardheerNews "Paramountcy of Alliteration in Somali Literature";
 Wikipedia "Somali literature", "Buraanbur", "Hawa Jibril", "Qolobaa Calankeed",
