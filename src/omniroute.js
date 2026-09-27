@@ -61,7 +61,7 @@ async function askAnthropic(systemPrompt, userPrompt) {
       },
       body: JSON.stringify({
         model: config.anthropicModel,
-        max_tokens: 300,
+        max_tokens: 900,
         system: systemPrompt,
         messages: [{ role: 'user', content: userPrompt }],
       }),
@@ -172,4 +172,34 @@ Describe a single short video scene for an AI video generator to create -- vivid
 export async function writeVideoConceptWithAI() {
   const userPrompt = `Describe one new short video concept (about 10 seconds) with a first-second hook and real ambient sound described. Pick whichever of the two lanes (broad viral appeal, or GK Legend Studio's Somali heritage) feels freshest right now -- don't repeat the same lane every time.`;
   return await askAI(VIDEO_CONCEPT_SYSTEM_PROMPT, userPrompt);
+}
+
+const HISTORY_SYSTEM_PROMPT = `You write YouTube metadata for a faceless history channel that covers football history and world history (long-form videos, 5 to 30 minutes, often narrated overviews). Tone: clear, curious, storytelling -- like a good documentary, never clickbait. Never invent a fact, figure, date or year; if you are not sure of something, leave it out. Base everything only on what the video's filename names.`;
+
+// Title / description / tags for the history channel (src/historyChannel.js).
+// Same AI route as GK captions (OmniRoute, then the Anthropic backup), so it
+// falls back to a plain template in historyChannel.js if both are down.
+export async function writeHistoryMetadataWithAI(filenameHint) {
+  const userPrompt = `The video file is named: "${filenameHint}"
+
+Write:
+1. One YouTube title, 70 characters or fewer, leading with the specific subject.
+2. A description: two or three opening sentences on what the viewer will learn, then two short paragraphs (2-4 sentences each). Plain sentences, no emoji, no headings.
+3. 8 to 10 lowercase search tags.
+
+Respond in exactly this format, nothing else:
+TITLE: <title>
+DESCRIPTION: <description>
+TAGS: <tag one, tag two, tag three>`;
+
+  const text = await askAI(HISTORY_SYSTEM_PROMPT, userPrompt);
+  const titleMatch = text.match(/TITLE:\s*(.+)/i);
+  const descMatch = text.match(/DESCRIPTION:\s*([\s\S]+?)(?:\nTAGS:|$)/i);
+  const tagsMatch = text.match(/TAGS:\s*(.+)/i);
+  if (!titleMatch || !descMatch) throw new Error('Could not parse AI response into title/description');
+  return {
+    title: titleMatch[1].trim().replace(/^"|"$/g, '').slice(0, 100),
+    description: descMatch[1].trim(),
+    tags: tagsMatch ? tagsMatch[1].split(',').map((t) => t.trim()).filter(Boolean) : [],
+  };
 }
