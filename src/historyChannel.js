@@ -48,7 +48,9 @@ function saveState(state) {
 }
 
 function titleFromFilename(name) {
-  let t = name.replace(/\.[^/.]+$/, '');
+  // Strip every trailing extension/dot, not just one: Joe's first upload
+  // was named "…Brazil.mp4..mp4" and came out titled "… Brazil.mp4." (27 Sep).
+  let t = name.replace(/(\.+(mp4|mov|m4v|webm|mkv|avi))+\.*$/i, '').replace(/\.+$/, '');
   t = t.replace(/[_\-]+/g, ' ');
   t = t.replace(/\b(4k|2k|1080p|720p|480p|360p)\b/gi, '');
   t = t.replace(/\b\d{8,}\b/g, '');
