@@ -128,4 +128,18 @@ export const config = {
   // every check cycle, so the log is readable from the cloud without
   // screenshotting the Terminal. Leave blank to skip this entirely.
   logSyncFileId: process.env.LOG_SYNC_FILE_ID || '',
+  // Second YouTube channel: the football + world history channel
+  // @TotollsportGK ("Jamal", same Google account). Joe drops finished
+  // long videos (5-30 min, often NotebookLM video overviews) into
+  // TOTOLL_HISTORY; src/historyChannel.js posts them to that channel only
+  // (never @PathFoundGK, never TikTok/Make) and moves them to
+  // TOTOLL_HISTORY_DONE. Folders created 27 Sep 2026. Its login lives in
+  // its own file (npm run auth-history), so the main token.json is
+  // untouched. Set HISTORY_CHANNEL_ENABLED=false to switch it off.
+  historyChannelEnabled: process.env.HISTORY_CHANNEL_ENABLED !== 'false',
+  historyFolderId: process.env.HISTORY_FOLDER_ID || '1dSP5luIoeK0pjkfqu9Zo-UagSaF9Ow4F',
+  historyDoneFolderId: process.env.HISTORY_DONE_FOLDER_ID || '1N0BcIlLZ7N1bpVDRlBj3oc623QRL_VzF',
+  historyTokenFile: process.env.HISTORY_TOKEN_FILE || 'token-history.json',
+  historyDailyLimit: Number(process.env.HISTORY_DAILY_LIMIT || 1),
+  historyChannelHandle: process.env.HISTORY_CHANNEL_HANDLE || '@TotollsportGK',
 };

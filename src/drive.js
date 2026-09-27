@@ -108,13 +108,13 @@ export function pipeWithTimeout(readable, dest, timeoutMs = DOWNLOAD_TIMEOUT_MS)
 }
 
 // Downloads a file to a temp path and returns that path.
-export async function downloadFile(auth, fileId, fileName) {
+export async function downloadFile(auth, fileId, fileName, timeoutMs = DOWNLOAD_TIMEOUT_MS) {
   const drive = google.drive({ version: 'v3', auth });
   const destPath = path.join(os.tmpdir(), `gk-${fileId}-${fileName}`);
   const dest = fs.createWriteStream(destPath);
 
   const res = await drive.files.get({ fileId, alt: 'media' }, { responseType: 'stream', timeout: API_TIMEOUT_MS });
-  await pipeWithTimeout(res.data, dest);
+  await pipeWithTimeout(res.data, dest, timeoutMs);
 
   return destPath;
 }
@@ -299,15 +299,15 @@ export async function uploadPublicImage(auth, localPath, fileName, folderId) {
 }
 
 // Moves a file into the DONE folder once it's been posted everywhere.
-export async function moveToDone(auth, fileId) {
-  if (!config.doneFolderId) return;
+export async function moveToDone(auth, fileId, doneFolderId = config.doneFolderId) {
+  if (!doneFolderId) return;
   const drive = google.drive({ version: 'v3', auth });
   const file = await drive.files.get({ fileId, fields: 'parents' }, { timeout: API_TIMEOUT_MS });
   const previousParents = (file.data.parents || []).join(',');
   await drive.files.update(
     {
       fileId,
-      addParents: config.doneFolderId,
+      addParents: doneFolderId,
       removeParents: previousParents,
       fields: 'id, parents',
     },

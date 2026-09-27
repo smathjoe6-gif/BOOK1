@@ -1,7 +1,7 @@
 import { google } from 'googleapis';
 import fs from 'node:fs';
 
-export async function uploadToYouTube(auth, { filePath, title, description }) {
+export async function uploadToYouTube(auth, { filePath, title, description, tags, categoryId = '24', containsSyntheticMedia, timeoutMs = 5 * 60 * 1000 }) {
   const youtube = google.youtube({ version: 'v3', auth });
 
   const res = await youtube.videos.insert(
@@ -11,11 +11,13 @@ export async function uploadToYouTube(auth, { filePath, title, description }) {
         snippet: {
           title,
           description,
-          categoryId: '24', // Entertainment, same as the Make.com scenario used
+          categoryId, // default 24 = Entertainment, same as the Make.com scenario used
+          ...(tags ? { tags } : {}),
         },
         status: {
           privacyStatus: 'public',
           selfDeclaredMadeForKids: false,
+          ...(containsSyntheticMedia !== undefined ? { containsSyntheticMedia } : {}),
         },
       },
       media: {
@@ -24,7 +26,7 @@ export async function uploadToYouTube(auth, { filePath, title, description }) {
     },
     // No timeout here used to mean a stalled upload could hang the whole
     // check cycle forever instead of failing and letting the queue move on.
-    { timeout: 5 * 60 * 1000 }
+    { timeout: timeoutMs }
   );
 
   return res.data; // includes res.data.id — the new video's YouTube ID

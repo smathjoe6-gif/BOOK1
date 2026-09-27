@@ -16,6 +16,7 @@ import { loadPinterestToken } from './pinterestAuth.js';
 import { uploadToTwitter } from './twitter.js';
 import { maybeAutoGenerateVideo } from './autoGenerate.js';
 import { ensureVerticalVideo } from './aspectRatio.js';
+import { postNextHistoryVideo } from './historyChannel.js';
 
 // Independent test rollout of Pinterest posting for GK_TERMINAL videos,
 // capped at config.pinterestDailyLimit attempts per day while Joe's new
@@ -442,9 +443,24 @@ async function safeCheckOnce() {
   }
 }
 
+// The history channel (@TotollsportGK) runs on its own timer, outside
+// safeCheckOnce()'s 10-minute cycle timeout: its long videos can take far
+// longer than that to upload, and abandoning one half-way would let the next
+// cycle start the same upload again. postNextHistoryVideo() has its own
+// "still uploading" guard.
+async function historyCycle() {
+  try {
+    await postNextHistoryVideo(auth);
+  } catch (err) {
+    console.error('History channel post failed (will retry next cycle):', err.message);
+  }
+}
+
 async function main() {
   await safeCheckOnce();
   const intervalMs = config.pollIntervalMinutes * 60 * 1000;
+  historyCycle();
+  setInterval(historyCycle, intervalMs);
   console.log(`\nWatching your configured Drive folder${config.mirrorFolderId ? ' (and mirroring with its pair folder)' : ''} — checking every ${config.pollIntervalMinutes} minutes, posting at most one video per check so they never all land at once. Leave this running (Ctrl+C to stop).`);
   setInterval(safeCheckOnce, intervalMs);
 }

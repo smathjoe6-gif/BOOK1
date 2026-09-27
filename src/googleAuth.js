@@ -5,6 +5,11 @@ import open from 'open';
 import { config } from './config.js';
 
 const TOKEN_PATH = new URL('../token.json', import.meta.url);
+// Extra YouTube channels (e.g. the history channel @TotollsportGK) keep their
+// own login in their own file, so signing in for them never replaces the
+// main token.json that Drive + @PathFoundGK use. `npm run auth-history`
+// passes that filename as the first argument.
+const LOGIN_TOKEN_PATH = process.argv[2] ? new URL(`../${process.argv[2]}`, import.meta.url) : TOKEN_PATH;
 const REDIRECT_PORT = 53682;
 const REDIRECT_URI = `http://127.0.0.1:${REDIRECT_PORT}/oauth2callback`;
 
@@ -15,13 +20,18 @@ const SCOPES = [
   'https://www.googleapis.com/auth/spreadsheets.readonly',
 ];
 
-export function loadOAuthClient() {
+export function loadOAuthClient(tokenFile) {
+  const tokenPath = tokenFile ? new URL(`../${tokenFile}`, import.meta.url) : TOKEN_PATH;
   const client = new OAuth2Client(config.googleClientId, config.googleClientSecret, REDIRECT_URI);
-  if (fs.existsSync(TOKEN_PATH)) {
-    const tokens = JSON.parse(fs.readFileSync(TOKEN_PATH, 'utf8'));
+  if (fs.existsSync(tokenPath)) {
+    const tokens = JSON.parse(fs.readFileSync(tokenPath, 'utf8'));
     client.setCredentials(tokens);
   }
   return client;
+}
+
+export function hasSavedLogin(tokenFile) {
+  return fs.existsSync(new URL(`../${tokenFile}`, import.meta.url));
 }
 
 async function runInteractiveLogin() {
@@ -57,8 +67,8 @@ async function runInteractiveLogin() {
   });
 
   const { tokens } = await client.getToken(code);
-  fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens, null, 2));
-  console.log(`\nSaved login to ${TOKEN_PATH.pathname}. You only need to do this once.`);
+  fs.writeFileSync(LOGIN_TOKEN_PATH, JSON.stringify(tokens, null, 2));
+  console.log(`\nSaved login to ${LOGIN_TOKEN_PATH.pathname}. You only need to do this once.`);
   console.log('Run "npm start" to start the automation.\n');
 }
 
