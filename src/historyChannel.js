@@ -3,7 +3,8 @@ import path from 'node:path';
 import { config } from './config.js';
 import { loadOAuthClient, hasSavedLogin } from './googleAuth.js';
 import { listVideosInFolder, downloadFile, moveToDone } from './drive.js';
-import { uploadToYouTube } from './youtube.js';
+import { google } from 'googleapis';
+import { uploadToYouTube, findOrCreatePlaylist, addVideoToPlaylist } from './youtube.js';
 import { writeHistoryMetadataWithAI } from './omniroute.js';
 
 // Second YouTube channel: football + world history on @TotollsportGK.
@@ -59,10 +60,10 @@ function titleFromFilename(name) {
   return t.slice(0, 100) || 'History Stories';
 }
 
-async function buildMetadata(fileName) {
+async function buildMetadata(fileName, topic) {
   let meta;
   try {
-    meta = await writeHistoryMetadataWithAI(fileName);
+    meta = await writeHistoryMetadataWithAI(topic ? `${fileName} (${topic.title})` : fileName);
     console.log(`History channel: AI-written title "${meta.title}"`);
   } catch (err) {
     const title = titleFromFilename(fileName);
@@ -73,8 +74,49 @@ async function buildMetadata(fileName) {
       tags: ['history', 'football history', 'world history', 'documentary'],
     };
   }
-  const footer = `\n\nSubscribe for more football history and world history: https://www.youtube.com/${config.historyChannelHandle}\n\nThis video is for general information and entertainment. Views are the creator's own.\n\n#history #footballhistory #worldhistory`;
+  const footer = `\n\nSubscribe for more history stories -- football, world and Somali history: https://www.youtube.com/${config.historyChannelHandle}\n\nThis video is for general information and entertainment. Views are the creator's own.\n\n${topic ? topic.hashtags : '#history #footballhistory #worldhistory'}`;
   return { ...meta, description: `${meta.description}${footer}`.slice(0, 4900) };
+}
+
+// Joe sorts videos by dropping them into a subfolder of TOTOLL_HISTORY
+// (SPORTS_HISTORY / WORLD_HISTORY / SOMALI_HISTORY, created 27 Sep 2026).
+// The folder decides the playlist; a video dropped straight into
+// TOTOLL_HISTORY just gets no playlist. Playlists are matched by title
+// word, so ones Joe made by hand in Studio are reused, not duplicated.
+const TOPICS = [
+  {
+    key: 'sports',
+    folder: /SPORT|FOOTBALL/i,
+    playlist: /sport|football/i,
+    title: 'Football & Sports History',
+    description: 'The greatest matches, players and moments in football and sports history, told as stories.',
+    hashtags: '#footballhistory #sportshistory #history',
+  },
+  {
+    key: 'world',
+    folder: /WORLD/i,
+    playlist: /world/i,
+    title: 'World History',
+    description: 'Empires, turning points and the people who shaped our world, told as stories.',
+    hashtags: '#worldhistory #history #documentary',
+  },
+  {
+    key: 'somali',
+    folder: /SOMALI/i,
+    playlist: /somali/i,
+    title: 'Somali History',
+    description: 'The history, heritage and people of Somalia, told as stories.',
+    hashtags: '#somalihistory #somalia #history',
+  },
+];
+
+async function topicForFile(driveAuth, fileId) {
+  const drive = google.drive({ version: 'v3', auth: driveAuth });
+  const file = await drive.files.get({ fileId, fields: 'parents' }, { timeout: 30000 });
+  const parentId = (file.data.parents || [])[0];
+  if (!parentId || parentId === config.historyFolderId) return null;
+  const parent = await drive.files.get({ fileId: parentId, fields: 'name' }, { timeout: 30000 });
+  return TOPICS.find((t) => t.folder.test(parent.data.name || '')) || null;
 }
 
 let isPosting = false;
@@ -109,7 +151,13 @@ export async function postNextHistoryVideo(driveAuth) {
     }
 
     console.log(`History channel: posting "${file.name}" to ${config.historyChannelHandle} (${files.length} waiting)...`);
-    const meta = await buildMetadata(file.name);
+    let topic = null;
+    try {
+      topic = await topicForFile(driveAuth, file.id);
+    } catch (err) {
+      console.log(`History channel: could not read the video's folder (${err.message}) -- posting without a playlist.`);
+    }
+    const meta = await buildMetadata(file.name, topic);
     localPath = await downloadFile(driveAuth, file.id, file.name, DOWNLOAD_TIMEOUT_MS);
     const youtubeAuth = loadOAuthClient(config.historyTokenFile);
     const result = await uploadToYouTube(youtubeAuth, {
@@ -126,6 +174,17 @@ export async function postNextHistoryVideo(driveAuth) {
     state.postedToday += 1;
     state.uploadedIds = [...state.uploadedIds, file.id].slice(-500);
     saveState(state);
+
+    if (topic) {
+      // A playlist failure must never undo or repeat the upload itself.
+      try {
+        const playlistId = await findOrCreatePlaylist(youtubeAuth, { matcher: topic.playlist, title: topic.title, description: topic.description });
+        await addVideoToPlaylist(youtubeAuth, playlistId, result.id);
+        console.log(`History channel: added to playlist "${topic.title}"`);
+      } catch (err) {
+        console.log(`History channel: could not add to playlist "${topic.title}": ${err.message}`);
+      }
+    }
 
     await moveToDone(driveAuth, file.id, config.historyDoneFolderId);
   } finally {
