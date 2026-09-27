@@ -186,20 +186,24 @@ Write:
 1. One YouTube title, 70 characters or fewer, leading with the specific subject.
 2. A description: two or three opening sentences on what the viewer will learn, then two short paragraphs (2-4 sentences each). Plain sentences, no emoji, no headings.
 3. 8 to 10 lowercase search tags.
+4. Which playlist it belongs in: sports (football or any sport), somali (Somalia or Somali people), or world (anything else).
 
 Respond in exactly this format, nothing else:
 TITLE: <title>
 DESCRIPTION: <description>
-TAGS: <tag one, tag two, tag three>`;
+TAGS: <tag one, tag two, tag three>
+TOPIC: <sports|somali|world>`;
 
   const text = await askAI(HISTORY_SYSTEM_PROMPT, userPrompt);
   const titleMatch = text.match(/TITLE:\s*(.+)/i);
   const descMatch = text.match(/DESCRIPTION:\s*([\s\S]+?)(?:\nTAGS:|$)/i);
   const tagsMatch = text.match(/TAGS:\s*(.+)/i);
+  const topicMatch = text.match(/TOPIC:\s*(sports|somali|world)/i);
   if (!titleMatch || !descMatch) throw new Error('Could not parse AI response into title/description');
   return {
     title: titleMatch[1].trim().replace(/^"|"$/g, '').slice(0, 100),
     description: descMatch[1].trim(),
     tags: tagsMatch ? tagsMatch[1].split(',').map((t) => t.trim()).filter(Boolean) : [],
+    topic: topicMatch ? topicMatch[1].toLowerCase() : undefined,
   };
 }
