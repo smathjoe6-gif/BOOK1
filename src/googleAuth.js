@@ -20,6 +20,17 @@ const SCOPES = [
   'https://www.googleapis.com/auth/spreadsheets.readonly',
 ];
 
+// Extra-channel logins (npm run auth-history) pick a YouTube *brand*
+// channel ("Jamal" / @TotollsportGK). Brand accounts have no Drive or
+// Sheets, so asking for those makes Google stop with "Service unavailable:
+// You tried to access a service that isn't available for your account"
+// (hit 27 Sep 2026). These logins only ever upload to YouTube -- Drive
+// still goes through the main token.json -- so ask for YouTube only.
+const YOUTUBE_ONLY_SCOPES = [
+  'https://www.googleapis.com/auth/youtube.upload',
+  'https://www.googleapis.com/auth/youtube.force-ssl',
+];
+
 export function loadOAuthClient(tokenFile) {
   const tokenPath = tokenFile ? new URL(`../${tokenFile}`, import.meta.url) : TOKEN_PATH;
   const client = new OAuth2Client(config.googleClientId, config.googleClientSecret, REDIRECT_URI);
@@ -39,8 +50,8 @@ async function runInteractiveLogin() {
 
   const authUrl = client.generateAuthUrl({
     access_type: 'offline',
-    prompt: 'consent',
-    scope: SCOPES,
+    prompt: 'consent select_account',
+    scope: process.argv[2] ? YOUTUBE_ONLY_SCOPES : SCOPES,
   });
 
   console.log('\nOpening your browser to log in with Google...');
