@@ -45,6 +45,30 @@ const THEME_BANK = [
   { title: 'Built to Be Remembered 🏆', capture: '🏆 Legends aren\'t made overnight — they\'re built, frame by frame. GK Legend Studio.' },
   { title: 'The Story Behind the Story 🎙️', capture: '🎙️ There\'s always more beneath the surface. GK Legend Studio tells it all.' },
   { title: 'Nothing Like the Original 💫', capture: '💫 Authentic, unmistakable, unforgettable. GK Legend Studio at its core.' },
+  { title: 'Watch Until the End 👀', capture: '👀 The best part is the last second. GK Legend Studio made this one for you.' },
+  { title: 'Carried by the Wind 🌬️', capture: '🌬️ Some stories travel further than we do. GK Legend Studio follows them.' },
+  { title: 'Gold in Every Frame 🟡', capture: '🟡 Light, texture, feeling — nothing wasted. GK Legend Studio.' },
+  { title: 'Quiet Power 🌙', capture: '🌙 Not every legend shouts. Some just stand still and let you feel it.' },
+  { title: 'Made by Hand, Held by Heart 🤲', capture: '🤲 The hands tell you everything. GK Legend Studio keeps the craft alive.' },
+  { title: 'Before the World Woke Up 🌄', capture: '🌄 First light, first story. GK Legend Studio was there.' },
+  { title: 'You Have to See This 🎥', capture: '🎥 Stop scrolling for ten seconds. This one is worth it.' },
+  { title: 'The Moment Everything Changed ⚡', capture: '⚡ One second, one frame, one feeling you won\'t forget.' },
+  { title: 'Echoes of Home 🏡', capture: '🏡 Wherever you are, this is where you come from. GK Legend Studio.' },
+  { title: 'Rhythm of the Land 🥁', capture: '🥁 Feel it before you hear it. GK Legend Studio brings the beat of the land.' },
+  { title: 'Light Finds a Way 🌤️', capture: '🌤️ Even the smallest moment can shine. GK Legend Studio saw it.' },
+  { title: 'Stories Our Elders Told 📜', capture: '📜 Passed down, never lost. GK Legend Studio keeps the telling going.' },
+  { title: 'Pure Focus 🎯', capture: '🎯 Patience, balance, precision — watch it all come together.' },
+  { title: 'Simple Things, Big Feelings 💛', capture: '💛 The everyday, seen the way it deserves. GK Legend Studio.' },
+  { title: 'A Scene You Can Feel 🌊', capture: '🌊 Turn the sound up and let it wash over you.' },
+  { title: 'Bold Vision, Deep Roots 🌳', capture: '🌳 Where tradition meets tomorrow. Join the GK Legend family.' },
+  { title: 'Every Detail Matters 🔍', capture: '🔍 Look closer — every detail was made to be noticed.' },
+  { title: 'Legends Walk Among Us 🚶', capture: '🚶 Ordinary people, extraordinary stories. GK Legend Studio.' },
+  { title: 'The Calm Before the Legend 🌫️', capture: '🌫️ Stillness first, then the story begins.' },
+  { title: 'Proud and Unfiltered 🦅', capture: '🦅 No filter needed. Just the real thing, from GK Legend Studio.' },
+  { title: 'This Deserves a Replay 🔁', capture: '🔁 Watch it once, then watch it again. You\'ll see something new.' },
+  { title: 'Sunset Stories 🌇', capture: '🌇 As the day ends, the legend begins. GK Legend Studio.' },
+  { title: 'A Gift for the Eyes 🎁', capture: '🎁 Made with care, shared with love. Welcome to GK Legend Studio.' },
+  { title: 'From Our World to Yours 🌐', capture: '🌐 A piece of the legacy, delivered to your screen. Join the family.' },
 ];
 
 // Persisted to disk (not just kept in memory) so a script restart -- the
@@ -93,8 +117,6 @@ const CAPTION_TAIL_BANK = [
   'Made to be watched, made to be remembered.',
 ];
 
-const EMOJI_BANK = ['✨', '🌅', '🎬', '👑', '🌿', '🔥', '📖', '🕊️'];
-
 function pickOne(bank) {
   return bank[Math.floor(Math.random() * bank.length)];
 }
@@ -115,8 +137,9 @@ function cleanFilenameToTitle(filename) {
   let name = filename.replace(/\.[^/.]+$/, '');
   name = name.replace(/_(\d{6,})(_\d+)?$/, '');
   name = name.replace(/_\d+$/, '');
+  name = name.replace(/[_\-]+/g, ' ');
   name = name.replace(/\b(4k|2k|1080p|720p|480p|360p)\b/gi, '');
-  name = name.replace(/[_\-]+/g, ' ').replace(/\s+/g, ' ').trim();
+  name = name.replace(/\s+/g, ' ').trim();
   return titleCase(name);
 }
 
@@ -126,6 +149,28 @@ function cleanFilenameToTitle(filename) {
 // treat it the same as a generic grok-video-<uuid> filename.
 function isTooGenericForTitle(cleanedTitle) {
   return cleanedTitle.split(' ').filter(Boolean).length <= 1;
+}
+
+// Gemini/Google (and other AI tools) name the downloaded file after the
+// start of the prompt Joe typed, cut off mid-word -- "go_now_Photorealistic_
+// cinemat.mp4", "create_video_make_II_The_Dh.mp4", "make_video.mp4". Those
+// are instructions, not a description of the video, and posting them as the
+// title made every Google video look the same (Joe, 27 Sep 2026). If the
+// name contains any of these prompt words it's treated like a Grok
+// uuid filename: it gets a fresh rotating title instead.
+const PROMPT_WORDS = new Set([
+  'create', 'make', 'generate', 'video', 'go', 'now', 'please', 'prompt',
+  'photorealistic', 'photorea', 'photoreal', 'cinematic', 'cinemat', 'cinema',
+  'realistic', 'ultra', 'hyper', 'hd', 'veo', 'gemini', 'sora', 'kling',
+  'runway', 'grok', 'ai', 'ii', 'shot', 'scene', 'style',
+]);
+
+function looksLikePromptFilename(cleanedTitle) {
+  return cleanedTitle
+    .toLowerCase()
+    .split(' ')
+    .filter(Boolean)
+    .some((word) => PROMPT_WORDS.has(word));
 }
 
 export function isLikelyDuplicateVariant(filename) {
@@ -179,17 +224,19 @@ export async function generateCaption(filename) {
   }
 
   const cleaned = cleanFilenameToTitle(filename);
-  if (isTooGenericForTitle(cleaned)) {
+  if (isTooGenericForTitle(cleaned) || looksLikePromptFilename(cleaned)) {
     return randomThemedCaption();
   }
 
-  // The filename itself has real descriptive words worth keeping (e.g. "Two
-  // Women Sharing Tea") -- so dress it up with an emoji and a rotating brand
-  // line instead of ever posting the raw cleaned filename verbatim, or the
-  // exact same boilerplate sentence, as the title/caption.
-  const emoji = pickOne(EMOJI_BANK);
+  // The filename describes the video (e.g. "Man Balancing Stones On Beach").
+  // Joe wants every video to get its own fresh title whatever tool made it
+  // (27 Sep 2026), so the title still comes from the rotating theme bank --
+  // the filename's description only goes into the caption text, where it
+  // tells viewers what they're watching. A truncated name ("Develo…") is
+  // left out of the caption too.
+  const theme = randomThemedCaption();
+  if (cleaned.includes('…')) return theme;
   const tail = pickOne(CAPTION_TAIL_BANK);
-  const title = `${cleaned} ${emoji}`;
-  const capture = `${emoji} ${cleaned} — ${tail}`;
-  return { title, capture, hashtag: pickRandomHashtags(6, NEUTRAL_HASHTAG_BANK) };
+  const capture = `${theme.capture}\n\n${cleaned}. ${tail}`;
+  return { title: theme.title, capture, hashtag: theme.hashtag };
 }
