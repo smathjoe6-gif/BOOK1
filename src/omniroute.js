@@ -207,3 +207,16 @@ TOPIC: <sports|somali|world>`;
     topic: topicMatch ? topicMatch[1].toLowerCase() : undefined,
   };
 }
+
+// One short, specific question to pin under a new YouTube video, so viewers
+// have something concrete to answer (comments fell 9% on PathFoundGK in the
+// 28 days to 27 Sep 2026 while the comment was a generic "What did you
+// think?"). Falls back to src/engagementQuestion.js's bank if AI is down.
+export async function writeEngagementQuestionWithAI(title, caption) {
+  const system = `You write the first comment under a GK Legend Studio YouTube video (Somali heritage, music, folklore and cinematic short videos). Write ONE short, warm question (under 20 words, 1 emoji) that viewers can answer in a few words -- about THIS video's subject, their own memories, or a choice between two things. No hashtags, no quotes, no "Drop a comment". Never invent Somali words.`;
+  const user = `Video title: "${title}"\nCaption: "${(caption || '').slice(0, 300)}"\n\nWrite the question only.`;
+  const text = await askAI(system, user);
+  const line = text.split('\n').map((l) => l.trim()).find(Boolean) || '';
+  if (!line || line.length > 160) throw new Error('AI question unusable');
+  return line.replace(/^["']|["']$/g, '');
+}

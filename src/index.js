@@ -16,6 +16,7 @@ import { loadPinterestToken } from './pinterestAuth.js';
 import { uploadToTwitter } from './twitter.js';
 import { maybeAutoGenerateVideo } from './autoGenerate.js';
 import { ensureVerticalVideo } from './aspectRatio.js';
+import { engagementQuestion } from './engagementQuestion.js';
 import { postNextHistoryVideo } from './historyChannel.js';
 
 // Independent test rollout of Pinterest posting for GK_TERMINAL videos,
@@ -144,12 +145,9 @@ async function processVideoOnce(file) {
     console.log(`YouTube: posted, id ${yt.id}`);
     youtubePosted = true;
     try {
-      await postEngagementComment(
-        auth,
-        yt.id,
-        '👀 What did you think? Drop a comment below and let us know! — GK Legend Studio'
-      );
-      console.log('YouTube: posted engagement comment');
+      const question = await engagementQuestion(row.title, row.capture);
+      await postEngagementComment(auth, yt.id, `${question} — GK Legend Studio`);
+      console.log(`YouTube: posted engagement question: "${question}"`);
     } catch (err) {
       console.error('Could not post the YouTube engagement comment (video still posted fine):', err.message);
     }
