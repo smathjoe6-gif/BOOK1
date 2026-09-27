@@ -1,0 +1,501 @@
+{
+  "name": "CHANNEL_NAME — Faceless YouTube Automation (Claude)",
+  "flow": [
+    {
+      "id": 2,
+      "mapper": {},
+      "module": "google-drive:watchFilesInAFolder",
+      "version": 4,
+      "metadata": {
+        "designer": {
+          "x": -484,
+          "y": -5
+        },
+        "restore": {
+          "parameters": {
+            "select": {
+              "label": "By Created Time"
+            },
+            "mimeType": {
+              "label": "All"
+            },
+            "destination": {
+              "label": "My Drive"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "__IMTCONN__",
+            "type": "account:google-restricted,google-drive",
+            "label": "Connection",
+            "required": true
+          },
+          {
+            "name": "select",
+            "type": "select",
+            "label": "Watch Files",
+            "required": true,
+            "validate": {
+              "enum": [
+                "create",
+                "modify"
+              ]
+            }
+          },
+          {
+            "name": "destination",
+            "type": "select",
+            "label": "Choose a Drive",
+            "required": true,
+            "validate": {
+              "enum": [
+                "drive",
+                "share",
+                "team"
+              ]
+            }
+          },
+          {
+            "name": "mimeType",
+            "type": "select",
+            "label": "File Types to Watch",
+            "required": true,
+            "validate": {
+              "enum": [
+                "all",
+                "document",
+                "spreadsheet",
+                "slide",
+                "drawing"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "type": "uinteger",
+            "label": "Limit",
+            "required": true
+          },
+          {
+            "name": "folderId",
+            "type": "folder",
+            "label": "Select the Folder to be Watched",
+            "required": true
+          }
+        ]
+      },
+      "parameters": {
+        "limit": 1,
+        "select": "create",
+        "mimeType": "all",
+        "destination": "drive"
+      }
+    },
+    {
+      "id": 4,
+      "filter": null,
+      "mapper": {
+        "file": "{{2.id}}",
+        "select": "map",
+        "formatDrawings": "image/jpeg",
+        "formatDocuments": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "formatSpreadsheets": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "formatPresentations": "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+      },
+      "module": "google-drive:getAFile",
+      "version": 4,
+      "metadata": {
+        "designer": {
+          "x": -62,
+          "y": -2
+        },
+        "restore": {
+          "expect": {
+            "select": {
+              "label": "Enter manually"
+            },
+            "formatDrawings": {
+              "label": "JPEG"
+            },
+            "formatDocuments": {
+              "label": "MS Word Document"
+            },
+            "formatSpreadsheets": {
+              "label": "MS Excel"
+            },
+            "formatPresentations": {
+              "label": "MS PowerPoint"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "__IMTCONN__",
+            "type": "account:google-restricted,google-drive",
+            "label": "Connection",
+            "required": true
+          }
+        ]
+      },
+      "parameters": {}
+    },
+    {
+      "id": 5,
+      "filter": null,
+      "mapper": {
+        "model": "claude-sonnet-5",
+        "messages": [
+          {
+            "role": "user",
+            "content": "You are writing a YouTube video description for the channel \"CHANNEL_NAME\".\n\nThe channel is about: CHANNEL_TOPIC\n\nWrite the description for the video named at the bottom. Cover only what that filename actually names. If it names a specific tool, product, place, person or event, stay on that subject and do not broaden it out.\n\nHOW TO WRITE IT:\n- Open with two or three sentences telling the viewer what they get from watching. Vary this opening between videos. Never reuse the same formula twice.\n- Then write two or three short paragraphs, 2 to 4 sentences each. Work the natural search terms for this subject in, but write for a person, not a search engine.\n- Match the tone to the subject and to what this channel is about.\n- Plain sentences in the body. No emoji, no all-caps words, no headings or labels, and no decorative symbols anywhere except the separator line described below.\n- Never invent a fact, figure, date or year. If you are not certain of something, leave it out.\n- After the paragraphs, leave a blank line and then add these links, each on its own line, exactly as written and with nothing added:\n  LINK_1\n  LINK_2\n- Then a separator line, on its own line, exactly: ───────────────\n- Then a short disclaimer, 2 to 3 sentences. It must say that the views expressed are the creator's own opinion and that the video is for general information and entertainment, and that viewers should do their own research before acting on anything in it. If the subject is financial, medical, legal or otherwise regulated, add one line making clear this is not professional advice. Do not add that line for subjects where it would make no sense. Word it freshly, do not copy this instruction back verbatim.\n- Then the same separator line again, on its own line, exactly: ───────────────\n- Finish with 3 to 5 lowercase hashtags on a single line, relevant to the subject.\n\nOutput the finished description text and nothing else. No preamble, no explanation, no quote marks around it.\n\nThe video filename is: {{4.name}}",
+            "inputType": "single"
+          }
+        ],
+        "metadata": {},
+        "thinking": {
+          "type": "disabled"
+        },
+        "container": {},
+        "max_tokens": 1500,
+        "temperature": 1,
+        "tool_choice": {},
+        "outputFormat": {
+          "type": "text"
+        }
+      },
+      "module": "anthropic-claude:createAMessage",
+      "version": 1,
+      "metadata": {
+        "restore": {
+          "expect": {
+            "model": {
+              "mode": "chose",
+              "label": "Claude Sonnet 5"
+            },
+            "messages": {
+              "mode": "chose",
+              "items": [
+                {
+                  "role": {
+                    "mode": "chose",
+                    "label": "User"
+                  },
+                  "inputType": {
+                    "mode": "chose",
+                    "label": "Single string"
+                  }
+                }
+              ]
+            },
+            "thinking": {
+              "nested": {
+                "type": {
+                  "mode": "chose",
+                  "label": "Disabled"
+                }
+              }
+            },
+            "outputFormat": {
+              "nested": {
+                "type": {
+                  "mode": "chose",
+                  "label": "Text"
+                }
+              }
+            }
+          }
+        },
+        "designer": {
+          "x": 530,
+          "y": -487
+        },
+        "parameters": [
+          {
+            "name": "__IMTCONN__",
+            "type": "account:anthropic-claude",
+            "label": "Connection",
+            "required": true
+          }
+        ]
+      },
+      "parameters": {}
+    },
+    {
+      "id": 8,
+      "filter": null,
+      "mapper": {
+        "model": "claude-sonnet-5",
+        "messages": [
+          {
+            "role": "user",
+            "content": "You create YouTube tags for the channel \"CHANNEL_NAME\", which is about: CHANNEL_TOPIC\n\nRead the video filename below and output 8 to 10 tags for it.\n\nRules:\n- Base the tags only on what the filename actually names, plus the channel subject where it genuinely fits.\n- Mix broad tags a viewer might search with two or three specific long-tail ones.\n- Output ONLY the tags as a single line, separated by a comma and a space, like: tag one, tag two, tag three\n- All lowercase. No numbering, no quotes, no hashtags, no preamble, no other text.\n- Keep the whole list under 450 characters in total.\n\nThe video filename is: {{4.name}}",
+            "inputType": "single"
+          }
+        ],
+        "metadata": {},
+        "thinking": {
+          "type": "disabled"
+        },
+        "container": {},
+        "max_tokens": 500,
+        "temperature": 1,
+        "tool_choice": {},
+        "outputFormat": {
+          "type": "text"
+        }
+      },
+      "module": "anthropic-claude:createAMessage",
+      "version": 1,
+      "metadata": {
+        "restore": {
+          "expect": {
+            "model": {
+              "mode": "chose",
+              "label": "Claude Sonnet 5"
+            },
+            "messages": {
+              "mode": "chose",
+              "items": [
+                {
+                  "role": {
+                    "mode": "chose",
+                    "label": "User"
+                  },
+                  "inputType": {
+                    "mode": "chose",
+                    "label": "Single string"
+                  }
+                }
+              ]
+            },
+            "thinking": {
+              "nested": {
+                "type": {
+                  "mode": "chose",
+                  "label": "Disabled"
+                }
+              }
+            },
+            "outputFormat": {
+              "nested": {
+                "type": {
+                  "mode": "chose",
+                  "label": "Text"
+                }
+              }
+            }
+          }
+        },
+        "designer": {
+          "x": 522,
+          "y": 95
+        },
+        "parameters": [
+          {
+            "name": "__IMTCONN__",
+            "type": "account:anthropic-claude",
+            "label": "Connection",
+            "required": true
+          }
+        ]
+      },
+      "parameters": {}
+    },
+    {
+      "id": 9,
+      "filter": null,
+      "mapper": {
+        "model": "claude-sonnet-5",
+        "messages": [
+          {
+            "role": "user",
+            "content": "You write YouTube video titles for the channel \"CHANNEL_NAME\", which is about: CHANNEL_TOPIC\n\nWrite ONE title for the video named at the bottom.\n\nRules:\n- HARD LIMIT: 70 characters or fewer, including spaces and punctuation. Count before you answer and shorten if needed. This is the most important rule.\n- Lead with the specific subject named in the filename.\n- Write it the way this channel's audience would search for or click it. Match the tone to the subject.\n- Clear beats clever. Do not overpromise anything the video cannot deliver.\n- No all-caps words unless the subject itself is capitalised that way. No clickbait punctuation such as multiple exclamation marks.\n- Never invent a fact, figure, date or year.\n- Output ONLY the finished title text. No quote marks, no explanation, no preamble.\n\nThe video filename is: {{4.name}}",
+            "inputType": "single"
+          }
+        ],
+        "metadata": {},
+        "thinking": {
+          "type": "disabled"
+        },
+        "container": {},
+        "max_tokens": 200,
+        "temperature": 1,
+        "tool_choice": {},
+        "outputFormat": {
+          "type": "text"
+        }
+      },
+      "module": "anthropic-claude:createAMessage",
+      "version": 1,
+      "metadata": {
+        "restore": {
+          "expect": {
+            "model": {
+              "mode": "chose",
+              "label": "Claude Sonnet 5"
+            },
+            "messages": {
+              "mode": "chose",
+              "items": [
+                {
+                  "role": {
+                    "mode": "chose",
+                    "label": "User"
+                  },
+                  "inputType": {
+                    "mode": "chose",
+                    "label": "Single string"
+                  }
+                }
+              ]
+            },
+            "thinking": {
+              "nested": {
+                "type": {
+                  "mode": "chose",
+                  "label": "Disabled"
+                }
+              }
+            },
+            "outputFormat": {
+              "nested": {
+                "type": {
+                  "mode": "chose",
+                  "label": "Text"
+                }
+              }
+            }
+          }
+        },
+        "designer": {
+          "x": 509,
+          "y": 703
+        },
+        "parameters": [
+          {
+            "name": "__IMTCONN__",
+            "type": "account:anthropic-claude",
+            "label": "Connection",
+            "required": true
+          }
+        ]
+      },
+      "parameters": {}
+    },
+    {
+      "id": 3,
+      "mapper": {
+        "data": "{{4.data}}",
+        "tags": "{{split(8.textResponse; \", \")}}",
+        "title": "{{9.textResponse}}",
+        "fileName": "{{2.name}}",
+        "categoryId": "27",
+        "description": "{{5.textResponse}}",
+        "privacyStatus": "public",
+        "containsSyntheticMedia": true,
+        "selfDeclaredMadeForKids": false
+      },
+      "module": "youtube:uploadVideo",
+      "version": 4,
+      "metadata": {
+        "designer": {
+          "x": 1047,
+          "y": 0
+        },
+        "restore": {
+          "expect": {
+            "tags": {
+              "mode": "edit"
+            },
+            "categoryId": {
+              "mode": "chose",
+              "label": "Education"
+            },
+            "privacyStatus": {
+              "mode": "chose",
+              "label": "Public"
+            },
+            "containsSyntheticMedia": {
+              "mode": "chose"
+            },
+            "selfDeclaredMadeForKids": {
+              "mode": "chose"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "__IMTCONN__",
+            "type": "account:youtube",
+            "label": "Connection",
+            "required": true
+          }
+        ]
+      },
+      "parameters": {}
+    },
+    {
+      "id": 6,
+      "mapper": {
+        "file": "{{4.id}}",
+        "move": "drive",
+        "select": "file",
+        "destination": "drive"
+      },
+      "module": "google-drive:moveAFileIntoAFolder",
+      "version": 4,
+      "metadata": {
+        "designer": {
+          "x": 1422,
+          "y": 0
+        },
+        "restore": {
+          "expect": {
+            "file": {
+              "mode": "edit",
+              "path": []
+            },
+            "move": {
+              "label": "My Drive"
+            },
+            "select": {
+              "label": "File"
+            },
+            "destination": {
+              "label": "My Drive"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "__IMTCONN__",
+            "type": "account:google-restricted,google-drive",
+            "label": "Connection",
+            "required": true
+          }
+        ]
+      },
+      "parameters": {}
+    }
+  ],
+  "metadata": {
+    "instant": false,
+    "version": 1,
+    "designer": {
+      "orphans": []
+    },
+    "scenario": {
+      "dlq": false,
+      "slots": null,
+      "dataloss": false,
+      "maxErrors": 3,
+      "autoCommit": true,
+      "roundtrips": 1,
+      "sequential": false,
+      "confidential": false,
+      "freshVariables": false,
+      "autoCommitTriggerLast": true
+    }
+  }
+}
