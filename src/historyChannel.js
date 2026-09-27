@@ -74,8 +74,12 @@ async function buildMetadata(fileName, topic) {
       tags: ['history', 'football history', 'world history', 'documentary'],
     };
   }
-  const footer = `\n\nSubscribe for more history stories -- football, world and Somali history: https://www.youtube.com/${config.historyChannelHandle}\n\nThis video is for general information and entertainment. Views are the creator's own.\n\n${topic ? topic.hashtags : '#history #footballhistory #worldhistory'}`;
-  return { ...meta, description: `${meta.description}${footer}`.slice(0, 4900) };
+  return meta;
+}
+
+function withFooter(description, topic) {
+  const footer = `\n\nSubscribe for more history stories -- football, world and Somali history: https://www.youtube.com/${config.historyChannelHandle}\n\nThis video is for general information and entertainment. Views are the creator's own.\n\n${topic.hashtags}`;
+  return `${description}${footer}`.slice(0, 4900);
 }
 
 // Joe sorts videos by dropping them into a subfolder of TOTOLL_HISTORY
@@ -109,6 +113,20 @@ const TOPICS = [
     hashtags: '#somalihistory #somalia #history',
   },
 ];
+
+// Joe mostly drops videos straight into TOTOLL_HISTORY and expects the
+// script to pick the playlist itself (27 Sep 2026). The AI's TOPIC answer
+// wins when OmniRoute/Anthropic is up; otherwise these filename words decide,
+// and anything unmatched counts as world history.
+const SOMALI_WORDS = /somali|somalia|mogadishu|muqdisho|hargeisa|hargeysa|puntland|jubaland|kismayo|berbera|zeila|saylac|laas.?geel|darwiish|dervish|sayyid|ajuran|\badal\b|geledi|warsangeli|majeerteen|gabay|buraanbur|\bpunt\b/i;
+const SPORTS_WORDS = /football|soccer|world.?cup|fifa|uefa|olympic|league|\bmatch|goal|stadium|maracan|pel[eé]\b|maradona|messi|ronaldo|cruyff|boxing|\bali\b|bern\b|wembley|hand.?of.?god|jesse.?owens|marathon|athlete|athletics|sprint|cricket|rugby|tennis|basketball|\bnba\b|\bf1\b|formula.?1|tournament|champion|\bfinal\b|derby|\bclub\b/i;
+
+function topicFromText(rawText) {
+  const text = rawText.replace(/[_\-.]+/g, ' ');
+  if (SOMALI_WORDS.test(text)) return 'somali';
+  if (SPORTS_WORDS.test(text)) return 'sports';
+  return 'world';
+}
 
 async function topicForFile(driveAuth, fileId) {
   const drive = google.drive({ version: 'v3', auth: driveAuth });
@@ -158,12 +176,17 @@ export async function postNextHistoryVideo(driveAuth) {
       console.log(`History channel: could not read the video's folder (${err.message}) -- posting without a playlist.`);
     }
     const meta = await buildMetadata(file.name, topic);
+    if (!topic) {
+      const key = meta.topic || topicFromText(`${file.name} ${meta.title}`);
+      topic = TOPICS.find((t) => t.key === key) || TOPICS.find((t) => t.key === 'world');
+      console.log(`History channel: sorted into "${topic.title}" (${meta.topic ? 'AI' : 'filename words'})`);
+    }
     localPath = await downloadFile(driveAuth, file.id, file.name, DOWNLOAD_TIMEOUT_MS);
     const youtubeAuth = loadOAuthClient(config.historyTokenFile);
     const result = await uploadToYouTube(youtubeAuth, {
       filePath: localPath,
       title: meta.title,
-      description: meta.description,
+      description: withFooter(meta.description, topic),
       tags: meta.tags,
       categoryId: '27', // Education
       containsSyntheticMedia: true, // AI narration/visuals (NotebookLM, Grok, Gemini)
