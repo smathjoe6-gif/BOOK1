@@ -10,7 +10,8 @@ import { writeHistoryMetadataWithAI } from './omniroute.js';
 // Second YouTube channel: football + world history on @TotollsportGK.
 // Joe drops finished long videos (5-30 min, often NotebookLM video
 // overviews) into TOTOLL_HISTORY; this posts at most HISTORY_DAILY_LIMIT a
-// day to that channel only, then moves each one to TOTOLL_HISTORY_DONE.
+// day to that channel only, then moves each one to TOTOLL_HISTORY_DONE (sorted into the same
+// SPORTS/WORLD/SOMALI_HISTORY subfolders as the drop folder).
 // Nothing here touches @PathFoundGK, TikTok, the caption sheet or Make.
 //
 // Drive access uses the main login (token.json). YouTube uses the history
@@ -91,6 +92,7 @@ const TOPICS = [
   {
     key: 'sports',
     folder: /SPORT|FOOTBALL/i,
+    doneFolder: 'SPORTS_HISTORY',
     playlist: /sport|football/i,
     title: 'Football & Sports History',
     description: 'The greatest matches, players and moments in football and sports history, told as stories.',
@@ -99,6 +101,7 @@ const TOPICS = [
   {
     key: 'world',
     folder: /WORLD/i,
+    doneFolder: 'WORLD_HISTORY',
     playlist: /world/i,
     title: 'World History',
     description: 'Empires, turning points and the people who shaped our world, told as stories.',
@@ -107,6 +110,7 @@ const TOPICS = [
   {
     key: 'somali',
     folder: /SOMALI/i,
+    doneFolder: 'SOMALI_HISTORY',
     playlist: /somali/i,
     title: 'Somali History',
     description: 'The history, heritage and people of Somalia, told as stories.',
@@ -135,6 +139,37 @@ async function topicForFile(driveAuth, fileId) {
   if (!parentId || parentId === config.historyFolderId) return null;
   const parent = await drive.files.get({ fileId: parentId, fields: 'name' }, { timeout: 30000 });
   return TOPICS.find((t) => t.folder.test(parent.data.name || '')) || null;
+}
+
+// Joe wants TOTOLL_HISTORY_DONE sorted the same way as the drop folder
+// (29 Sep 2026), so finished videos go into DONE/SPORTS_HISTORY,
+// DONE/WORLD_HISTORY or DONE/SOMALI_HISTORY (created here if missing).
+// Any problem finding the subfolder falls back to DONE itself, so the move
+// never fails because of sorting.
+async function doneFolderFor(driveAuth, topic) {
+  if (!topic) return config.historyDoneFolderId;
+  try {
+    const drive = google.drive({ version: 'v3', auth: driveAuth });
+    const res = await drive.files.list(
+      {
+        q: `'${config.historyDoneFolderId}' in parents and name = '${topic.doneFolder}' and mimeType = 'application/vnd.google-apps.folder' and trashed = false`,
+        fields: 'files(id)',
+      },
+      { timeout: 30000 }
+    );
+    if (res.data.files?.[0]) return res.data.files[0].id;
+    const created = await drive.files.create(
+      {
+        requestBody: { name: topic.doneFolder, mimeType: 'application/vnd.google-apps.folder', parents: [config.historyDoneFolderId] },
+        fields: 'id',
+      },
+      { timeout: 30000 }
+    );
+    return created.data.id;
+  } catch (err) {
+    console.log(`History channel: could not open DONE/${topic.doneFolder} (${err.message}) -- using DONE instead.`);
+    return config.historyDoneFolderId;
+  }
 }
 
 let isPosting = false;
@@ -209,7 +244,7 @@ export async function postNextHistoryVideo(driveAuth) {
       }
     }
 
-    await moveToDone(driveAuth, file.id, config.historyDoneFolderId);
+    await moveToDone(driveAuth, file.id, await doneFolderFor(driveAuth, topic));
   } finally {
     isPosting = false;
     if (localPath) fs.rm(localPath, { force: true }, () => {});
