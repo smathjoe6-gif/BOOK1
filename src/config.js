@@ -68,6 +68,11 @@ export const config = {
   // provider. Leave blank if OmniRoute isn't installed; captions/replies
   // just fall back to the built-in templates in that case.
   omnirouteApiKey: process.env.OMNIROUTE_API_KEY || '',
+  // Which OmniRoute model to ask for captions/titles. "auto" lets OmniRoute
+  // pick, but on 30 Sep 2026 that kept returning 502 while only some
+  // providers worked -- set this to one exact model id copied from the
+  // OmniRoute dashboard (a provider that tests green) to pin it.
+  omnirouteModel: process.env.OMNIROUTE_MODEL || 'auto',
   // Model id OmniRoute expects for its free "Veo AI Free" video provider.
   // Confirm the exact string via OmniRoute's Playground -> Copy cURL (the
   // Model field shown there) if this default ever stops working.
