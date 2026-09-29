@@ -18,7 +18,7 @@ async function requestOnce(systemPrompt, userPrompt) {
         ...(config.omnirouteApiKey ? { Authorization: `Bearer ${config.omnirouteApiKey}` } : {}),
       },
       body: JSON.stringify({
-        model: 'auto',
+        model: config.omnirouteModel,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
