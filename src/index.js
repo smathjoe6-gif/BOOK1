@@ -18,6 +18,7 @@ import { maybeAutoGenerateVideo } from './autoGenerate.js';
 import { ensureVerticalVideo } from './aspectRatio.js';
 import { engagementQuestion } from './engagementQuestion.js';
 import { postNextHistoryVideo } from './historyChannel.js';
+import { sortDoneFoldersByShape } from './doneSorter.js';
 
 // Independent test rollout of Pinterest posting for GK_TERMINAL videos,
 // capped at config.pinterestDailyLimit attempts per day while Joe's new
@@ -345,6 +346,12 @@ async function checkOnce() {
     await mirrorNewVideos(auth);
   } catch (err) {
     console.error('Mirroring videos between GK_TERMINAL and GK_JING failed:', err.message);
+  }
+
+  try {
+    await sortDoneFoldersByShape(auth);
+  } catch (err) {
+    console.error('Sorting the done folders failed (will retry next cycle):', err.message);
   }
 
   try {

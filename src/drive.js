@@ -153,14 +153,27 @@ export async function mirrorNewVideos(auth) {
   // copied right back in. This was a real, confirmed source of videos
   // reposting (20 Sep 2026), not just theoretical -- always page through the
   // full folder.
+  // Done folders are sorted into "9x16 (Vertical)" / "16x9 (Horizontal)"
+  // subfolders (src/doneSorter.js, 29 Sep 2026), so look one level down too
+  // -- otherwise a sorted, already-posted video would look missing and get
+  // mirrored straight back in.
   const listVideos = async (folderId) => {
     if (!folderId) return [];
+    const sub = await drive.files.list(
+      {
+        q: `'${folderId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`,
+        fields: 'files(id)',
+        pageSize: 50,
+      },
+      { timeout: API_TIMEOUT_MS }
+    );
+    const parentClause = [folderId, ...(sub.data.files || []).map((f) => f.id)].map((id) => `'${id}' in parents`).join(' or ');
     const files = [];
     let pageToken;
     do {
       const res = await drive.files.list(
         {
-          q: `'${folderId}' in parents and mimeType contains 'video/' and trashed = false`,
+          q: `(${parentClause}) and mimeType contains 'video/' and trashed = false`,
           fields: 'nextPageToken, files(id, name)',
           pageSize: 1000,
           pageToken,
