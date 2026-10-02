@@ -5,9 +5,16 @@
         "source": "github",
         "repo": "Imbad0202/academic-research-skills"
       }
+    },
+    "claude-video": {
+      "source": {
+        "source": "github",
+        "repo": "bradautomates/claude-video"
+      }
     }
   },
   "enabledPlugins": {
-    "academic-research-skills@academic-research-skills": true
+    "academic-research-skills@academic-research-skills": true,
+    "watch@claude-video": true
   }
 }
