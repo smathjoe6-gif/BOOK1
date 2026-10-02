@@ -21,7 +21,7 @@ one built and started over with a different approach. Rules:
    decided: Mac script + Buffer API (YouTube/TikTok/X), Make.com
    (IG/FB/Pinterest), Manychat (DMs). **No Zapier.**
 3. **Verify, don't assume.** Check the live log (Drive file
-   `gk-automation-log-live.txt`, id `1Kyh87FahJHv7GkmC7zI_TWiKqhi4HdZs`),
+   `gk-automation-log-live.txt`, id `1SrzWDMGMH8X0hTeXs7GO_-c9TApOx3Mp` since 2 Oct; the old `1Kyh87FahJHv7GkmC7zI_TWiKqhi4HdZs` was deleted),
    Make executions, and the sheet before claiming something works/broke.
 4. **Update the board** (date + what changed) at the end of every session.
 
@@ -104,6 +104,7 @@ one built and started over with a different approach. Rules:
 4. Fix OmniRoute so captions are AI-written again.
 
 ### 📅 Log
+- **2 Oct 2026 ~16:10 London:** Joe: 2 sports-history videos in TOTOLL_HISTORY/SPORTS_HISTORY not moving ("1975 Ali vs. Frazier III showdown..mp4" dropped 03:42Z, "The_Spatial_Infiltrator…Peekaboo.mp4" 13:24Z). Cause: `HISTORY_DAILY_LIMIT`=1/day and the day's slot was already used ("Sept_30,_1927" + "The_60th__Babe_Ruth…" both went 1-2 Oct), so they post one per day; Joe can set `HISTORY_DAILY_LIMIT=2`. Also: Mac script's last visible activity (mirror copies into GK_JING) ~06:30Z — likely asleep. **Live log file `1Kyh87…` was deleted** (probably during Joe's Drive clean-up) → new empty `gk-automation-log-live.txt` `1SrzWDMGMH8X0hTeXs7GO_-c9TApOx3Mp` (My Drive root); Joe must set `LOG_SYNC_FILE_ID` to it + kickstart. Joe asked about "Gemini watches a video link → tells Claude": Claude can't watch video; for now Joe pastes Gemini's description (gemini.google.com + link) into chat; an automatic Gemini-API "describe this video" script into Drive is possible if Joe wants it (not built).
 - **2 Oct 2026 08:15 London:** 2 Oct prompts doc saved + verified (`15PpkwtWUdAAGDcEYoQRdd6QfMTxgfXvKmVphNrJAzsI`). Trends: "Two Fishes", Ramalama costume walk, Pumpkin Head illusion (3 broad, 4 heritage). Documentary facts: Berbera annual fair (1833: ~70k people, ~6k camels/day; both sources are Wikipedia pages), Radio Hargeisa 1943, Hadraawi "Shakespeare of Somalia" (no portrait). Skipped the Hargeisa MiG memorial (mass-atrocity topic).
 - **1 Oct 2026 08:15 London:** 1 Oct prompts doc saved + verified (`1Y094oxnBb88J716FdeeLNHP_lg5HPWhz-B4OcUcGo0c`). Trends: spooky-season prop reveals, "Everyone who knows me knows you", "My Day Is Good", fall "A New Season". Documentary facts (2 sources each): Somali Airlines 5 Mar 1964, National Theatre 1967, Hawo Tako monument (monument only, no face/violence). 30 Sep 10:05 check: Nadin (Google Cloud) had not replied; no more checks unless Joe asks.
 - **30 Sep 2026 08:15 London:** 30 Sep prompts doc saved + verified (`11INW7NWkVy7ohvu_m7HVhS5QT8tzaGrQNXHeHScQ-FE`). Trends: adult fidget trading, shoe-kick transition, police suspect drawing, "Once a Day/Week/Month". Documentary facts (2 sources each): Somali Youth League 15 May 1943 (13 founders), xeedho (UNESCO urgent list 2023), shax board game. Dropped Taleh fort (sources disagree on build dates). Also ~02:00: Joe's "MY Memory" folder confirmed gone from Drive; the stray "Terminal Saved Output.txt" (X keys, My Mac (1)/Documents backup) is gone too.
