@@ -72,6 +72,9 @@ export const config = {
   // PICTURE_FOLDER_ID = a Drive folder holding HERITAGE and WILDLIFE
   // subfolders of finished post pictures. Blank = off.
   pictureFolderId: process.env.PICTURE_FOLDER_ID || '',
+  // Instead of Drive, read the pictures straight from Canva folders:
+  // "HERITAGE=<canva folder id>,WILDLIFE=<canva folder id>".
+  pictureCanvaFolders: process.env.PICTURE_CANVA_FOLDERS || '',
   pictureSlots: process.env.PICTURE_SLOTS || '09:00,13:00,19:00',
   pictureServices: process.env.PICTURE_SERVICES || 'facebook,pinterest',
   picturePinterestWildlifeBoardId: process.env.PICTURE_PINTEREST_WILDLIFE_BOARD_ID || '',
