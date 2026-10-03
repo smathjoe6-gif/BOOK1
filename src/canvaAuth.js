@@ -21,6 +21,9 @@ const SCOPES = [
   // integration's Scopes page at canva.com/developers, then run
   // `npm run canva-auth` once more.
   'design:meta:read',
+  // Lets the picture poster list a Canva folder's designs (src/canvaPictures.js).
+  // Tick it on canva.com/developers -> Scopes, then `npm run canva-auth` once more.
+  'folder:read',
 ].join(' ');
 
 function base64url(buffer) {

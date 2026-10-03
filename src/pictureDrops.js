@@ -5,6 +5,7 @@ import { config } from './config.js';
 import { bufferGraphQL } from './bufferTikTok.js';
 import { listBufferChannels } from './bufferPost.js';
 import { generateCaption } from './autoCaption.js';
+import { listCanvaPictures, exportCanvaPng } from './canvaPictures.js';
 
 // Picture posts for Facebook (+ Pinterest): Joe keeps ready-made post pictures
 // (his Canva "Daily Drops" designs) in two Drive folders under
@@ -75,7 +76,22 @@ async function findSubfolder(drive, name) {
   return res.data.files && res.data.files[0] && res.data.files[0].id;
 }
 
+function canvaFolderFor(kind) {
+  for (const part of config.pictureCanvaFolders.split(',')) {
+    const [name, id] = part.split('=').map((x) => (x || '').trim());
+    if (name.toUpperCase() === kind && id) return id;
+  }
+  return '';
+}
+
 async function nextPicture(drive, kind, posted) {
+  if (config.pictureCanvaFolders) {
+    const canvaId = canvaFolderFor(kind);
+    if (!canvaId) return null;
+    const designs = await listCanvaPictures(canvaId);
+    const design = designs.find((d) => !posted[d.id]);
+    return design ? { ...design, kind, canva: true } : null;
+  }
   const folderId = await findSubfolder(drive, kind);
   if (!folderId) return null;
   const res = await drive.files.list(
@@ -115,7 +131,7 @@ async function postToChannel(service, { imageUrl, title, text, kind }) {
 }
 
 export async function postDuePicture(auth) {
-  if (!config.pictureFolderId || !config.bufferAccessToken) return;
+  if ((!config.pictureFolderId && !config.pictureCanvaFolders) || !config.bufferAccessToken) return;
   const state = load();
   const slot = dueSlot(state);
   save(state);
@@ -137,7 +153,7 @@ export async function postDuePicture(auth) {
     if (pic) break;
   }
   if (!pic) {
-    console.log(`Pictures: nothing left to post in ${config.pictureFolderId} (drop more into HERITAGE / WILDLIFE).`);
+    console.log(`Pictures: nothing left to post in ${config.pictureCanvaFolders || config.pictureFolderId} (drop more into HERITAGE / WILDLIFE).`);
     state.slots[day].push(slot);
     save(state);
     return;
@@ -147,8 +163,13 @@ export async function postDuePicture(auth) {
   state.tries[tryKey] = (state.tries[tryKey] || 0) + 1;
   save(state);
 
-  await drive.permissions.create({ fileId: pic.id, requestBody: { role: 'reader', type: 'anyone' } }, { timeout: 30000 });
-  const imageUrl = `https://drive.google.com/uc?export=download&id=${pic.id}`;
+  let imageUrl;
+  if (pic.canva) {
+    imageUrl = await exportCanvaPng(pic.id);
+  } else {
+    await drive.permissions.create({ fileId: pic.id, requestBody: { role: 'reader', type: 'anyone' } }, { timeout: 30000 });
+    imageUrl = `https://drive.google.com/uc?export=download&id=${pic.id}`;
+  }
   const gen = await generateCaption(prettyName(pic.name));
   const text = `${gen.title}\n\n${gen.capture}\n\n${gen.hashtag}\n\n${FOOTER}`.trim();
 
