@@ -68,6 +68,13 @@ export const config = {
   tiktokOrder: process.env.TIKTOK_ORDER === 'oldest' ? 'oldest' : 'newest',
   // Pause between one network and the next when posting a video via Buffer.
   bufferGapSeconds: Number.isFinite(Number(process.env.BUFFER_GAP_SECONDS)) && process.env.BUFFER_GAP_SECONDS !== undefined && process.env.BUFFER_GAP_SECONDS !== '' ? Number(process.env.BUFFER_GAP_SECONDS) : 60,
+  // Picture posts for Facebook/Pinterest from Drive (src/pictureDrops.js).
+  // PICTURE_FOLDER_ID = a Drive folder holding HERITAGE and WILDLIFE
+  // subfolders of finished post pictures. Blank = off.
+  pictureFolderId: process.env.PICTURE_FOLDER_ID || '',
+  pictureSlots: process.env.PICTURE_SLOTS || '09:00,13:00,19:00',
+  pictureServices: process.env.PICTURE_SERVICES || 'facebook,pinterest',
+  picturePinterestWildlifeBoardId: process.env.PICTURE_PINTEREST_WILDLIFE_BOARD_ID || '',
   bufferPostServices: process.env.BUFFER_POST_SERVICES || '',
   // shareNow = post the moment the video is processed (default); addToQueue =
   // let Buffer spread posts over each channel's own posting times.

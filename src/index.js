@@ -20,6 +20,7 @@ import { engagementQuestion } from './engagementQuestion.js';
 import { postNextHistoryVideo } from './historyChannel.js';
 import { sortDoneFoldersByShape } from './doneSorter.js';
 import { isAlreadyPosted, rememberPosted, seedPostedHashes } from './postedHashes.js';
+import { postDuePicture } from './pictureDrops.js';
 import { bufferPostingEnabled, bufferServices, postToBuffer, retryFailedBufferPosts } from './bufferPost.js';
 
 // Independent test rollout of Pinterest posting for GK_TERMINAL videos,
@@ -464,6 +465,12 @@ async function checkOnce() {
     } catch (err) {
       console.error('Buffer retry check failed:', err.message);
     }
+  }
+
+  try {
+    await postDuePicture(auth);
+  } catch (err) {
+    console.error('Picture posting failed (will retry next cycle):', err.message);
   }
 
   console.log('Checking for new YouTube comments to reply to...');
