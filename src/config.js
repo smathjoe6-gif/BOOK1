@@ -65,6 +65,9 @@ export const config = {
   // Instagram/Facebook/Pinterest/X posting through Buffer (src/bufferPost.js).
   // Comma list, e.g. "instagram,facebook,pinterest,x". Blank = off.
   bufferPostServices: process.env.BUFFER_POST_SERVICES || '',
+  // shareNow = post the moment the video is processed (default); addToQueue =
+  // let Buffer spread posts over each channel's own posting times.
+  bufferPostMode: ['addToQueue', 'shareNext'].includes(process.env.BUFFER_POST_MODE) ? process.env.BUFFER_POST_MODE : 'shareNow',
   bufferInstagramType: process.env.BUFFER_INSTAGRAM_TYPE || 'reel',
   bufferFacebookType: process.env.BUFFER_FACEBOOK_TYPE || 'reel',
   bufferPinterestBoardId: process.env.BUFFER_PINTEREST_BOARD_ID || '',
