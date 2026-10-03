@@ -73,8 +73,15 @@ function metadataFor(service, title, firstComment) {
   return undefined;
 }
 
-function textFor(service, caption) {
-  if (service === 'twitter') return caption.length > 270 ? `${caption.slice(0, 267)}...` : caption;
+// Pinterest and X have no "first comment" in Buffer's API, so for them the
+// engagement question goes into the post text itself (first on X, where the
+// text is cut at ~270 characters; last in the Pinterest description).
+function textFor(service, caption, firstComment) {
+  if (service === 'twitter') {
+    const text = firstComment ? `${firstComment}\n\n${caption}` : caption;
+    return text.length > 270 ? `${text.slice(0, 267)}...` : text;
+  }
+  if (service === 'pinterest' && firstComment) return `${caption}\n\n${firstComment}`;
   return caption;
 }
 
@@ -105,7 +112,7 @@ async function postToService(service, { videoUrl, title, caption, firstComment, 
   await assertUnderDailyLimit(channels[0].id, service);
   const input = {
     channelId: channels[0].id,
-    text: textFor(service, caption),
+    text: textFor(service, caption, firstComment),
     schedulingType: 'automatic',
     mode: config.bufferPostMode,
     // Pinterest shows the video's cover image: pass ours as the thumbnail
