@@ -27,7 +27,7 @@ import { fetchWithTimeout } from './fetchWithTimeout.js';
 
 const BUFFER_API_URL = 'https://api.buffer.com';
 
-async function bufferGraphQL(query, variables) {
+export async function bufferGraphQL(query, variables) {
   const res = await fetchWithTimeout(
     BUFFER_API_URL,
     {

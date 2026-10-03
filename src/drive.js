@@ -68,13 +68,41 @@ export async function listVideosInFolder(auth, rootFolderId) {
   const res = await drive.files.list(
     {
       q: `(${parentClause}) and mimeType contains 'video/' and trashed = false`,
-      fields: 'files(id, name, mimeType, createdTime)',
+      fields: 'files(id, name, mimeType, createdTime, md5Checksum)',
       orderBy: 'createdTime',
       pageSize: 50,
     },
     { timeout: API_TIMEOUT_MS }
   );
   return res.data.files || [];
+}
+
+// Every video's name + content fingerprint (md5) in a folder and its
+// subfolders, following Drive's paging. Used once to seed the "already
+// posted" list (src/postedHashes.js) from the DONE folders.
+export async function listAllVideoHashes(auth, rootFolderId) {
+  const drive = google.drive({ version: 'v3', auth });
+  const folderIds = await listWatchedFolderIds(drive, rootFolderId);
+  const found = [];
+  for (const folderId of folderIds) {
+    let pageToken;
+    do {
+      const res = await drive.files.list(
+        {
+          q: `'${folderId}' in parents and mimeType contains 'video/' and trashed = false`,
+          fields: 'nextPageToken, files(name, md5Checksum)',
+          pageSize: 1000,
+          pageToken,
+        },
+        { timeout: API_TIMEOUT_MS }
+      );
+      for (const f of res.data.files || []) {
+        if (f.md5Checksum) found.push({ name: f.name, md5: f.md5Checksum });
+      }
+      pageToken = res.data.nextPageToken;
+    } while (pageToken);
+  }
+  return found;
 }
 
 // Lists video files in GK_TERMINAL (this script's own watched folder).

@@ -62,6 +62,12 @@ export const config = {
   // BUFFER_ACCESS_TOKEN blank to fall back to the direct TikTok API instead.
   bufferAccessToken: process.env.BUFFER_ACCESS_TOKEN || '',
   bufferTikTokProfileId: process.env.BUFFER_TIKTOK_PROFILE_ID || '',
+  // Instagram/Facebook/Pinterest/X posting through Buffer (src/bufferPost.js).
+  // Comma list, e.g. "instagram,facebook,pinterest,x". Blank = off.
+  bufferPostServices: process.env.BUFFER_POST_SERVICES || '',
+  bufferInstagramType: process.env.BUFFER_INSTAGRAM_TYPE || 'reel',
+  bufferFacebookType: process.env.BUFFER_FACEBOOK_TYPE || 'reel',
+  bufferPinterestBoardId: process.env.BUFFER_PINTEREST_BOARD_ID || '',
   xaiApiKey: process.env.XAI_API_KEY || '',
   // API key for the local OmniRoute AI gateway (http://localhost:20128) --
   // copy it from OmniRoute's Dashboard -> Endpoints after connecting a
