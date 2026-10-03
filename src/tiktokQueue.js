@@ -49,8 +49,13 @@ export function queueTikTok({ fileId, name, caption }) {
   console.log(`TikTok: queued "${name}" (${state.queue.length} waiting, ${state.postedToday}/${config.tiktokDailyLimit} posted today).`);
 }
 
-// Sends the oldest queued video to Buffer, if today's limit allows. Safe to
-// call every cycle -- does nothing when the queue is empty.
+// Sends one queued video to Buffer, if today's limit allows. NEWEST first by
+// default (TIKTOK_ORDER=oldest for the old behaviour): a video Joe just
+// dropped goes to TikTok within the daily cap instead of waiting behind a
+// backlog of dozens (3 Oct 2026: new videos reached IG/FB/Pinterest/X at once
+// while TikTok kept posting week-old ones). The backlog drains in the
+// leftover slots. Safe to call every cycle -- does nothing when the queue is
+// empty.
 export async function postNextQueuedTikTok(auth) {
   const state = loadState();
   if (state.queue.length === 0) return;
@@ -75,18 +80,28 @@ export async function postNextQueuedTikTok(auth) {
     return;
   }
 
-  const item = state.queue[0];
+  const newestFirst = config.tiktokOrder !== 'oldest';
+  const item = newestFirst ? state.queue[state.queue.length - 1] : state.queue[0];
+  const removeItem = () => (newestFirst ? state.queue.pop() : state.queue.shift());
   console.log(`Posting to TikTok via Buffer: "${item.name}"...`);
   try {
     const tk = await uploadToTikTokViaBuffer(auth, { fileId: item.fileId, caption: item.caption });
-    state.queue.shift();
+    removeItem();
     state.postedToday += 1;
     state.lastPostedAt = Date.now();
     console.log(`TikTok (via Buffer): posted, update id ${tk.updateId} (${state.postedToday}/${config.tiktokDailyLimit} today, ${state.queue.length} still waiting).`);
   } catch (err) {
+    // TikTok switched off / not connected in Buffer is not the video's fault:
+    // keep it queued and don't burn its attempts (3 Oct 2026: ~20 videos were
+    // dropped this way while TikTok was disconnected).
+    if (/channel not found|no tiktok channel/i.test(err.message)) {
+      console.error(`TikTok (via Buffer): no TikTok channel connected in Buffer -- keeping ${state.queue.length} video(s) queued until it is reconnected.`);
+      saveState(state);
+      return;
+    }
     item.attempts = (item.attempts || 0) + 1;
     if (item.attempts >= MAX_ATTEMPTS) {
-      state.queue.shift();
+      removeItem();
       console.error(`TikTok (via Buffer) failed ${item.attempts} times for "${item.name}" -- dropping it from the queue: ${err.message}`);
     } else {
       console.error(`TikTok (via Buffer) upload failed for "${item.name}" (will retry next cycle): ${err.message}`);
