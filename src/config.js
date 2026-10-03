@@ -64,6 +64,8 @@ export const config = {
   bufferTikTokProfileId: process.env.BUFFER_TIKTOK_PROFILE_ID || '',
   // Instagram/Facebook/Pinterest/X posting through Buffer (src/bufferPost.js).
   // Comma list, e.g. "instagram,facebook,pinterest,x". Blank = off.
+  // newest (default) or oldest: which queued video goes to TikTok next.
+  tiktokOrder: process.env.TIKTOK_ORDER === 'oldest' ? 'oldest' : 'newest',
   bufferPostServices: process.env.BUFFER_POST_SERVICES || '',
   // shareNow = post the moment the video is processed (default); addToQueue =
   // let Buffer spread posts over each channel's own posting times.
