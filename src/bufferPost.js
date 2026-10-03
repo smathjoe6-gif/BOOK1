@@ -75,9 +75,31 @@ function textFor(service, caption) {
   return caption;
 }
 
+class DailyLimitError extends Error {}
+
+// Buffer reports, per channel, whether today's posting limit is used up
+// (dailyPostingLimits in its GraphQL schema). Checking first means a busy day
+// WAITS instead of failing and burning retry attempts.
+async function assertUnderDailyLimit(channelId, service) {
+  try {
+    const { dailyPostingLimits } = await bufferGraphQL(
+      'query L($input: DailyPostingLimitsInput!) { dailyPostingLimits(input: $input) { channelId isAtLimit limit sent scheduled } }',
+      { input: { channelIds: [channelId] } }
+    );
+    const status = (dailyPostingLimits || [])[0];
+    if (status && status.isAtLimit) {
+      throw new DailyLimitError(`${service} is at its daily posting limit (${status.sent} sent, limit ${status.limit}) -- waiting until tomorrow.`);
+    }
+  } catch (err) {
+    if (err instanceof DailyLimitError) throw err;
+    // The limit check itself failing must never block posting.
+  }
+}
+
 async function postToService(service, { videoUrl, title, caption }) {
   const channels = (await listBufferChannels()).filter((c) => String(c.service).toLowerCase() === service);
   if (channels.length === 0) throw new Error(`No ${service} channel connected in Buffer.`);
+  await assertUnderDailyLimit(channels[0].id, service);
   const input = {
     channelId: channels[0].id,
     text: textFor(service, caption),
@@ -117,8 +139,9 @@ export async function postToBuffer(auth, { fileId, name, title, caption }) {
       const id = await postToService(service, { videoUrl, title, caption });
       console.log(`Buffer ${service}: posted (${id}).`);
     } catch (err) {
-      console.error(`Buffer ${service} failed (will retry up to ${MAX_ATTEMPTS} times):`, err.message);
-      retries.push({ fileId, name, title, caption, service, attempts: 1 });
+      const waiting = err instanceof DailyLimitError;
+      console.error(`Buffer ${service} ${waiting ? 'waiting' : `failed (will retry up to ${MAX_ATTEMPTS} times)`}:`, err.message);
+      retries.push({ fileId, name, title, caption, service, attempts: waiting ? 0 : 1, queuedAt: Date.now() });
     }
   }
   saveRetries(retries);
@@ -134,6 +157,13 @@ export async function retryFailedBufferPosts(auth) {
     const id = await postToService(item.service, { videoUrl, title: item.title, caption: item.caption });
     console.log(`Buffer ${item.service}: retry posted "${item.name}" (${id}).`);
   } catch (err) {
+    if (err instanceof DailyLimitError) {
+      // Not a failure: keep waiting for a day with room, up to 3 days.
+      if (Date.now() - (item.queuedAt || 0) < 3 * 24 * 3600 * 1000) retries.push(item);
+      else console.error(`Buffer ${item.service}: gave up waiting for room to post "${item.name}".`);
+      saveRetries(retries);
+      return;
+    }
     item.attempts += 1;
     if (item.attempts > MAX_ATTEMPTS) {
       console.error(`Buffer ${item.service}: giving up on "${item.name}" after ${MAX_ATTEMPTS} tries:`, err.message);
