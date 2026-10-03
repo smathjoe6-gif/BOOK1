@@ -155,10 +155,28 @@ async function publicUrl(auth, fileId) {
 
 // Each network is independent: one failing is queued for a retry on its own
 // and never re-posts the networks that already worked (no duplicates).
+//
+// Every network is written to buffer-retry.json BEFORE anything is posted and
+// removed only once it succeeds. So if the script is stopped or restarted
+// halfway (3 Oct 2026: three restarts in an hour re-posted one video to
+// Instagram 3x), the networks not yet done simply resume from the queue and
+// the ones already done are never repeated.
 export async function postToBuffer(auth, { fileId, name, title, caption, firstComment = '', coverUrl = '' }) {
   const videoUrl = await publicUrl(auth, fileId);
-  const retries = loadRetries();
   const services = bufferServices();
+  const base = { fileId, name, title, caption, firstComment, coverUrl, attempts: 0, queuedAt: Date.now() };
+  const pending = loadRetries().filter((r) => !(r.fileId === fileId && services.includes(r.service)));
+  saveRetries([...pending, ...services.map((service) => ({ ...base, service }))]);
+
+  const update = (service, change) => {
+    const list = loadRetries();
+    const idx = list.findIndex((r) => r.fileId === fileId && r.service === service);
+    if (idx === -1) return;
+    if (change === null) list.splice(idx, 1);
+    else list[idx] = { ...list[idx], ...change };
+    saveRetries(list);
+  };
+
   for (let i = 0; i < services.length; i++) {
     const service = services[i];
     // One network at a time, with a pause between them (BUFFER_GAP_SECONDS,
@@ -168,14 +186,14 @@ export async function postToBuffer(auth, { fileId, name, title, caption, firstCo
     }
     try {
       const id = await postToService(service, { videoUrl, title, caption, firstComment, coverUrl });
+      update(service, null);
       console.log(`Buffer ${service}: posted (${id}).`);
     } catch (err) {
       const waiting = err instanceof DailyLimitError;
       console.error(`Buffer ${service} ${waiting ? 'waiting' : `failed (will retry up to ${MAX_ATTEMPTS} times)`}:`, err.message);
-      retries.push({ fileId, name, title, caption, firstComment, coverUrl, service, attempts: waiting ? 0 : 1, queuedAt: Date.now() });
+      update(service, { attempts: waiting ? 0 : 1 });
     }
   }
-  saveRetries(retries);
 }
 
 // One retry per cycle at most, so a broken connection can't hammer the API.

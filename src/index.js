@@ -158,6 +158,9 @@ async function processVideoOnce(file) {
     });
     console.log(`YouTube: posted, id ${yt.id}`);
     youtubePosted = true;
+    // Remember the moment YouTube accepts it: a restart after this point can
+    // never upload the same video again (the md5 guard catches it).
+    rememberPosted(file.md5Checksum, file.name);
     try {
       const question = await engagementQuestion(row.title, row.capture);
       engagementText = `${question} — GK Legend Studio`;
@@ -189,6 +192,23 @@ async function processVideoOnce(file) {
       }
     } else {
       console.log('Not logged in to TikTok yet — skipping (run "node src/tiktokAuth.js" to connect).');
+    }
+  }
+
+  // Move to DONE as soon as YouTube has posted and TikTok is queued -- BEFORE
+  // the slow Buffer posts (one minute apart). If the script is restarted
+  // during those minutes the video is already filed away and the networks
+  // not yet done resume from buffer-retry.json, instead of the whole video
+  // being posted again from the top (3 Oct 2026: 3 restarts = Instagram 3x).
+  let movedToDone = false;
+  if (youtubePosted) {
+    rememberPosted(file.md5Checksum, file.name);
+    try {
+      console.log('Moving to DONE folder...');
+      await moveToDone(auth, file.id);
+      movedToDone = true;
+    } catch (err) {
+      console.error('Could not move the video to DONE yet (will try again at the end):', err.message);
     }
   }
 
@@ -266,9 +286,10 @@ async function processVideoOnce(file) {
   fs.unlink(localPath, () => {});
 
   if (youtubePosted) {
-    rememberPosted(file.md5Checksum, file.name);
-    console.log('Moving to DONE folder...');
-    await moveToDone(auth, file.id);
+    if (!movedToDone) {
+      console.log('Moving to DONE folder...');
+      await moveToDone(auth, file.id);
+    }
     console.log(`--- Finished: ${file.name} ---\n`);
   } else {
     console.log(`--- YouTube failed for "${file.name}" -- leaving it in place to retry next cycle ---\n`);
