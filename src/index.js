@@ -92,6 +92,7 @@ async function processVideoOnce(file) {
   }
 
   let row = await findRowForFile(auth, file.name);
+  let newRowCover = '';
   const collisionBaseName = stripCollisionSuffix(file.name);
   if (!row && collisionBaseName !== file.name) {
     // Drive/macOS append " (1)", " (2)" etc whenever a file lands with the
@@ -123,6 +124,7 @@ async function processVideoOnce(file) {
     let coverImageUrl = '';
     try {
       coverImageUrl = await getCoverImage(auth, generated.title);
+      newRowCover = coverImageUrl || '';
     } catch (err) {
       console.error(`Could not get a Pinterest cover image for "${file.name}" (falling back to Make's default rotation):`, err.message);
     }
@@ -198,7 +200,17 @@ async function processVideoOnce(file) {
   const viaBuffer = bufferPostingEnabled() ? bufferServices() : [];
   if (youtubePosted && viaBuffer.length) {
     try {
-      await postToBuffer(auth, { fileId: file.id, name: file.name, title: row.title, caption, firstComment: engagementText });
+      // Pinterest's "preview" (cover) image: reuse the cover made for this
+      // video's sheet row, or make one now if the row already existed.
+      let coverUrl = newRowCover || row.cover || '';
+      if (!coverUrl && viaBuffer.includes('pinterest')) {
+        try {
+          coverUrl = (await getCoverImage(auth, row.title)) || '';
+        } catch (err) {
+          console.error('Could not get a Pinterest cover image for the Buffer pin (posting without one):', err.message);
+        }
+      }
+      await postToBuffer(auth, { fileId: file.id, name: file.name, title: row.title, caption, firstComment: engagementText, coverUrl });
     } catch (err) {
       console.error('Buffer posting failed (other posts above still stand):', err.message);
     }
