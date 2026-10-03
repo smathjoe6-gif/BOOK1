@@ -19,6 +19,8 @@ import { ensureVerticalVideo } from './aspectRatio.js';
 import { engagementQuestion } from './engagementQuestion.js';
 import { postNextHistoryVideo } from './historyChannel.js';
 import { sortDoneFoldersByShape } from './doneSorter.js';
+import { isAlreadyPosted, rememberPosted, seedPostedHashes } from './postedHashes.js';
+import { bufferPostingEnabled, bufferServices, postToBuffer, retryFailedBufferPosts } from './bufferPost.js';
 
 // Independent test rollout of Pinterest posting for GK_TERMINAL videos,
 // capped at config.pinterestDailyLimit attempts per day while Joe's new
@@ -80,6 +82,14 @@ if (!auth.credentials || !auth.credentials.refresh_token) {
 
 async function processVideoOnce(file) {
   console.log(`\n--- Found: ${file.name} ---`);
+
+  // Same bytes already posted (e.g. a " (1)" re-download of a posted video)?
+  // Park it in DONE instead of posting it again.
+  if (isAlreadyPosted(file.md5Checksum)) {
+    console.log(`"${file.name}" has identical content to a video already posted -- moving to DONE without posting again.`);
+    await moveToDone(auth, file.id);
+    return 'skipped';
+  }
 
   let row = await findRowForFile(auth, file.name);
   const collisionBaseName = stripCollisionSuffix(file.name);
@@ -183,7 +193,16 @@ async function processVideoOnce(file) {
   // videos), capped at a few per day while the new trial API access is
   // still being proven out. A failure or a not-yet-logged-in state here
   // never blocks YouTube/TikTok above or the move-to-done below.
-  if (youtubePosted) {
+  const viaBuffer = bufferPostingEnabled() ? bufferServices() : [];
+  if (youtubePosted && viaBuffer.length) {
+    try {
+      await postToBuffer(auth, { fileId: file.id, name: file.name, title: row.title, caption });
+    } catch (err) {
+      console.error('Buffer posting failed (other posts above still stand):', err.message);
+    }
+  }
+
+  if (youtubePosted && !viaBuffer.includes('pinterest')) {
     if (!loadPinterestToken()) {
       console.log('Not logged in to Pinterest yet — skipping (run "node src/pinterestAuth.js" to connect).');
     } else {
@@ -216,7 +235,7 @@ async function processVideoOnce(file) {
   // X (Twitter) -- a 6th platform for the same GK_TERMINAL videos, no daily
   // cap (unlike Pinterest's trial-access rollout above). A failure here
   // never blocks anything else or stops the move-to-done below.
-  if (youtubePosted) {
+  if (youtubePosted && !viaBuffer.includes('twitter')) {
     if (!config.xApiKey) {
       console.log('X (Twitter) is not configured yet — skipping (set X_API_KEY etc. in .env).');
     } else {
@@ -233,6 +252,7 @@ async function processVideoOnce(file) {
   fs.unlink(localPath, () => {});
 
   if (youtubePosted) {
+    rememberPosted(file.md5Checksum, file.name);
     console.log('Moving to DONE folder...');
     await moveToDone(auth, file.id);
     console.log(`--- Finished: ${file.name} ---\n`);
@@ -360,6 +380,12 @@ async function checkOnce() {
     console.error('GK_JING caption backfill check failed:', err.message);
   }
 
+  try {
+    await seedPostedHashes(auth);
+  } catch (err) {
+    console.error('Duplicate-guard seeding failed (will retry next cycle):', err.message);
+  }
+
   console.log(`[${new Date().toLocaleString()}] Checking for new videos...`);
   const files = await listNewVideos(auth);
   if (files.length === 0) {
@@ -394,6 +420,14 @@ async function checkOnce() {
       await postNextQueuedTikTok(auth);
     } catch (err) {
       console.error('TikTok queue check failed:', err.message);
+    }
+  }
+
+  if (bufferPostingEnabled()) {
+    try {
+      await retryFailedBufferPosts(auth);
+    } catch (err) {
+      console.error('Buffer retry check failed:', err.message);
     }
   }
 
