@@ -147,6 +147,7 @@ async function processVideoOnce(file) {
 
   console.log('Uploading to YouTube...');
   let youtubePosted = false;
+  let engagementText = '';
   try {
     const yt = await uploadToYouTube(auth, {
       filePath: localPath,
@@ -157,6 +158,7 @@ async function processVideoOnce(file) {
     youtubePosted = true;
     try {
       const question = await engagementQuestion(row.title, row.capture);
+      engagementText = `${question} — GK Legend Studio`;
       await postEngagementComment(auth, yt.id, `${question} — GK Legend Studio`);
       console.log(`YouTube: posted engagement question: "${question}"`);
     } catch (err) {
@@ -196,7 +198,7 @@ async function processVideoOnce(file) {
   const viaBuffer = bufferPostingEnabled() ? bufferServices() : [];
   if (youtubePosted && viaBuffer.length) {
     try {
-      await postToBuffer(auth, { fileId: file.id, name: file.name, title: row.title, caption });
+      await postToBuffer(auth, { fileId: file.id, name: file.name, title: row.title, caption, firstComment: engagementText });
     } catch (err) {
       console.error('Buffer posting failed (other posts above still stand):', err.message);
     }

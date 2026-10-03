@@ -54,12 +54,15 @@ const CREATE_POST = `
   }
 `;
 
-function metadataFor(service, title) {
+function metadataFor(service, title, firstComment) {
+  // firstComment = the engagement question Buffer posts as the first comment
+  // under the video (Instagram + Facebook support it).
+  const comment = firstComment ? { firstComment } : {};
   if (service === 'instagram') {
-    return { instagram: { type: config.bufferInstagramType, shouldShareToFeed: true } };
+    return { instagram: { type: config.bufferInstagramType, shouldShareToFeed: true, ...comment } };
   }
   if (service === 'facebook') {
-    return { facebook: { type: config.bufferFacebookType } };
+    return { facebook: { type: config.bufferFacebookType, ...comment } };
   }
   if (service === 'pinterest') {
     if (!config.bufferPinterestBoardId) {
@@ -96,7 +99,7 @@ async function assertUnderDailyLimit(channelId, service) {
   }
 }
 
-async function postToService(service, { videoUrl, title, caption }) {
+async function postToService(service, { videoUrl, title, caption, firstComment }, withComment = true) {
   const channels = (await listBufferChannels()).filter((c) => String(c.service).toLowerCase() === service);
   if (channels.length === 0) throw new Error(`No ${service} channel connected in Buffer.`);
   await assertUnderDailyLimit(channels[0].id, service);
@@ -107,13 +110,26 @@ async function postToService(service, { videoUrl, title, caption }) {
     mode: config.bufferPostMode,
     assets: [{ video: { url: videoUrl } }],
   };
-  const metadata = metadataFor(service, title);
+  const metadata = metadataFor(service, title, withComment ? firstComment : '');
   if (metadata) input.metadata = metadata;
-  const { createPost } = await bufferGraphQL(CREATE_POST, { input });
-  if (!createPost || !createPost.post) {
-    throw new Error((createPost && createPost.message) || JSON.stringify(createPost));
+  let result;
+  try {
+    result = (await bufferGraphQL(CREATE_POST, { input })).createPost;
+  } catch (err) {
+    // The first comment is a bonus: if Buffer refuses it, post without it.
+    if (firstComment && withComment && /comment/i.test(err.message)) {
+      return postToService(service, { videoUrl, title, caption, firstComment }, false);
+    }
+    throw err;
   }
-  return createPost.post.id;
+  if (!result || !result.post) {
+    const message = (result && result.message) || JSON.stringify(result);
+    if (firstComment && withComment && /comment/i.test(message)) {
+      return postToService(service, { videoUrl, title, caption, firstComment }, false);
+    }
+    throw new Error(message);
+  }
+  return result.post.id;
 }
 
 function loadRetries() {
@@ -131,7 +147,7 @@ async function publicUrl(auth, fileId) {
 
 // Each network is independent: one failing is queued for a retry on its own
 // and never re-posts the networks that already worked (no duplicates).
-export async function postToBuffer(auth, { fileId, name, title, caption }) {
+export async function postToBuffer(auth, { fileId, name, title, caption, firstComment = '' }) {
   const videoUrl = await publicUrl(auth, fileId);
   const retries = loadRetries();
   const services = bufferServices();
@@ -143,12 +159,12 @@ export async function postToBuffer(auth, { fileId, name, title, caption }) {
       await new Promise((resolve) => setTimeout(resolve, config.bufferGapSeconds * 1000));
     }
     try {
-      const id = await postToService(service, { videoUrl, title, caption });
+      const id = await postToService(service, { videoUrl, title, caption, firstComment });
       console.log(`Buffer ${service}: posted (${id}).`);
     } catch (err) {
       const waiting = err instanceof DailyLimitError;
       console.error(`Buffer ${service} ${waiting ? 'waiting' : `failed (will retry up to ${MAX_ATTEMPTS} times)`}:`, err.message);
-      retries.push({ fileId, name, title, caption, service, attempts: waiting ? 0 : 1, queuedAt: Date.now() });
+      retries.push({ fileId, name, title, caption, firstComment, service, attempts: waiting ? 0 : 1, queuedAt: Date.now() });
     }
   }
   saveRetries(retries);
@@ -161,7 +177,7 @@ export async function retryFailedBufferPosts(auth) {
   const item = retries.shift();
   try {
     const videoUrl = await publicUrl(auth, item.fileId);
-    const id = await postToService(item.service, { videoUrl, title: item.title, caption: item.caption });
+    const id = await postToService(item.service, { videoUrl, title: item.title, caption: item.caption, firstComment: item.firstComment });
     console.log(`Buffer ${item.service}: retry posted "${item.name}" (${id}).`);
   } catch (err) {
     if (err instanceof DailyLimitError) {
