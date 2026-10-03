@@ -154,6 +154,63 @@ function saveRetries(list) {
   fs.writeFileSync(RETRY_PATH, JSON.stringify(list, null, 2));
 }
 
+// Buffer accepts a post first and the network (Pinterest especially) can still
+// reject it a minute later -- status "error" in Buffer while the script's log
+// says "posted". Every accepted post is therefore checked again a few minutes
+// later (buffer-verify.json); if it ended in error it is posted again, up to
+// MAX_REDO times (3 Oct 2026: Pinterest said "this site doesn't allow pins to
+// be saved" on first try, then accepted the identical retry).
+const VERIFY_PATH = path.join(process.cwd(), 'buffer-verify.json');
+const MAX_REDO = 2;
+function loadVerify() {
+  try { return JSON.parse(fs.readFileSync(VERIFY_PATH, 'utf8')); } catch { return []; }
+}
+function saveVerify(list) {
+  fs.writeFileSync(VERIFY_PATH, JSON.stringify(list, null, 2));
+}
+function addVerify(postId, item, redo = 0) {
+  const list = loadVerify();
+  list.push({ postId, service: item.service, fileId: item.fileId, name: item.name, title: item.title, caption: item.caption, firstComment: item.firstComment, coverUrl: item.coverUrl, redo, checks: 0, dueAt: Date.now() + 3 * 60 * 1000 });
+  saveVerify(list);
+}
+
+async function verifyDueBufferPosts() {
+  const list = loadVerify();
+  const due = list.filter((v) => v.dueAt <= Date.now()).slice(0, 3);
+  if (due.length === 0) return;
+  let retries = null;
+  for (const v of due) {
+    let status = '';
+    let message = '';
+    try {
+      const { post } = await bufferGraphQL('query P($input: PostInput!) { post(input: $input) { status error { message } } }', { input: { id: v.postId } });
+      status = post && post.status;
+      message = post && post.error && post.error.message;
+    } catch (err) {
+      console.error(`Buffer: could not check post ${v.postId}:`, err.message);
+      v.dueAt = Date.now() + 5 * 60 * 1000;
+      continue;
+    }
+    if (status === 'error') {
+      list.splice(list.indexOf(v), 1);
+      if (v.redo < MAX_REDO) {
+        retries = retries || loadRetries();
+        retries.push({ ...v, attempts: 0, queuedAt: Date.now() });
+        console.error(`Buffer ${v.service}: "${v.name}" was rejected after posting (${message || 'no reason given'}) -- posting it again (${v.redo + 1}/${MAX_REDO}).`);
+      } else {
+        console.error(`Buffer ${v.service}: "${v.name}" was rejected again (${message || 'no reason given'}) -- giving up; delete the failed post in Buffer and post it by hand if you want it there.`);
+      }
+    } else if (status === 'sent' || (v.checks || 0) >= 5) {
+      list.splice(list.indexOf(v), 1);
+    } else {
+      v.checks = (v.checks || 0) + 1;
+      v.dueAt = Date.now() + 3 * 60 * 1000;
+    }
+  }
+  saveVerify(list);
+  if (retries) saveRetries(retries);
+}
+
 async function publicUrl(auth, fileId) {
   const drive = google.drive({ version: 'v3', auth });
   await drive.permissions.create({ fileId, requestBody: { role: 'reader', type: 'anyone' } }, { timeout: 30000 });
@@ -194,6 +251,7 @@ export async function postToBuffer(auth, { fileId, name, title, caption, firstCo
     try {
       const id = await postToService(service, { videoUrl, title, caption, firstComment, coverUrl });
       update(service, null);
+      addVerify(id, { service, fileId, name, title, caption, firstComment, coverUrl });
       console.log(`Buffer ${service}: posted (${id}).`);
     } catch (err) {
       const waiting = err instanceof DailyLimitError;
@@ -205,12 +263,18 @@ export async function postToBuffer(auth, { fileId, name, title, caption, firstCo
 
 // One retry per cycle at most, so a broken connection can't hammer the API.
 export async function retryFailedBufferPosts(auth) {
+  try {
+    await verifyDueBufferPosts();
+  } catch (err) {
+    console.error('Buffer post check failed (will retry next cycle):', err.message);
+  }
   const retries = loadRetries();
   if (retries.length === 0) return;
   const item = retries.shift();
   try {
     const videoUrl = await publicUrl(auth, item.fileId);
     const id = await postToService(item.service, { videoUrl, title: item.title, caption: item.caption, firstComment: item.firstComment, coverUrl: item.coverUrl });
+    addVerify(id, item, (item.redo || 0) + (item.postId ? 1 : 0));
     console.log(`Buffer ${item.service}: retry posted "${item.name}" (${id}).`);
   } catch (err) {
     if (err instanceof DailyLimitError) {
