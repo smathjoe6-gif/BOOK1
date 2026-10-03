@@ -66,6 +66,8 @@ export const config = {
   // Comma list, e.g. "instagram,facebook,pinterest,x". Blank = off.
   // newest (default) or oldest: which queued video goes to TikTok next.
   tiktokOrder: process.env.TIKTOK_ORDER === 'oldest' ? 'oldest' : 'newest',
+  // Pause between one network and the next when posting a video via Buffer.
+  bufferGapSeconds: Number.isFinite(Number(process.env.BUFFER_GAP_SECONDS)) && process.env.BUFFER_GAP_SECONDS !== undefined && process.env.BUFFER_GAP_SECONDS !== '' ? Number(process.env.BUFFER_GAP_SECONDS) : 60,
   bufferPostServices: process.env.BUFFER_POST_SERVICES || '',
   // shareNow = post the moment the video is processed (default); addToQueue =
   // let Buffer spread posts over each channel's own posting times.

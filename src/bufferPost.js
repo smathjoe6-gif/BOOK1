@@ -134,7 +134,14 @@ async function publicUrl(auth, fileId) {
 export async function postToBuffer(auth, { fileId, name, title, caption }) {
   const videoUrl = await publicUrl(auth, fileId);
   const retries = loadRetries();
-  for (const service of bufferServices()) {
+  const services = bufferServices();
+  for (let i = 0; i < services.length; i++) {
+    const service = services[i];
+    // One network at a time, with a pause between them (BUFFER_GAP_SECONDS,
+    // default 60) so the five platforms never all get hit in the same second.
+    if (i > 0 && config.bufferGapSeconds > 0) {
+      await new Promise((resolve) => setTimeout(resolve, config.bufferGapSeconds * 1000));
+    }
     try {
       const id = await postToService(service, { videoUrl, title, caption });
       console.log(`Buffer ${service}: posted (${id}).`);
