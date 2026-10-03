@@ -82,7 +82,7 @@ async function postToService(service, { videoUrl, title, caption }) {
     channelId: channels[0].id,
     text: textFor(service, caption),
     schedulingType: 'automatic',
-    mode: 'shareNow',
+    mode: config.bufferPostMode,
     assets: [{ video: { url: videoUrl } }],
   };
   const metadata = metadataFor(service, title);
