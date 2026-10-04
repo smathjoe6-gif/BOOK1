@@ -3,6 +3,7 @@ import path from 'node:path';
 import { google } from 'googleapis';
 import { config } from './config.js';
 import { bufferGraphQL } from './bufferTikTok.js';
+import { bufferInCooldown, bufferCooldownUntil, isRateLimitError } from './bufferCooldown.js';
 
 // Posts one Drive video to Instagram, Facebook, Pinterest and X through
 // Buffer's GraphQL API -- the replacement for Make scenario 9696465 (Oct 2026,
@@ -90,7 +91,11 @@ class DailyLimitError extends Error {}
 // Buffer reports, per channel, whether today's posting limit is used up
 // (dailyPostingLimits in its GraphQL schema). Checking first means a busy day
 // WAITS instead of failing and burning retry attempts.
+const limitCheckedAt = {};
 async function assertUnderDailyLimit(channelId, service) {
+  // Checked at most every 30 min per network: each check is one of Buffer's
+  // ~250 daily API calls.
+  if (Date.now() - (limitCheckedAt[service] || 0) < 30 * 60 * 1000) return;
   try {
     const { dailyPostingLimits } = await bufferGraphQL(
       'query L($input: DailyPostingLimitsInput!) { dailyPostingLimits(input: $input) { channelId isAtLimit limit sent scheduled } }',
@@ -100,6 +105,7 @@ async function assertUnderDailyLimit(channelId, service) {
     if (status && status.isAtLimit) {
       throw new DailyLimitError(`${service} is at its daily posting limit (${status.sent} sent, limit ${status.limit}) -- waiting until tomorrow.`);
     }
+    limitCheckedAt[service] = Date.now();
   } catch (err) {
     if (err instanceof DailyLimitError) throw err;
     // The limit check itself failing must never block posting.
@@ -169,6 +175,10 @@ function saveVerify(list) {
   fs.writeFileSync(VERIFY_PATH, JSON.stringify(list, null, 2));
 }
 function addVerify(postId, item, redo = 0) {
+  // Only networks that really reject posts after accepting them (Pinterest) are
+  // re-checked; every check costs one Buffer API call.
+  const verifyServices = (process.env.BUFFER_VERIFY_SERVICES || 'pinterest').split(',').map((x) => x.trim().toLowerCase());
+  if (!verifyServices.includes(item.service)) return;
   const list = loadVerify();
   list.push({ postId, service: item.service, fileId: item.fileId, name: item.name, title: item.title, caption: item.caption, firstComment: item.firstComment, coverUrl: item.coverUrl, redo, checks: 0, dueAt: Date.now() + 3 * 60 * 1000 });
   saveVerify(list);
@@ -254,15 +264,21 @@ export async function postToBuffer(auth, { fileId, name, title, caption, firstCo
       addVerify(id, { service, fileId, name, title, caption, firstComment, coverUrl });
       console.log(`Buffer ${service}: posted (${id}).`);
     } catch (err) {
-      const waiting = err instanceof DailyLimitError;
+      const waiting = err instanceof DailyLimitError || isRateLimitError(err);
       console.error(`Buffer ${service} ${waiting ? 'waiting' : `failed (will retry up to ${MAX_ATTEMPTS} times)`}:`, err.message);
       update(service, { attempts: waiting ? 0 : 1 });
+      // Rate limited: the other networks would fail too -- leave them queued.
+      if (isRateLimitError(err)) break;
     }
   }
 }
 
 // One retry per cycle at most, so a broken connection can't hammer the API.
 export async function retryFailedBufferPosts(auth) {
+  if (bufferInCooldown()) {
+    console.log(`Buffer: cooling down after hitting its API limit until ${new Date(bufferCooldownUntil()).toLocaleTimeString()} -- queued posts wait.`);
+    return;
+  }
   try {
     await verifyDueBufferPosts();
   } catch (err) {
@@ -281,6 +297,12 @@ export async function retryFailedBufferPosts(auth) {
       // Not a failure: keep waiting for a day with room, up to 3 days.
       if (Date.now() - (item.queuedAt || 0) < 3 * 24 * 3600 * 1000) retries.push(item);
       else console.error(`Buffer ${item.service}: gave up waiting for room to post "${item.name}".`);
+      saveRetries(retries);
+      return;
+    }
+    if (isRateLimitError(err)) {
+      // Not the post's fault: keep it (and its attempts) for after the cooldown.
+      retries.push(item);
       saveRetries(retries);
       return;
     }
