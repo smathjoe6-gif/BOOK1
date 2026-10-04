@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { config } from './config.js';
 import { uploadToTikTokViaBuffer } from './bufferTikTok.js';
+import { bufferInCooldown, isRateLimitError } from './bufferCooldown.js';
 
 // TikTok caps how many videos one account may publish through the API in a
 // day. On 23 Sep 2026 ~30 videos went to Buffer within 24 hours; Buffer
@@ -68,6 +69,9 @@ export async function postNextQueuedTikTok(auth) {
     return;
   }
 
+  // Buffer's API limit was hit: wait, keep every video (and its attempts).
+  if (bufferInCooldown()) return;
+
   // Spread posts out: TikTok flags bursts of API posts, not just the total.
   const minGapMs = config.tiktokMinGapMinutes * 60 * 1000;
   if (state.lastPostedAt && Date.now() - state.lastPostedAt < minGapMs) {
@@ -96,6 +100,12 @@ export async function postNextQueuedTikTok(auth) {
     // dropped this way while TikTok was disconnected).
     if (/channel not found|no tiktok channel/i.test(err.message)) {
       console.error(`TikTok (via Buffer): no TikTok channel connected in Buffer -- keeping ${state.queue.length} video(s) queued until it is reconnected.`);
+      saveState(state);
+      return;
+    }
+    // Rate-limited by Buffer's own API: not this video's fault, keep it.
+    if (isRateLimitError(err)) {
+      console.error('TikTok (via Buffer): Buffer API limit reached -- keeping the video queued until it recovers.');
       saveState(state);
       return;
     }

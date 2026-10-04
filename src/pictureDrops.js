@@ -3,6 +3,7 @@ import path from 'node:path';
 import { google } from 'googleapis';
 import { config } from './config.js';
 import { bufferGraphQL } from './bufferTikTok.js';
+import { bufferInCooldown, isRateLimitError } from './bufferCooldown.js';
 import { listBufferChannels } from './bufferPost.js';
 import { generateCaption } from './autoCaption.js';
 import { listCanvaPictures, exportCanvaPng } from './canvaPictures.js';
@@ -132,6 +133,7 @@ async function postToChannel(service, { imageUrl, title, text, kind }) {
 
 export async function postDuePicture(auth) {
   if ((!config.pictureFolderId && !config.pictureCanvaFolders) || !config.bufferAccessToken) return;
+  if (bufferInCooldown()) return; // Buffer API limit hit: the slot stays due (skipped only if >4 h late)
   const state = load();
   const slot = dueSlot(state);
   save(state);
@@ -175,7 +177,9 @@ export async function postDuePicture(auth) {
 
   const services = config.pictureServices.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
   let okCount = 0;
+  let rateLimited = false;
   for (let i = 0; i < services.length; i++) {
+    if (rateLimited) break;
     if (i > 0 && config.bufferGapSeconds > 0) await new Promise((r) => setTimeout(r, config.bufferGapSeconds * 1000));
     try {
       const id = await postToChannel(services[i], { imageUrl, title: gen.title, text, kind: pic.kind });
@@ -183,7 +187,13 @@ export async function postDuePicture(auth) {
       console.log(`Pictures: ${services[i]} posted (${id}).`);
     } catch (err) {
       console.error(`Pictures: ${services[i]} failed:`, err.message);
+      if (isRateLimitError(err)) rateLimited = true;
     }
+  }
+  // A rate-limited try doesn't count against the slot's 3 tries.
+  if (rateLimited && okCount === 0) {
+    state.tries[tryKey] = Math.max(0, (state.tries[tryKey] || 1) - 1);
+    save(state);
   }
 
   if (okCount > 0) {

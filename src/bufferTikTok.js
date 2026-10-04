@@ -1,6 +1,7 @@
 import { google } from 'googleapis';
 import { config } from './config.js';
 import { fetchWithTimeout } from './fetchWithTimeout.js';
+import { BufferRateLimitError, bufferInCooldown, bufferCooldownUntil, isRateLimitError, startBufferCooldown } from './bufferCooldown.js';
 
 // Posts a GK_TERMINAL video to TikTok via Buffer, replacing the direct
 // TikTok Content Posting API integration in src/tiktok.js (added 21 Sep 2026
@@ -28,6 +29,21 @@ import { fetchWithTimeout } from './fetchWithTimeout.js';
 const BUFFER_API_URL = 'https://api.buffer.com';
 
 export async function bufferGraphQL(query, variables) {
+  if (bufferInCooldown()) {
+    throw new BufferRateLimitError(`Too many requests (Buffer cooldown until ${new Date(bufferCooldownUntil()).toLocaleTimeString()}).`);
+  }
+  try {
+    return await bufferGraphQLCall(query, variables);
+  } catch (err) {
+    if (isRateLimitError(err) && !(err instanceof BufferRateLimitError)) {
+      const until = startBufferCooldown();
+      console.error(`Buffer: rate limit reached -- pausing every Buffer call until ${new Date(until).toLocaleTimeString()}.`);
+    }
+    throw err;
+  }
+}
+
+async function bufferGraphQLCall(query, variables) {
   const res = await fetchWithTimeout(
     BUFFER_API_URL,
     {
