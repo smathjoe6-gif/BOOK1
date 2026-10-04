@@ -9,9 +9,18 @@ import { spawn } from 'node:child_process';
 // every other video waiting behind it.
 const PROCESS_TIMEOUT_MS = 4 * 60 * 1000;
 
+// The launchd background job starts with a short PATH (no Homebrew), so
+// ffmpeg/ffprobe installed with "brew install ffmpeg" were reported as
+// "not installed" even though they exist in /opt/homebrew/bin.
+const BREW_PATHS = ['/opt/homebrew/bin', '/usr/local/bin'];
+const SPAWN_ENV = {
+  ...process.env,
+  PATH: [...BREW_PATHS, process.env.PATH || ''].filter(Boolean).join(path.delimiter),
+};
+
 function run(cmd, args) {
   return new Promise((resolve, reject) => {
-    const proc = spawn(cmd, args);
+    const proc = spawn(cmd, args, { env: SPAWN_ENV });
     let stdout = '';
     let stderr = '';
     let timedOut = false;
