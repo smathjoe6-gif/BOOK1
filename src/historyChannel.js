@@ -4,7 +4,7 @@ import { config } from './config.js';
 import { loadOAuthClient, hasSavedLogin } from './googleAuth.js';
 import { listVideosInFolder, downloadFile, moveToDone } from './drive.js';
 import { google } from 'googleapis';
-import { uploadToYouTube, findOrCreatePlaylist, addVideoToPlaylist } from './youtube.js';
+import { uploadToYouTube, findOrCreatePlaylist, addVideoToPlaylist, postEngagementComment } from './youtube.js';
 import { writeHistoryMetadataWithAI } from './omniroute.js';
 
 // Second YouTube channel: football + world history on @TotollsportGK.
@@ -79,7 +79,7 @@ async function buildMetadata(fileName, topic) {
 }
 
 function withFooter(description, topic) {
-  const footer = `\n\nSubscribe for more history stories -- football, world and Somali history: https://www.youtube.com/${config.historyChannelHandle}\n\nThis video is for general information and entertainment. Views are the creator's own.\n\n${topic.hashtags}`;
+  const footer = `\n\nWhat story should we tell next? Tell us in the comments, and subscribe so you never miss one.\n\nSubscribe for more history stories -- football, world and Somali history: https://www.youtube.com/${config.historyChannelHandle}\n\nThis video is for general information and entertainment. Views are the creator's own.\n\n${topic.hashtags}`;
   return `${description}${footer}`.slice(0, 4900);
 }
 
@@ -172,6 +172,34 @@ async function doneFolderFor(driveAuth, topic) {
   }
 }
 
+// A new channel needs conversation under every video (Joe, 5 Oct 2026), so
+// each upload gets a pinned-style first comment with a question. Plain
+// question banks per topic: no AI call, so it can never fail the upload.
+const ENGAGEMENT_QUESTIONS = {
+  sports: [
+    'Which moment from this story still gives you goosebumps? Tell us below.',
+    'Who is the greatest athlete of all time in your eyes, and why?',
+    'Which sporting story should we tell next? Drop a name or a year.',
+  ],
+  world: [
+    'Did you know this story before today? Tell us what surprised you most.',
+    'Which moment in history should we cover next? Give us a year or a name.',
+    'If you could stand in this moment for one hour, what would you ask?',
+  ],
+  somali: [
+    'Does your family have a story that connects to this? Share it below.',
+    'Which part of Somali history should we tell next? Name a place, a person or a year.',
+    'Where are you watching from today? Tell us your city or country.',
+  ],
+};
+
+function engagementFor(topic, videoId) {
+  const bank = ENGAGEMENT_QUESTIONS[topic?.key] || ENGAGEMENT_QUESTIONS.world;
+  let n = 0;
+  for (const ch of String(videoId)) n += ch.charCodeAt(0);
+  return bank[n % bank.length];
+}
+
 let isPosting = false;
 
 export async function postNextHistoryVideo(driveAuth) {
@@ -232,6 +260,14 @@ export async function postNextHistoryVideo(driveAuth) {
     state.postedToday += 1;
     state.uploadedIds = [...state.uploadedIds, file.id].slice(-500);
     saveState(state);
+
+    // An engagement-comment failure must never undo or repeat the upload.
+    try {
+      await postEngagementComment(youtubeAuth, result.id, engagementFor(topic, result.id));
+      console.log('History channel: posted engagement question');
+    } catch (err) {
+      console.log(`History channel: could not post engagement question: ${err.message}`);
+    }
 
     if (topic) {
       // A playlist failure must never undo or repeat the upload itself.

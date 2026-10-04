@@ -168,6 +168,6 @@ export const config = {
   historyFolderId: process.env.HISTORY_FOLDER_ID || '1dSP5luIoeK0pjkfqu9Zo-UagSaF9Ow4F',
   historyDoneFolderId: process.env.HISTORY_DONE_FOLDER_ID || '1N0BcIlLZ7N1bpVDRlBj3oc623QRL_VzF',
   historyTokenFile: process.env.HISTORY_TOKEN_FILE || 'token-history.json',
-  historyDailyLimit: Number(process.env.HISTORY_DAILY_LIMIT || 1),
+  historyDailyLimit: Number(process.env.HISTORY_DAILY_LIMIT || 2),
   historyChannelHandle: process.env.HISTORY_CHANNEL_HANDLE || '@TotollsportGK',
 };
