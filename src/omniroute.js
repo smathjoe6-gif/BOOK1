@@ -82,6 +82,59 @@ async function askAnthropic(systemPrompt, userPrompt) {
   }
 }
 
+const GEMINI_TIMEOUT_MS = 25000;
+
+// Direct Google Gemini call (no OmniRoute needed). Added 6 Oct 2026 after
+// OmniRoute broke three nights running ("Invalid API key" on its own key,
+// then "No active credentials for provider: gemini"). Uses a free Google AI
+// Studio key (aistudio.google.com/apikey) in GEMINI_API_KEY; the key goes in
+// the x-goog-api-key header, which works for both the older AIza... keys and
+// the newer AQ.... ones. Only used if GEMINI_API_KEY is set.
+async function askGemini(systemPrompt, userPrompt) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
+
+  try {
+    const model = config.geminiModel;
+    const generationConfig = { maxOutputTokens: 1200 };
+    // 2.5 Flash "thinks" by default and can spend the whole output budget
+    // before writing anything; a short caption doesn't need it.
+    if (/2\.5-flash/.test(model)) generationConfig.thinkingConfig = { thinkingBudget: 0 };
+
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': config.geminiApiKey,
+        },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+          generationConfig,
+        }),
+        signal: controller.signal,
+      },
+    );
+
+    if (!res.ok) {
+      const body = await res.text().catch(() => '');
+      throw new Error(`Gemini API returned ${res.status}: ${body.slice(0, 200)}`);
+    }
+
+    const data = await res.json();
+    const text = (data.candidates?.[0]?.content?.parts || [])
+      .map((p) => p.text || '')
+      .join('')
+      .trim();
+    if (!text) throw new Error('Gemini API gave an empty response');
+    return text;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 // OmniRoute already routes across whichever AI providers Joe has connected
 // on his end -- "model: auto" picks one of them per request. A single failed
 // attempt here (Mac just waking up, a provider cold-starting, one dropped
@@ -96,6 +149,19 @@ async function askAnthropic(systemPrompt, userPrompt) {
 // built-in templates.
 async function askAI(systemPrompt, userPrompt) {
   let lastErr;
+
+  // Direct Gemini first when a key is set: it needs no OmniRoute window open
+  // and no per-night fixing. Any failure falls through to OmniRoute, then the
+  // Anthropic backup, then the templates, exactly as before.
+  if (config.geminiApiKey) {
+    try {
+      return await askGemini(systemPrompt, userPrompt);
+    } catch (err) {
+      lastErr = err;
+      console.log(`Direct Gemini call failed (${err.message}), trying OmniRoute...`);
+    }
+  }
+
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     try {
       return await requestOnce(systemPrompt, userPrompt);

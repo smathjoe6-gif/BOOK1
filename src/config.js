@@ -91,6 +91,11 @@ export const config = {
   // provider. Leave blank if OmniRoute isn't installed; captions/replies
   // just fall back to the built-in templates in that case.
   omnirouteApiKey: process.env.OMNIROUTE_API_KEY || '',
+  // Direct Google Gemini key (free, from aistudio.google.com/apikey), used
+  // for captions/titles/replies BEFORE OmniRoute so the script no longer
+  // depends on OmniRoute running. Leave blank to keep the old behaviour.
+  geminiApiKey: process.env.GEMINI_API_KEY || '',
+  geminiModel: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
   // Which OmniRoute model to ask for captions/titles. "auto" lets OmniRoute
   // pick, but on 30 Sep 2026 that kept returning 502 while only some
   // providers worked -- set this to one exact model id copied from the
