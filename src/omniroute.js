@@ -154,11 +154,22 @@ async function askAI(systemPrompt, userPrompt) {
   // and no per-night fixing. Any failure falls through to OmniRoute, then the
   // Anthropic backup, then the templates, exactly as before.
   if (config.geminiApiKey) {
-    try {
-      return await askGemini(systemPrompt, userPrompt);
-    } catch (err) {
-      lastErr = err;
-      console.log(`Direct Gemini call failed (${err.message}), trying OmniRoute...`);
+    // Google answers 503 "high demand" / 429 in short spikes (seen 7 Oct 2026
+    // on the history channel's single call, which then fell back to a plain
+    // filename title). A couple of short retries nearly always get through.
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        return await askGemini(systemPrompt, userPrompt);
+      } catch (err) {
+        lastErr = err;
+        const transient = /returned (429|500|502|503|504)|aborted|timeout|fetch failed/i.test(err.message);
+        if (transient && attempt < 3) {
+          await new Promise((resolve) => setTimeout(resolve, 4000 * attempt));
+          continue;
+        }
+        console.log(`Direct Gemini call failed (${err.message.split('\n')[0].slice(0, 160)}), trying OmniRoute...`);
+        break;
+      }
     }
   }
 
