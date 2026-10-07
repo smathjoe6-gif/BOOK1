@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { config } from './config.js';
 import { loadOAuthClient } from './googleAuth.js';
-import { listNewVideos, listVideosInFolder, downloadFile, moveToDone, mirrorNewVideos, syncLogToDrive } from './drive.js';
+import { listNewVideos, listVideosInFolder, downloadFile, moveToDone, mirrorNewVideos, syncLogToDrive, uploadVerticalCopy } from './drive.js';
 import { findRowForFile, appendGeneratedRow, updateCoverImage } from './sheets.js';
 import { uploadToYouTube, postEngagementComment } from './youtube.js';
 import { generateCaption, isLikelyDuplicateVariant, stripCollisionSuffix } from './autoCaption.js';
@@ -140,10 +140,23 @@ async function processVideoOnce(file) {
   console.log(`Downloading...`);
   let localPath = await downloadFile(auth, file.id, file.name);
 
+  // Which Drive file Buffer (IG/FB/Pinterest/X/TikTok) fetches: the original,
+  // unless the video had to be converted to 9:16, in which case a copy of the
+  // converted file (a wide original is rejected by Facebook Reels).
+  let postFileId = file.id;
+  const downloadedPath = localPath;
   try {
     localPath = await ensureVerticalVideo(localPath);
   } catch (err) {
     console.error(`Could not check/convert "${file.name}" to vertical 9:16 (posting as-is):`, err.message);
+  }
+  if (localPath !== downloadedPath) {
+    try {
+      postFileId = await uploadVerticalCopy(auth, localPath, file.name);
+      console.log(`Uploaded the 9:16 copy for Buffer (Drive id ${postFileId}).`);
+    } catch (err) {
+      console.error(`Could not upload the 9:16 copy of "${file.name}" (Buffer gets the original file):`, err.message);
+    }
   }
 
   const caption = `${row.capture} ${row.hashtag}`.trim();
@@ -182,7 +195,7 @@ async function processVideoOnce(file) {
     if (config.bufferAccessToken) {
       // Queued, not posted here -- postNextQueuedTikTok() in checkOnce()
       // sends it, keeping TikTok under its daily API post limit.
-      queueTikTok({ fileId: file.id, name: file.name, caption });
+      queueTikTok({ fileId: postFileId, name: file.name, caption });
     } else if (loadTikTokToken()) {
       console.log('Posting to TikTok...');
       try {
@@ -231,7 +244,7 @@ async function processVideoOnce(file) {
           console.error('Could not get a Pinterest cover image for the Buffer pin (posting without one):', err.message);
         }
       }
-      await postToBuffer(auth, { fileId: file.id, name: file.name, title: row.title, caption, firstComment: engagementText, coverUrl });
+      await postToBuffer(auth, { fileId: postFileId, name: file.name, title: row.title, caption, firstComment: engagementText, coverUrl });
     } catch (err) {
       console.error('Buffer posting failed (other posts above still stand):', err.message);
     }
