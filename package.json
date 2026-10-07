@@ -9,7 +9,6 @@
     "auth-history": "node src/googleAuth.js token-history.json",
     "canva-auth": "node src/canvaAuth.js",
     "pinterest-auth": "node src/pinterestAuth.js",
-    "facebook-redo": "node src/facebookRedo.js",
     "organize-covers": "node src/organizeCoverPool.js",
     "organize-drive": "node src/organizeDriveDuplicates.js",
     "organize-music": "node src/organizeMusicByLanguage.js",

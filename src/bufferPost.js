@@ -273,18 +273,6 @@ export async function postToBuffer(auth, { fileId, name, title, caption, firstCo
   }
 }
 
-// One network only, right now, no retry queue -- used by `npm run facebook-redo`
-// to re-send a video to just Facebook (its other networks already posted).
-export async function postOneServiceNow(auth, service, { fileId, name, title, caption, firstComment = '', coverUrl = '' }) {
-  if (bufferInCooldown()) {
-    throw new Error(`Buffer is cooling down after hitting its API limit until ${new Date(bufferCooldownUntil()).toLocaleTimeString()} -- try again after that.`);
-  }
-  const videoUrl = await publicUrl(auth, fileId);
-  const id = await postToService(service, { videoUrl, title, caption, firstComment, coverUrl });
-  addVerify(id, { service, fileId, name, title, caption, firstComment, coverUrl });
-  return id;
-}
-
 // One retry per cycle at most, so a broken connection can't hammer the API.
 export async function retryFailedBufferPosts(auth) {
   if (bufferInCooldown()) {
