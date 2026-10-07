@@ -339,6 +339,43 @@ export async function uploadPublicImage(auth, localPath, fileName, folderId) {
   return `https://drive.google.com/thumbnail?id=${file.data.id}&sz=w1000`;
 }
 
+// YouTube already gets the converted 9:16 file (processVideo() uploads it from
+// disk), but Buffer (Instagram/Facebook/Pinterest/X/TikTok) fetches the video
+// from a public Drive link, so it used to get the ORIGINAL wide file --
+// Facebook Reels rejects those ("height must be at least 960px", "aspect ratio
+// too wide"). This uploads the converted file into its own folder
+// (GK_VERTICAL_COPIES, created in My Drive root -- NOT inside a watched
+// folder, so it is never picked up and re-posted) and returns the new file id.
+export async function uploadVerticalCopy(auth, localPath, fileName) {
+  const drive = google.drive({ version: 'v3', auth });
+  const folderName = 'GK_VERTICAL_COPIES';
+  const found = await drive.files.list(
+    {
+      q: `name = '${folderName}' and mimeType = 'application/vnd.google-apps.folder' and 'root' in parents and trashed = false`,
+      fields: 'files(id)',
+      pageSize: 1,
+    },
+    { timeout: API_TIMEOUT_MS }
+  );
+  let folderId = found.data.files?.[0]?.id;
+  if (!folderId) {
+    const created = await drive.files.create(
+      { requestBody: { name: folderName, mimeType: 'application/vnd.google-apps.folder' }, fields: 'id' },
+      { timeout: API_TIMEOUT_MS }
+    );
+    folderId = created.data.id;
+  }
+  const file = await drive.files.create(
+    {
+      requestBody: { name: `vertical-${fileName}`, parents: [folderId] },
+      media: { mimeType: 'video/mp4', body: fs.createReadStream(localPath) },
+      fields: 'id',
+    },
+    { timeout: 10 * 60 * 1000 }
+  );
+  return file.data.id;
+}
+
 // Moves a file into the DONE folder once it's been posted everywhere.
 export async function moveToDone(auth, fileId, doneFolderId = config.doneFolderId) {
   if (!doneFolderId) return;
