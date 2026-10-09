@@ -42,10 +42,26 @@ function saveState(state) {
   fs.writeFileSync(QUEUE_PATH, JSON.stringify(state, null, 2));
 }
 
-export function queueTikTok({ fileId, name, caption }) {
+// One video, one TikTok post. A video is identified by its content hash (md5)
+// when known, else its file name -- NOT by Drive file id alone, because the
+// 9:16 copy made for Buffer gets a brand-new Drive id every time, so the same
+// video could otherwise be queued (and posted) again under a different id.
+// Every video sent is remembered in `sent` (last SENT_MEMORY) so it can never
+// go to TikTok twice, even across restarts or a re-queue.
+const SENT_MEMORY = 1000;
+function videoKey({ md5, name }) {
+  return md5 ? `md5:${md5}` : `name:${name}`;
+}
+
+export function queueTikTok({ fileId, name, caption, md5 }) {
   const state = loadState();
-  if (state.queue.some((item) => item.fileId === fileId)) return;
-  state.queue.push({ fileId, name, caption, attempts: 0 });
+  const key = videoKey({ md5, name });
+  if (state.queue.some((item) => item.fileId === fileId || item.key === key)) return;
+  if ((state.sent || []).includes(key)) {
+    console.log(`TikTok: "${name}" was already sent to TikTok -- not queuing it again.`);
+    return;
+  }
+  state.queue.push({ fileId, name, caption, key, attempts: 0 });
   saveState(state);
   console.log(`TikTok: queued "${name}" (${state.queue.length} waiting, ${state.postedToday}/${config.tiktokDailyLimit} posted today).`);
 }
@@ -84,17 +100,38 @@ export async function postNextQueuedTikTok(auth) {
     return;
   }
 
+  // A video marked `sending` was being handed to Buffer when the script was
+  // stopped/restarted -- nobody knows if Buffer accepted it. Re-sending it is
+  // exactly how the same video used to appear on TikTok again and again, so
+  // drop it and ask Joe to check instead of risking a duplicate.
+  const interrupted = state.queue.filter((q) => q.sending);
+  if (interrupted.length) {
+    for (const q of interrupted) {
+      console.error(`TikTok: "${q.name}" was interrupted mid-send last time -- NOT sending it again (check Buffer/TikTok; post by hand if it is missing).`);
+      state.sent = [...(state.sent || []), q.key || videoKey({ name: q.name })].slice(-SENT_MEMORY);
+    }
+    state.queue = state.queue.filter((q) => !q.sending);
+    saveState(state);
+    if (state.queue.length === 0) return;
+  }
+
   const newestFirst = config.tiktokOrder !== 'oldest';
   const item = newestFirst ? state.queue[state.queue.length - 1] : state.queue[0];
   const removeItem = () => (newestFirst ? state.queue.pop() : state.queue.shift());
   console.log(`Posting to TikTok via Buffer: "${item.name}"...`);
+  // Written to disk BEFORE calling Buffer (see "interrupted" above).
+  item.sending = true;
+  saveState(state);
   try {
     const tk = await uploadToTikTokViaBuffer(auth, { fileId: item.fileId, caption: item.caption });
     removeItem();
+    state.sent = [...(state.sent || []), item.key || videoKey({ name: item.name })].slice(-SENT_MEMORY);
     state.postedToday += 1;
     state.lastPostedAt = Date.now();
     console.log(`TikTok (via Buffer): posted, update id ${tk.updateId} (${state.postedToday}/${config.tiktokDailyLimit} today, ${state.queue.length} still waiting).`);
   } catch (err) {
+    // Buffer answered with an error, so nothing was posted: safe to retry.
+    delete item.sending;
     // TikTok switched off / not connected in Buffer is not the video's fault:
     // keep it queued and don't burn its attempts (3 Oct 2026: ~20 videos were
     // dropped this way while TikTok was disconnected).
