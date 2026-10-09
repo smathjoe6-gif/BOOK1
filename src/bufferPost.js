@@ -88,6 +88,31 @@ function textFor(service, caption, firstComment) {
 
 class DailyLimitError extends Error {}
 
+// A network's OWN daily limit (Pinterest: "The daily posting limit for this
+// channel has been reached") is only visible AFTER Buffer accepted a post and
+// the network rejected it, so Buffer's dailyPostingLimits check can't see it.
+// On 9 Oct 2026 the old code answered every such rejection by posting the
+// video again -- each retry left another failed copy in Buffer's queue (37 of
+// them) and burned Buffer's ~250 API calls/day until everything stalled. Now
+// the first "daily limit" rejection blocks that network for the rest of the
+// day: new posts wait (no failed copies, no API calls) and go out tomorrow.
+const DAY_BLOCK_PATH = path.join(process.cwd(), 'buffer-day-block.json');
+function dayKey() {
+  return new Date().toLocaleDateString('en-CA');
+}
+function loadDayBlock() {
+  try { return JSON.parse(fs.readFileSync(DAY_BLOCK_PATH, 'utf8')); } catch { return {}; }
+}
+function blockServiceToday(service) {
+  const block = loadDayBlock();
+  block[service] = dayKey();
+  fs.writeFileSync(DAY_BLOCK_PATH, JSON.stringify(block, null, 2));
+}
+function serviceBlockedToday(service) {
+  return loadDayBlock()[service] === dayKey();
+}
+const isNetworkDailyLimit = (message) => /daily posting limit/i.test(message || '');
+
 // Buffer reports, per channel, whether today's posting limit is used up
 // (dailyPostingLimits in its GraphQL schema). Checking first means a busy day
 // WAITS instead of failing and burning retry attempts.
@@ -113,6 +138,9 @@ async function assertUnderDailyLimit(channelId, service) {
 }
 
 async function postToService(service, { videoUrl, title, caption, firstComment, coverUrl }, withComment = true, withCover = true) {
+  if (serviceBlockedToday(service)) {
+    throw new DailyLimitError(`${service} said its daily posting limit is reached -- waiting until tomorrow.`);
+  }
   const channels = (await listBufferChannels()).filter((c) => String(c.service).toLowerCase() === service);
   if (channels.length === 0) throw new Error(`No ${service} channel connected in Buffer.`);
   await assertUnderDailyLimit(channels[0].id, service);
@@ -203,7 +231,14 @@ async function verifyDueBufferPosts() {
     }
     if (status === 'error') {
       list.splice(list.indexOf(v), 1);
-      if (v.redo < MAX_REDO) {
+      if (isNetworkDailyLimit(message)) {
+        // Posting again today can only fail again (and add another failed copy
+        // to Buffer's queue): block the network for today, retry tomorrow.
+        blockServiceToday(v.service);
+        retries = retries || loadRetries();
+        retries.push({ ...v, attempts: 0, queuedAt: Date.now() });
+        console.error(`Buffer ${v.service}: "${v.name}" was rejected (daily posting limit reached) -- NOT posting again today; it goes out tomorrow. Delete the failed copy in Buffer by hand.`);
+      } else if (v.redo < MAX_REDO) {
         retries = retries || loadRetries();
         retries.push({ ...v, attempts: 0, queuedAt: Date.now() });
         console.error(`Buffer ${v.service}: "${v.name}" was rejected after posting (${message || 'no reason given'}) -- posting it again (${v.redo + 1}/${MAX_REDO}).`);
