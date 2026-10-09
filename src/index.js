@@ -195,7 +195,7 @@ async function processVideoOnce(file) {
     if (config.bufferAccessToken) {
       // Queued, not posted here -- postNextQueuedTikTok() in checkOnce()
       // sends it, keeping TikTok under its daily API post limit.
-      queueTikTok({ fileId: postFileId, name: file.name, caption });
+      queueTikTok({ fileId: postFileId, name: file.name, caption, md5: file.md5Checksum });
     } else if (loadTikTokToken()) {
       console.log('Posting to TikTok...');
       try {
