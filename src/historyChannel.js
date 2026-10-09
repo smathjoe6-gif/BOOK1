@@ -78,9 +78,14 @@ async function buildMetadata(fileName, topic) {
   return meta;
 }
 
+// Joe's rule (9 Oct 2026): EVERY public GK Legend post carries the copyright
+// line + channel link, history videos included.
+const COPYRIGHT = '© 2026 GK Legend Studio. All rights reserved.\nhttps://www.youtube.com/@PathFoundGK';
+
 function withFooter(description, topic) {
-  const footer = `\n\nWhat story should we tell next? Tell us in the comments, and subscribe so you never miss one.\n\nSubscribe for more history stories -- football, world and Somali history: https://www.youtube.com/${config.historyChannelHandle}\n\nThis video is for general information and entertainment. Views are the creator's own.\n\n${topic.hashtags}`;
-  return `${description}${footer}`.slice(0, 4900);
+  const footer = `\n\nWhat story should we tell next? Tell us in the comments, and subscribe so you never miss one.\n\nSubscribe for more history stories -- football, world and Somali history: https://www.youtube.com/${config.historyChannelHandle}\n\nThis video is for general information and entertainment. Views are the creator's own.\n\n${COPYRIGHT}\n\n${topic.hashtags}`;
+  // Cut the AI description (never the footer) to fit YouTube's limit.
+  return `${description.slice(0, Math.max(0, 4900 - footer.length))}${footer}`;
 }
 
 // Joe sorts videos by dropping them into a subfolder of TOTOLL_HISTORY
