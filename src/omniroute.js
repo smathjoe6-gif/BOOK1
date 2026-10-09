@@ -6,7 +6,7 @@ const TIMEOUT_MS = 25000;
 const MAX_ATTEMPTS = 3;
 const RETRY_DELAY_MS = 3000;
 
-async function requestOnce(systemPrompt, userPrompt) {
+async function requestOnce(systemPrompt, userPrompt, model = config.omnirouteModel) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
@@ -18,7 +18,7 @@ async function requestOnce(systemPrompt, userPrompt) {
         ...(config.omnirouteApiKey ? { Authorization: `Bearer ${config.omnirouteApiKey}` } : {}),
       },
       body: JSON.stringify({
-        model: config.omnirouteModel,
+        model,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
@@ -181,14 +181,29 @@ async function askAI(systemPrompt, userPrompt) {
     }
   }
 
-  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-    try {
-      return await requestOnce(systemPrompt, userPrompt);
-    } catch (err) {
-      lastErr = err;
-      if (attempt < MAX_ATTEMPTS) {
-        console.log(`OmniRoute attempt ${attempt}/${MAX_ATTEMPTS} failed (${err.message}), retrying...`);
-        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS * attempt));
+  // Each OmniRoute model in OMNIROUTE_MODELS gets its turn; when one fails the
+  // next takes over. If OmniRoute itself isn't running (connection refused),
+  // trying more of its models is pointless, so go straight on.
+  const omniModels = config.omnirouteModels.length ? config.omnirouteModels : [config.omnirouteModel];
+  let omniDown = false;
+  for (const model of omniModels) {
+    if (omniDown) break;
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      try {
+        return await requestOnce(systemPrompt, userPrompt, model);
+      } catch (err) {
+        lastErr = err;
+        if (/ECONNREFUSED/.test(err.message)) {
+          console.log('OmniRoute is not running (connection refused) -- skipping it.');
+          omniDown = true;
+          break;
+        }
+        if (attempt < MAX_ATTEMPTS) {
+          console.log(`OmniRoute ${model} attempt ${attempt}/${MAX_ATTEMPTS} failed (${err.message}), retrying...`);
+          await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS * attempt));
+        } else {
+          console.log(`OmniRoute ${model} failed (${err.message})${model === omniModels[omniModels.length - 1] ? '' : ', trying the next model...'}`);
+        }
       }
     }
   }
