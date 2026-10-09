@@ -90,12 +90,11 @@ const GEMINI_TIMEOUT_MS = 25000;
 // Studio key (aistudio.google.com/apikey) in GEMINI_API_KEY; the key goes in
 // the x-goog-api-key header, which works for both the older AIza... keys and
 // the newer AQ.... ones. Only used if GEMINI_API_KEY is set.
-async function askGemini(systemPrompt, userPrompt) {
+async function askGemini(systemPrompt, userPrompt, model = config.geminiModel) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
 
   try {
-    const model = config.geminiModel;
     const generationConfig = { maxOutputTokens: 1200 };
     // 2.5 Flash "thinks" by default and can spend the whole output budget
     // before writing anything; a short caption doesn't need it.
@@ -154,22 +153,31 @@ async function askAI(systemPrompt, userPrompt) {
   // and no per-night fixing. Any failure falls through to OmniRoute, then the
   // Anthropic backup, then the templates, exactly as before.
   if (config.geminiApiKey) {
-    // Google answers 503 "high demand" / 429 in short spikes (seen 7 Oct 2026
-    // on the history channel's single call, which then fell back to a plain
-    // filename title). A couple of short retries nearly always get through.
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      try {
-        return await askGemini(systemPrompt, userPrompt);
-      } catch (err) {
-        lastErr = err;
-        const transient = /returned (429|500|502|503|504)|aborted|timeout|fetch failed/i.test(err.message);
-        if (transient && attempt < 3) {
-          await new Promise((resolve) => setTimeout(resolve, 4000 * attempt));
-          continue;
+    // Google answers 503 "high demand" in short spikes (seen 7 Oct 2026 on
+    // the history channel's single call, which then fell back to a plain
+    // filename title): a couple of short retries nearly always get through.
+    // Google's free-tier quota is counted PER MODEL. On 9 Oct 2026 every
+    // caption/engagement question answered 429 (quota used up) and the posts
+    // went out with template captions, so a 429 now tries a second model
+    // (GEMINI_FALLBACK_MODEL, default gemini-2.5-flash-lite) before OmniRoute.
+    const models = [config.geminiModel];
+    if (config.geminiFallbackModel && config.geminiFallbackModel !== config.geminiModel) models.push(config.geminiFallbackModel);
+    for (const model of models) {
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          return await askGemini(systemPrompt, userPrompt, model);
+        } catch (err) {
+          lastErr = err;
+          if (/returned 429/.test(err.message)) break; // quota: retrying this model won't help
+          const transient = /returned (500|502|503|504)|aborted|timeout|fetch failed/i.test(err.message);
+          if (transient && attempt < 3) {
+            await new Promise((resolve) => setTimeout(resolve, 4000 * attempt));
+            continue;
+          }
+          break;
         }
-        console.log(`Direct Gemini call failed (${err.message.split('\n')[0].slice(0, 160)}), trying OmniRoute...`);
-        break;
       }
+      console.log(`Gemini ${model} failed (${(lastErr.message.replace(/\s+/g, ' ')).slice(0, 220)})${model === models[models.length - 1] ? ', trying OmniRoute...' : ', trying the backup model...'}`);
     }
   }
 
