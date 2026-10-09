@@ -96,7 +96,10 @@ export const config = {
   // depends on OmniRoute running. Leave blank to keep the old behaviour.
   geminiApiKey: process.env.GEMINI_API_KEY || '',
   geminiModel: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
-  geminiFallbackModel: process.env.GEMINI_FALLBACK_MODEL === undefined ? 'gemini-2.5-flash-lite' : process.env.GEMINI_FALLBACK_MODEL,
+  // Backup Gemini models, tried in this order when the main one runs out of free
+  // quota (429). Comma-separated; set GEMINI_FALLBACK_MODEL= (empty) to switch off.
+  geminiFallbackModels: (process.env.GEMINI_FALLBACK_MODEL === undefined ? 'gemini-2.5-flash-lite,gemini-3.5-flash-lite' : process.env.GEMINI_FALLBACK_MODEL)
+    .split(',').map((m) => m.trim()).filter(Boolean),
   // Which OmniRoute model to ask for captions/titles. "auto" lets OmniRoute
   // pick, but on 30 Sep 2026 that kept returning 502 while only some
   // providers worked -- set this to one exact model id copied from the

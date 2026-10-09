@@ -159,9 +159,9 @@ async function askAI(systemPrompt, userPrompt) {
     // Google's free-tier quota is counted PER MODEL. On 9 Oct 2026 every
     // caption/engagement question answered 429 (quota used up) and the posts
     // went out with template captions, so a 429 now tries a second model
-    // (GEMINI_FALLBACK_MODEL, default gemini-2.5-flash-lite) before OmniRoute.
-    const models = [config.geminiModel];
-    if (config.geminiFallbackModel && config.geminiFallbackModel !== config.geminiModel) models.push(config.geminiFallbackModel);
+    // (GEMINI_FALLBACK_MODEL: a comma-separated list, default gemini-2.5-flash-lite then
+    // gemini-3.5-flash-lite, each with its own quota) before OmniRoute.
+    const models = [config.geminiModel, ...config.geminiFallbackModels.filter((m) => m !== config.geminiModel)];
     for (const model of models) {
       for (let attempt = 1; attempt <= 3; attempt++) {
         try {
