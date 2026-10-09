@@ -96,11 +96,19 @@ export const config = {
   // depends on OmniRoute running. Leave blank to keep the old behaviour.
   geminiApiKey: process.env.GEMINI_API_KEY || '',
   geminiModel: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+  // Backup Gemini models, tried in this order when the main one runs out of free
+  // quota (429). Comma-separated; set GEMINI_FALLBACK_MODEL= (empty) to switch off.
+  geminiFallbackModels: (process.env.GEMINI_FALLBACK_MODEL === undefined ? 'gemini-2.5-flash-lite,gemini-3.5-flash-lite' : process.env.GEMINI_FALLBACK_MODEL)
+    .split(',').map((m) => m.trim()).filter(Boolean),
   // Which OmniRoute model to ask for captions/titles. "auto" lets OmniRoute
   // pick, but on 30 Sep 2026 that kept returning 502 while only some
   // providers worked -- set this to one exact model id copied from the
   // OmniRoute dashboard (a provider that tests green) to pin it.
   omnirouteModel: process.env.OMNIROUTE_MODEL || 'auto',
+  // Every OmniRoute model to try, in order, when the one before it fails (add a
+  // new free model here as soon as OmniRoute offers one). Comma-separated;
+  // defaults to just OMNIROUTE_MODEL.
+  omnirouteModels: (process.env.OMNIROUTE_MODELS || process.env.OMNIROUTE_MODEL || 'auto').split(',').map((m) => m.trim()).filter(Boolean),
   // Model id OmniRoute expects for its free "Veo AI Free" video provider.
   // Confirm the exact string via OmniRoute's Playground -> Copy cURL (the
   // Model field shown there) if this default ever stops working.
