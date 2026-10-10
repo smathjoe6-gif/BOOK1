@@ -39,6 +39,12 @@ export const config = {
   // Music under the stacked video: songs (wav/mp3/m4a, at least ~8 MB) in this
   // Drive folder; blank = no music. The clips' own sound is turned down to
   // STITCH_CLIP_AUDIO_VOLUME (0 = muted) so random talking never fights the song.
+  // Designed edit on top of the stacked clips (hook text, zoom punch at each cut,
+  // white flash cut, colour grade, GK tag, progress bar, end line). STITCH_DESIGN=false
+  // = plain stitching. STITCH_HOOK blank = made from the story folder name.
+  stitchDesign: process.env.STITCH_DESIGN !== 'false',
+  stitchHook: process.env.STITCH_HOOK || '',
+  stitchEndText: process.env.STITCH_END_TEXT === undefined ? 'Follow for more' : process.env.STITCH_END_TEXT,
   stitchMusicDriveFolderId: process.env.STITCH_MUSIC_DRIVE_FOLDER_ID || '',
   stitchClipAudioVolume: process.env.STITCH_CLIP_AUDIO_VOLUME === undefined || process.env.STITCH_CLIP_AUDIO_VOLUME === '' ? 0.12 : Number(process.env.STITCH_CLIP_AUDIO_VOLUME),
   canvaClientId: process.env.CANVA_CLIENT_ID || '',
