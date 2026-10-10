@@ -173,35 +173,67 @@ function loadMusicUsed() {
 
 // Picks one of Joe's own songs from the Drive music folder (not one of the last
 // 5 used) and downloads it. Returns { id, name, full, duration } or null.
+// Songs directly in a Drive folder and, up to `depth` levels down, in its subfolders
+// (Joe's vault is nested, e.g. GK_MUSIC_VAULT/01_SOMALI_HERITAGE/SOMALI_HIGH_ENERGY).
+async function listSongsDeep(auth, folderId, depth = 3) {
+  const drive = google.drive({ version: 'v3', auth });
+  const songs = [];
+  let pageToken;
+  do {
+    const res = await drive.files.list(
+      {
+        q: `'${folderId}' in parents and mimeType contains 'audio/' and trashed = false`,
+        fields: 'nextPageToken, files(id, name, size)',
+        pageSize: 1000,
+        pageToken,
+      },
+      { timeout: 60 * 1000 }
+    );
+    songs.push(...(res.data.files || []));
+    pageToken = res.data.nextPageToken;
+  } while (pageToken);
+  if (depth > 0) {
+    for (const sub of await listSubfolders(auth, folderId)) {
+      songs.push(...(await listSongsDeep(auth, sub.id, depth - 1)));
+    }
+  }
+  return songs;
+}
+
+// First music folder (searching down from the main one) whose name matches the
+// clip theme: same letters, or one contains the other ("HIP_HOP" ~ "02_HIP_HOP").
+async function findThemeMusicFolder(auth, rootId, themeName, depth = 3) {
+  const key = themeKey(themeName);
+  if (!key) return null;
+  let level = [{ id: rootId }];
+  for (let d = 0; d <= depth && level.length > 0; d++) {
+    const next = [];
+    for (const parent of level) {
+      for (const sub of await listSubfolders(auth, parent.id)) {
+        const k = themeKey(sub.name);
+        if (k && (k === key || k.includes(key) || key.includes(k))) return sub;
+        next.push(sub);
+      }
+    }
+    level = next;
+  }
+  return null;
+}
+
 async function pickMusic(auth, themeName = '') {
   let folderId = config.stitchMusicDriveFolderId;
   if (!folderId) return null;
   try {
-    // A music subfolder named like the clip theme (e.g. HIP_HOP for a HIP_HOP
-    // clip folder) is preferred; otherwise any song in the music folder.
+    // A music folder named like the clip theme is preferred; otherwise any
+    // song anywhere under the main music folder.
     if (themeName) {
-      const match = (await listSubfolders(auth, folderId)).find((f) => themeKey(f.name) && themeKey(f.name) === themeKey(themeName));
+      const match = await findThemeMusicFolder(auth, folderId, themeName);
       if (match) {
         folderId = match.id;
         console.log(`Stitch: using the "${match.name}" music folder to match the "${themeName}" clips.`);
       }
     }
-    const drive = google.drive({ version: 'v3', auth });
-    const songs = [];
-    let pageToken;
-    do {
-      const res = await drive.files.list(
-        {
-          q: `'${folderId}' in parents and mimeType contains 'audio/' and trashed = false`,
-          fields: 'nextPageToken, files(id, name, size)',
-          pageSize: 1000,
-          pageToken,
-        },
-        { timeout: 60 * 1000 }
-      );
-      songs.push(...(res.data.files || []));
-      pageToken = res.data.nextPageToken;
-    } while (pageToken);
+    const songs = await listSongsDeep(auth, folderId);
     const usable = songs.filter((f) => Number(f.size) >= MIN_MUSIC_BYTES && !/ssstik/i.test(f.name));
     if (usable.length === 0) {
       if (folderId !== config.stitchMusicDriveFolderId) {
