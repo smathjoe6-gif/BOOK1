@@ -73,9 +73,15 @@ export function chooseClips(clips, targetSeconds, maxClipSeconds) {
   return { chosen, total };
 }
 
-async function normalizeClip(clip, outPath) {
-  const filter =
-    '[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,fps=30,format=yuv420p[v]';
+async function normalizeClip(clip, outPath, design = false) {
+  // Designed cut: each clip starts zoomed in and settles back over 10 frames
+  // (a "punch"), with a very short white flash on the cut. zoompan works on
+  // every ffmpeg version, unlike per-frame scale expressions.
+  const filter = design
+    ? '[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,fps=30,' +
+      "zoompan=z='if(lt(on,10),1.14-0.14*on/10,1)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1080x1920:fps=30," +
+      'setsar=1,fade=t=in:st=0:d=0.12:color=white,format=yuv420p[v]'
+    : '[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,fps=30,format=yuv420p[v]';
   const args = ['-y', '-i', clip.full];
   if (!clip.hasAudio) args.push('-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo');
   args.push(
@@ -311,8 +317,48 @@ export function themeKey(name) {
   return String(name || '').toLowerCase().replace(/[^a-z]/g, '');
 }
 
+// The designed look on the joined video: colour grade + vignette, a big hook
+// line in the first 2.8 s, a small GK tag top-left, an end line in the last 6 s
+// and a gold progress bar along the top. Any failure keeps the plain video.
+async function designPass(videoPath, outPath, { hook, brand, endText }) {
+  const { duration } = await probe(videoPath);
+  const fontPart = config.stitchFont ? `fontfile='${config.stitchFont.replace(/'/g, '')}':` : '';
+  const text = (label, extra) =>
+    label ? `drawtext=${fontPart}text='${label}':fontcolor=white:borderw=5:bordercolor=black:${extra}` : '';
+  // Biggest font that keeps the line inside the 1080 px frame (about 0.74 em, wide bold fonts per character).
+  const fit = (label, max) => Math.max(40, Math.min(max, Math.floor(980 / (Math.max(1, String(label || '').length) * 0.74))));
+  const hookAlpha = "alpha='if(lt(t,0.3),t/0.3,if(gt(t,2.5),(2.8-t)/0.3,1))'";
+  const parts = [
+    'eq=contrast=1.08:saturation=1.15',
+    'vignette=PI/6',
+    text(hook, `fontsize=${fit(hook, 96)}:x=(w-text_w)/2:y=h*0.14:enable='between(t,0,2.8)':${hookAlpha}`),
+    text(brand, "fontsize=40:x=48:y=96:alpha=0.85"),
+    text(endText, `fontsize=${fit(endText, 76)}:x=(w-text_w)/2:y=h*0.28:enable='gte(t,${Math.max(0, duration - 6).toFixed(2)})'`),
+  ].filter(Boolean);
+  const bar = `color=c=0xE8B84A:s=1080x12:d=${duration.toFixed(2)}:r=30[bar]`;
+  const filter = `[0:v]${parts.join(',')}[v0];${bar};[v0][bar]overlay=x='-w+W*t/${duration.toFixed(2)}':y=0[v]`;
+  await run('ffmpeg', [
+    '-y', '-i', videoPath,
+    '-filter_complex', filter,
+    '-map', '[v]', '-map', '0:a?',
+    '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '21', '-pix_fmt', 'yuv420p',
+    '-c:a', 'copy',
+    '-t', duration.toFixed(2),
+    outPath,
+  ]);
+}
+
+// "2_FAMILY_FUN" / "Blacksmith_hiphop" -> the story word shown in the hook.
+export function hookFor(themeName) {
+  if (config.stitchHook) return cleanText(config.stitchHook).toUpperCase();
+  const word = String(themeName || '')
+    .split(/[^A-Za-z]+/)
+    .find((w) => w.length >= 4 && !/^(hiphop|somali|slow|cinematic|music|mix|story|fun)$/i.test(w));
+  return word ? cleanText(`WATCH THE ${word}`).toUpperCase() : 'WAIT FOR IT';
+}
+
 // Joins the chosen clips into one video in outDir. Returns { finalName, withText, withMusic, musicName }.
-async function buildStitch(chosen, outDir, stamp, music) {
+async function buildStitch(chosen, outDir, stamp, music, themeName = '') {
   const work = fs.mkdtempSync(path.join(os.tmpdir(), 'gk-stitch-'));
   const finalName = `GK_Stitch_${stamp}.mp4`;
   const hiddenOut = path.join(outDir, `.stitching-${stamp}.mp4`);
@@ -320,10 +366,31 @@ async function buildStitch(chosen, outDir, stamp, music) {
     const parts = [];
     for (let i = 0; i < chosen.length; i++) {
       const part = path.join(work, `part-${i}.mp4`);
-      await normalizeClip(chosen[i], part);
+      try {
+        await normalizeClip(chosen[i], part, config.stitchDesign);
+      } catch (err) {
+        if (!config.stitchDesign) throw err;
+        console.log(`Stitch: designed cut failed (${err.message.slice(0, 100)}) -- using a plain cut for this clip.`);
+        await normalizeClip(chosen[i], part, false);
+      }
       parts.push(part);
     }
-    const withText = await joinClips(parts, path.join(work, 'list.txt'), hiddenOut, config.stitchText);
+    // With the designed edit the GK tag is drawn by designPass, not joinClips.
+    let withText = await joinClips(parts, path.join(work, 'list.txt'), hiddenOut, config.stitchDesign ? '' : config.stitchText);
+    if (config.stitchDesign) {
+      const designed = path.join(work, 'designed.mp4');
+      try {
+        await designPass(hiddenOut, designed, {
+          hook: hookFor(themeName),
+          brand: cleanText(config.stitchText).toUpperCase(),
+          endText: cleanText(config.stitchEndText),
+        });
+        fs.renameSync(designed, hiddenOut);
+        withText = true;
+      } catch (err) {
+        console.log(`Stitch: could not add the designed look (${err.message.slice(0, 160)}) -- saving the plain stitch.`);
+      }
+    }
     let withMusic = false;
     if (music) {
       const musicOut = path.join(work, 'with-music.mp4');
@@ -459,7 +526,7 @@ async function stitchFromDrive(auth, folderId, outDir, state) {
     const music = await pickMusic(auth, theme ? theme.name : '');
     let result;
     try {
-      result = await buildStitch(chosen, outDir, `${state.day}_${state.made + 1}`, music);
+      result = await buildStitch(chosen, outDir, `${state.day}_${state.made + 1}`, music, theme ? theme.name : '');
     } finally {
       if (music) fs.rmSync(music.full, { force: true });
     }
