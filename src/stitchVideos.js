@@ -159,8 +159,120 @@ async function listDriveStock(auth, folderId) {
   return found;
 }
 
-// Joins the chosen clips into one video in outDir. Returns { finalName, withText }.
-async function buildStitch(chosen, outDir, stamp) {
+const MUSIC_USED_PATH = path.join(process.cwd(), 'stitch-music-used.json');
+const MIN_MUSIC_BYTES = 8 * 1024 * 1024;
+
+function loadMusicUsed() {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(MUSIC_USED_PATH, 'utf8'));
+    return Array.isArray(parsed.used) ? parsed.used : [];
+  } catch {
+    return [];
+  }
+}
+
+// Picks one of Joe's own songs from the Drive music folder (not one of the last
+// 5 used) and downloads it. Returns { id, name, full, duration } or null.
+async function pickMusic(auth, themeName = '') {
+  let folderId = config.stitchMusicDriveFolderId;
+  if (!folderId) return null;
+  try {
+    // A music subfolder named like the clip theme (e.g. HIP_HOP for a HIP_HOP
+    // clip folder) is preferred; otherwise any song in the music folder.
+    if (themeName) {
+      const match = (await listSubfolders(auth, folderId)).find((f) => themeKey(f.name) && themeKey(f.name) === themeKey(themeName));
+      if (match) {
+        folderId = match.id;
+        console.log(`Stitch: using the "${match.name}" music folder to match the "${themeName}" clips.`);
+      }
+    }
+    const drive = google.drive({ version: 'v3', auth });
+    const songs = [];
+    let pageToken;
+    do {
+      const res = await drive.files.list(
+        {
+          q: `'${folderId}' in parents and mimeType contains 'audio/' and trashed = false`,
+          fields: 'nextPageToken, files(id, name, size)',
+          pageSize: 1000,
+          pageToken,
+        },
+        { timeout: 60 * 1000 }
+      );
+      songs.push(...(res.data.files || []));
+      pageToken = res.data.nextPageToken;
+    } while (pageToken);
+    const usable = songs.filter((f) => Number(f.size) >= MIN_MUSIC_BYTES && !/ssstik/i.test(f.name));
+    if (usable.length === 0) {
+      if (folderId !== config.stitchMusicDriveFolderId) {
+        console.log('Stitch: that music folder has no usable songs -- using the main music folder.');
+        return pickMusic(auth);
+      }
+      console.log('Stitch: no usable songs in the music folder -- making the video without music.');
+      return null;
+    }
+    const recent = loadMusicUsed().slice(-5);
+    const fresh = usable.filter((f) => !recent.includes(f.id));
+    const song = shuffled(fresh.length > 0 ? fresh : usable)[0];
+    const full = await downloadFile(auth, song.id, song.name.replace(/[^\w.-]+/g, '_'));
+    const { duration } = await probe(full);
+    if (duration < 20) {
+      fs.rmSync(full, { force: true });
+      console.log(`Stitch: song "${song.name}" is too short -- making the video without music.`);
+      return null;
+    }
+    fs.writeFileSync(MUSIC_USED_PATH, JSON.stringify({ used: [...loadMusicUsed(), song.id].slice(-50) }, null, 2));
+    return { id: song.id, name: song.name, full, duration };
+  } catch (err) {
+    console.log(`Stitch: could not get a song (${err.message.slice(0, 120)}) -- making the video without music.`);
+    return null;
+  }
+}
+
+// Puts the song under the video: starts partway into the song (skips long
+// intros), fades in and out, and turns the clips' own sound down. If this
+// fails the video is kept as it was.
+async function addMusic(videoPath, music, outPath) {
+  const { duration } = await probe(videoPath);
+  const maxStart = Math.max(0, music.duration - duration - 3);
+  const start = maxStart > 15 ? 8 + Math.random() * (maxStart - 8) : 0;
+  const fadeOutAt = Math.max(0, duration - 2.5);
+  const clipVol = Number.isFinite(config.stitchClipAudioVolume) ? config.stitchClipAudioVolume : 0.12;
+  const filter =
+    `[0:a]volume=${clipVol}[a0];` +
+    `[1:a]atrim=0:${duration.toFixed(2)},asetpts=PTS-STARTPTS,afade=t=in:d=1.2,afade=t=out:st=${fadeOutAt.toFixed(2)}:d=2.5[a1];` +
+    '[a0][a1]amix=inputs=2:duration=first:dropout_transition=0,volume=2,alimiter=limit=0.95[a]';
+  await run('ffmpeg', [
+    '-y', '-i', videoPath,
+    '-ss', start.toFixed(2), '-i', music.full,
+    '-filter_complex', filter,
+    '-map', '0:v', '-map', '[a]',
+    '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k',
+    '-t', duration.toFixed(2),
+    outPath,
+  ]);
+}
+
+async function listSubfolders(auth, folderId) {
+  const drive = google.drive({ version: 'v3', auth });
+  const res = await drive.files.list(
+    {
+      q: `'${folderId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`,
+      fields: 'files(id, name)',
+      pageSize: 200,
+    },
+    { timeout: 60 * 1000 }
+  );
+  return res.data.files || [];
+}
+
+// "2_FAMILY_FUN" and "family fun" count as the same theme name.
+export function themeKey(name) {
+  return String(name || '').toLowerCase().replace(/[^a-z]/g, '');
+}
+
+// Joins the chosen clips into one video in outDir. Returns { finalName, withText, withMusic, musicName }.
+async function buildStitch(chosen, outDir, stamp, music) {
   const work = fs.mkdtempSync(path.join(os.tmpdir(), 'gk-stitch-'));
   const finalName = `GK_Stitch_${stamp}.mp4`;
   const hiddenOut = path.join(outDir, `.stitching-${stamp}.mp4`);
@@ -172,8 +284,19 @@ async function buildStitch(chosen, outDir, stamp) {
       parts.push(part);
     }
     const withText = await joinClips(parts, path.join(work, 'list.txt'), hiddenOut, config.stitchText);
+    let withMusic = false;
+    if (music) {
+      const musicOut = path.join(work, 'with-music.mp4');
+      try {
+        await addMusic(hiddenOut, music, musicOut);
+        fs.renameSync(musicOut, hiddenOut);
+        withMusic = true;
+      } catch (err) {
+        console.log(`Stitch: could not add the song (${err.message.slice(0, 120)}) -- saving the video without music.`);
+      }
+    }
     fs.renameSync(hiddenOut, path.join(outDir, finalName));
-    return { finalName, withText };
+    return { finalName, withText, withMusic, musicName: music ? music.name : '' };
   } catch (err) {
     fs.rmSync(hiddenOut, { force: true });
     throw err;
@@ -183,7 +306,7 @@ async function buildStitch(chosen, outDir, stamp) {
 }
 
 // Mac-folder mode: clips are consumed (moved to "used").
-async function stitchFromFolder(dir, outDir, state) {
+async function stitchFromFolder(auth, dir, outDir, state) {
   fs.mkdirSync(path.join(dir, 'used'), { recursive: true });
   const finished = listFinishedVideos(dir, config.localDropMinAgeSeconds);
   if (finished.length === 0) return;
@@ -210,7 +333,14 @@ async function stitchFromFolder(dir, outDir, state) {
     return;
   }
   console.log(`Stitch: joining ${chosen.length} clips (about ${Math.round(total)}s)...`);
-  const { finalName, withText } = await buildStitch(chosen, outDir, `${state.day}_${state.made + 1}`);
+  const music = await pickMusic(auth);
+  let result;
+  try {
+    result = await buildStitch(chosen, outDir, `${state.day}_${state.made + 1}`, music);
+  } finally {
+    if (music) fs.rmSync(music.full, { force: true });
+  }
+  const { finalName, withText, withMusic, musicName } = result;
   for (const clip of chosen) {
     let dest = path.join(dir, 'used', clip.name);
     if (fs.existsSync(dest)) dest = path.join(dir, 'used', `${Date.now()}-${clip.name}`);
@@ -220,15 +350,20 @@ async function stitchFromFolder(dir, outDir, state) {
   state.waitingLogged = false;
   state.failedAt = 0;
   saveState(state);
-  console.log(`Stitch: saved "${finalName}" to the drop folder${withText ? ' with the GK text line' : ''} (${state.made}/${config.stitchPerDay} today).`);
+  console.log(`Stitch: saved "${finalName}" to the drop folder${withText ? ' with the GK text line' : ''}${withMusic ? ` and the song "${musicName}"` : ''} (${state.made}/${config.stitchPerDay} today).`);
 }
 
 // Drive-stock mode: the library stays where it is. Random unused clips are
 // downloaded, joined, and remembered in stitch-used.json; when every clip has
 // been used the cycle starts again.
 async function stitchFromDrive(auth, folderId, outDir, state) {
-  const stock = await listDriveStock(auth, folderId);
   const needed = Math.min(MAX_CLIPS, Math.ceil(config.stitchTargetSeconds / config.stitchMaxClipSeconds) + 2);
+  const rootClips = await listDriveStock(auth, folderId);
+  const themes = [];
+  for (const sub of await listSubfolders(auth, folderId)) {
+    themes.push({ name: sub.name, clips: await listDriveStock(auth, sub.id) });
+  }
+  const stock = [...rootClips, ...themes.flatMap((t) => t.clips)];
   if (stock.length < needed) {
     if (!state.waitingLogged) {
       console.log(`Stitch: the Drive stock folder has ${stock.length} videos, need at least ${needed} -- waiting for more.`);
@@ -238,13 +373,24 @@ async function stitchFromDrive(auth, folderId, outDir, state) {
     return;
   }
   let used = loadUsedIds();
-  let pool = stock.filter((f) => !used.includes(f.id));
-  if (pool.length < needed) {
-    console.log('Stitch: every stock clip has been used once -- starting a new round.');
-    used = [];
-    pool = stock;
+  // Prefer ONE theme folder per video (all clips from the same subfolder), so
+  // the clips go together. Folders with too few unused clips are skipped.
+  let theme = null;
+  let pool = [];
+  const ready = themes.filter((t) => t.clips.filter((f) => !used.includes(f.id)).length >= needed);
+  if (ready.length > 0) {
+    theme = shuffled(ready)[0];
+    pool = theme.clips.filter((f) => !used.includes(f.id));
+  } else {
+    pool = stock.filter((f) => !used.includes(f.id));
+    if (pool.length < needed) {
+      console.log('Stitch: every stock clip has been used once -- starting a new round.');
+      used = [];
+      pool = stock;
+    }
   }
   const picked = shuffled(pool).slice(0, needed);
+  if (theme) console.log(`Stitch: using the "${theme.name}" folder (${picked.length} clips).`);
 
   const downloaded = [];
   const probed = [];
@@ -264,13 +410,20 @@ async function stitchFromDrive(auth, folderId, outDir, state) {
       return;
     }
     console.log(`Stitch: joining ${chosen.length} Drive stock clips (about ${Math.round(total)}s)...`);
-    const { finalName, withText } = await buildStitch(chosen, outDir, `${state.day}_${state.made + 1}`);
+    const music = await pickMusic(auth, theme ? theme.name : '');
+    let result;
+    try {
+      result = await buildStitch(chosen, outDir, `${state.day}_${state.made + 1}`, music);
+    } finally {
+      if (music) fs.rmSync(music.full, { force: true });
+    }
+    const { finalName, withText, withMusic, musicName } = result;
     saveUsedIds([...used, ...chosen.map((c) => c.id)]);
     state.made += 1;
     state.waitingLogged = false;
     state.failedAt = 0;
     saveState(state);
-    console.log(`Stitch: saved "${finalName}" to the drop folder${withText ? ' with the GK text line' : ''} (${state.made}/${config.stitchPerDay} today).`);
+    console.log(`Stitch: saved "${finalName}" to the drop folder${withText ? ' with the GK text line' : ''}${withMusic ? ` and the song "${musicName}"` : ''} (${state.made}/${config.stitchPerDay} today).`);
   } finally {
     for (const f of downloaded) fs.rmSync(f, { force: true });
   }
@@ -293,7 +446,7 @@ export async function stitchOnce(auth) {
 
   try {
     if (driveFolderId) await stitchFromDrive(auth, driveFolderId, outDir, state);
-    else await stitchFromFolder(dir, outDir, state);
+    else await stitchFromFolder(auth, dir, outDir, state);
   } catch (err) {
     console.error(`Stitch failed (will try again in an hour): ${err.message}`);
     state.failedAt = Date.now();
