@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { config } from './config.js';
 import { loadOAuthClient } from './googleAuth.js';
+import { uploadLocalDrops } from './localDrop.js';
 import { listNewVideos, listVideosInFolder, downloadFile, moveToDone, mirrorNewVideos, syncLogToDrive, uploadVerticalCopy } from './drive.js';
 import { findRowForFile, appendGeneratedRow, updateCoverImage } from './sheets.js';
 import { uploadToYouTube, postEngagementComment } from './youtube.js';
@@ -411,6 +412,12 @@ async function backfillGkJingCaptions() {
 }
 
 async function checkOnce() {
+  try {
+    await uploadLocalDrops(auth);
+  } catch (err) {
+    console.error('Local drop folder upload failed (will retry next cycle):', err.message);
+  }
+
   try {
     await mirrorNewVideos(auth);
   } catch (err) {
