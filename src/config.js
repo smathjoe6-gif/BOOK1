@@ -36,6 +36,11 @@ export const config = {
   stitchPerDay: process.env.STITCH_PER_DAY === undefined || process.env.STITCH_PER_DAY === '' ? 2 : Number(process.env.STITCH_PER_DAY),
   stitchText: process.env.STITCH_TEXT === undefined ? 'GK Legend Studio' : process.env.STITCH_TEXT,
   stitchFont: process.env.STITCH_FONT || '/System/Library/Fonts/Supplemental/Arial Bold.ttf',
+  // Music under the stacked video: songs (wav/mp3/m4a, at least ~8 MB) in this
+  // Drive folder; blank = no music. The clips' own sound is turned down to
+  // STITCH_CLIP_AUDIO_VOLUME (0 = muted) so random talking never fights the song.
+  stitchMusicDriveFolderId: process.env.STITCH_MUSIC_DRIVE_FOLDER_ID || '',
+  stitchClipAudioVolume: process.env.STITCH_CLIP_AUDIO_VOLUME === undefined || process.env.STITCH_CLIP_AUDIO_VOLUME === '' ? 0.12 : Number(process.env.STITCH_CLIP_AUDIO_VOLUME),
   canvaClientId: process.env.CANVA_CLIENT_ID || '',
   canvaClientSecret: process.env.CANVA_CLIENT_SECRET || '',
   canvaBrandTemplateId: process.env.CANVA_BRAND_TEMPLATE_ID || '',
