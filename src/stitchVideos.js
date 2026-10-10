@@ -3,6 +3,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { config } from './config.js';
 import { run } from './aspectRatio.js';
+import { google } from 'googleapis';
+import { downloadFile } from './drive.js';
 import { expandHome, listFinishedVideos } from './localDrop.js';
 
 // Video stacker: Joe keeps a stack of short clips (Grok Library downloads,
@@ -15,6 +17,7 @@ import { expandHome, listFinishedVideos } from './localDrop.js';
 // STITCH_FOLDER and LOCAL_DROP_FOLDER are both set. Needs ffmpeg.
 
 const STATE_PATH = path.join(process.cwd(), 'stitch-state.json');
+const USED_PATH = path.join(process.cwd(), 'stitch-used.json');
 const MAX_CLIPS = 20;
 const RETRY_AFTER_FAILURE_MS = 60 * 60 * 1000;
 
@@ -113,21 +116,75 @@ async function joinClips(partPaths, listPath, outPath, text) {
   }
 }
 
-export async function stitchOnce() {
-  const dir = expandHome(config.stitchFolder);
-  const outDir = expandHome(config.localDropFolder);
-  if (!dir) return;
-  if (!outDir) {
-    console.log('Stitch: STITCH_FOLDER is set but LOCAL_DROP_FOLDER is not -- nowhere to save the result, skipping.');
-    return;
+function loadUsedIds() {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(USED_PATH, 'utf8'));
+    return Array.isArray(parsed.used) ? parsed.used : [];
+  } catch {
+    return [];
   }
+}
+
+function saveUsedIds(used) {
+  fs.writeFileSync(USED_PATH, JSON.stringify({ used: used.slice(-5000) }, null, 2));
+}
+
+function shuffled(list) {
+  const copy = [...list];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+// Every video directly inside the Drive stock folder (all pages).
+async function listDriveStock(auth, folderId) {
+  const drive = google.drive({ version: 'v3', auth });
+  const found = [];
+  let pageToken;
+  do {
+    const res = await drive.files.list(
+      {
+        q: `'${folderId}' in parents and mimeType contains 'video/' and trashed = false`,
+        fields: 'nextPageToken, files(id, name)',
+        pageSize: 1000,
+        pageToken,
+      },
+      { timeout: 60 * 1000 }
+    );
+    found.push(...(res.data.files || []));
+    pageToken = res.data.nextPageToken;
+  } while (pageToken);
+  return found;
+}
+
+// Joins the chosen clips into one video in outDir. Returns { finalName, withText }.
+async function buildStitch(chosen, outDir, stamp) {
+  const work = fs.mkdtempSync(path.join(os.tmpdir(), 'gk-stitch-'));
+  const finalName = `GK_Stitch_${stamp}.mp4`;
+  const hiddenOut = path.join(outDir, `.stitching-${stamp}.mp4`);
+  try {
+    const parts = [];
+    for (let i = 0; i < chosen.length; i++) {
+      const part = path.join(work, `part-${i}.mp4`);
+      await normalizeClip(chosen[i], part);
+      parts.push(part);
+    }
+    const withText = await joinClips(parts, path.join(work, 'list.txt'), hiddenOut, config.stitchText);
+    fs.renameSync(hiddenOut, path.join(outDir, finalName));
+    return { finalName, withText };
+  } catch (err) {
+    fs.rmSync(hiddenOut, { force: true });
+    throw err;
+  } finally {
+    fs.rmSync(work, { recursive: true, force: true });
+  }
+}
+
+// Mac-folder mode: clips are consumed (moved to "used").
+async function stitchFromFolder(dir, outDir, state) {
   fs.mkdirSync(path.join(dir, 'used'), { recursive: true });
-  fs.mkdirSync(outDir, { recursive: true });
-
-  const state = loadState();
-  if (state.made >= config.stitchPerDay) return;
-  if (state.failedAt && Date.now() - state.failedAt < RETRY_AFTER_FAILURE_MS) return;
-
   const finished = listFinishedVideos(dir, config.localDropMinAgeSeconds);
   if (finished.length === 0) return;
 
@@ -152,37 +209,94 @@ export async function stitchOnce() {
     }
     return;
   }
+  console.log(`Stitch: joining ${chosen.length} clips (about ${Math.round(total)}s)...`);
+  const { finalName, withText } = await buildStitch(chosen, outDir, `${state.day}_${state.made + 1}`);
+  for (const clip of chosen) {
+    let dest = path.join(dir, 'used', clip.name);
+    if (fs.existsSync(dest)) dest = path.join(dir, 'used', `${Date.now()}-${clip.name}`);
+    fs.renameSync(clip.full, dest);
+  }
+  state.made += 1;
+  state.waitingLogged = false;
+  state.failedAt = 0;
+  saveState(state);
+  console.log(`Stitch: saved "${finalName}" to the drop folder${withText ? ' with the GK text line' : ''} (${state.made}/${config.stitchPerDay} today).`);
+}
 
-  const work = fs.mkdtempSync(path.join(os.tmpdir(), 'gk-stitch-'));
-  const stamp = `${state.day}_${state.made + 1}`;
-  const finalName = `GK_Stitch_${stamp}.mp4`;
-  const hiddenOut = path.join(outDir, `.stitching-${stamp}.mp4`);
+// Drive-stock mode: the library stays where it is. Random unused clips are
+// downloaded, joined, and remembered in stitch-used.json; when every clip has
+// been used the cycle starts again.
+async function stitchFromDrive(auth, folderId, outDir, state) {
+  const stock = await listDriveStock(auth, folderId);
+  const needed = Math.min(MAX_CLIPS, Math.ceil(config.stitchTargetSeconds / config.stitchMaxClipSeconds) + 2);
+  if (stock.length < needed) {
+    if (!state.waitingLogged) {
+      console.log(`Stitch: the Drive stock folder has ${stock.length} videos, need at least ${needed} -- waiting for more.`);
+      state.waitingLogged = true;
+      saveState(state);
+    }
+    return;
+  }
+  let used = loadUsedIds();
+  let pool = stock.filter((f) => !used.includes(f.id));
+  if (pool.length < needed) {
+    console.log('Stitch: every stock clip has been used once -- starting a new round.');
+    used = [];
+    pool = stock;
+  }
+  const picked = shuffled(pool).slice(0, needed);
+
+  const downloaded = [];
+  const probed = [];
   try {
-    console.log(`Stitch: joining ${chosen.length} clips (about ${Math.round(total)}s) into "${finalName}"...`);
-    const parts = [];
-    for (let i = 0; i < chosen.length; i++) {
-      const part = path.join(work, `part-${i}.mp4`);
-      await normalizeClip(chosen[i], part);
-      parts.push(part);
+    for (const f of picked) {
+      try {
+        const full = await downloadFile(auth, f.id, f.name.replace(/[^\w.-]+/g, '_'));
+        downloaded.push(full);
+        probed.push({ id: f.id, name: f.name, full, ...(await probe(full)) });
+      } catch (err) {
+        console.log(`Stitch: could not use "${f.name}" (${err.message.slice(0, 100)}) -- skipping it.`);
+      }
     }
-    const withText = await joinClips(parts, path.join(work, 'list.txt'), hiddenOut, config.stitchText);
-    fs.renameSync(hiddenOut, path.join(outDir, finalName));
-    for (const clip of chosen) {
-      let dest = path.join(dir, 'used', clip.name);
-      if (fs.existsSync(dest)) dest = path.join(dir, 'used', `${Date.now()}-${clip.name}`);
-      fs.renameSync(clip.full, dest);
+    const { chosen, total } = chooseClips(probed, config.stitchTargetSeconds, config.stitchMaxClipSeconds);
+    if (total < config.stitchTargetSeconds * 0.8) {
+      console.log(`Stitch: only ${Math.round(total)}s of readable clips this round -- will try again next cycle.`);
+      return;
     }
+    console.log(`Stitch: joining ${chosen.length} Drive stock clips (about ${Math.round(total)}s)...`);
+    const { finalName, withText } = await buildStitch(chosen, outDir, `${state.day}_${state.made + 1}`);
+    saveUsedIds([...used, ...chosen.map((c) => c.id)]);
     state.made += 1;
     state.waitingLogged = false;
     state.failedAt = 0;
     saveState(state);
     console.log(`Stitch: saved "${finalName}" to the drop folder${withText ? ' with the GK text line' : ''} (${state.made}/${config.stitchPerDay} today).`);
+  } finally {
+    for (const f of downloaded) fs.rmSync(f, { force: true });
+  }
+}
+
+export async function stitchOnce(auth) {
+  const dir = expandHome(config.stitchFolder);
+  const driveFolderId = config.stitchDriveFolderId;
+  const outDir = expandHome(config.localDropFolder);
+  if (!dir && !driveFolderId) return;
+  if (!outDir) {
+    console.log('Stitch: no LOCAL_DROP_FOLDER set -- nowhere to save the result, skipping.');
+    return;
+  }
+  fs.mkdirSync(outDir, { recursive: true });
+
+  const state = loadState();
+  if (state.made >= config.stitchPerDay) return;
+  if (state.failedAt && Date.now() - state.failedAt < RETRY_AFTER_FAILURE_MS) return;
+
+  try {
+    if (driveFolderId) await stitchFromDrive(auth, driveFolderId, outDir, state);
+    else await stitchFromFolder(dir, outDir, state);
   } catch (err) {
     console.error(`Stitch failed (will try again in an hour): ${err.message}`);
-    fs.rmSync(hiddenOut, { force: true });
     state.failedAt = Date.now();
     saveState(state);
-  } finally {
-    fs.rmSync(work, { recursive: true, force: true });
   }
 }

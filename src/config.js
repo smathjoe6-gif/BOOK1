@@ -28,6 +28,9 @@ export const config = {
   // folder into one ~60 s vertical video per run and saves it into
   // LOCAL_DROP_FOLDER. Blank = off.
   stitchFolder: process.env.STITCH_FOLDER || '',
+  // Or take the clips straight from a Google Drive folder (stays in Drive,
+  // clips are reused round after round). Wins over STITCH_FOLDER if both set.
+  stitchDriveFolderId: process.env.STITCH_DRIVE_FOLDER_ID || '',
   stitchTargetSeconds: Number(process.env.STITCH_TARGET_SECONDS) || 60,
   stitchMaxClipSeconds: Number(process.env.STITCH_MAX_CLIP_SECONDS) || 10,
   stitchPerDay: process.env.STITCH_PER_DAY === undefined || process.env.STITCH_PER_DAY === '' ? 2 : Number(process.env.STITCH_PER_DAY),

@@ -420,7 +420,7 @@ async function checkOnce() {
   }
 
   try {
-    await stitchOnce();
+    await stitchOnce(auth);
   } catch (err) {
     console.error('Video stacker failed (will retry next cycle):', err.message);
   }
