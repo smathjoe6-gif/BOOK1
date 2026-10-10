@@ -147,7 +147,7 @@ async function listDriveStock(auth, folderId) {
     const res = await drive.files.list(
       {
         q: `'${folderId}' in parents and mimeType contains 'video/' and trashed = false`,
-        fields: 'nextPageToken, files(id, name)',
+        fields: 'nextPageToken, files(id, name, createdTime)',
         pageSize: 1000,
         pageToken,
       },
@@ -156,7 +156,8 @@ async function listDriveStock(auth, folderId) {
     found.push(...(res.data.files || []));
     pageToken = res.data.nextPageToken;
   } while (pageToken);
-  return found;
+  // Oldest upload first: a story folder plays in the order Joe added the clips.
+  return found.sort((a, b) => String(a.createdTime || '').localeCompare(String(b.createdTime || '')));
 }
 
 const MUSIC_USED_PATH = path.join(process.cwd(), 'stitch-music-used.json');
@@ -203,19 +204,26 @@ async function listSongsDeep(auth, folderId, depth = 3) {
 // First music folder (searching down from the main one) whose name matches the
 // clip theme: same letters, or one contains the other ("HIP_HOP" ~ "02_HIP_HOP").
 async function findThemeMusicFolder(auth, rootId, themeName, depth = 3) {
-  const key = themeKey(themeName);
-  if (!key) return null;
+  // The whole theme name first, then each word of it ("Blacksmith_hiphop" ->
+  // "blacksmith", "hiphop"), so a clip folder can name its music style.
+  const keys = [themeKey(themeName), ...String(themeName).split(/[^A-Za-z]+/).map(themeKey).filter((k) => k.length >= 4)];
+  const wanted = [...new Set(keys.filter(Boolean))];
+  if (wanted.length === 0) return null;
+  const folders = [];
   let level = [{ id: rootId }];
   for (let d = 0; d <= depth && level.length > 0; d++) {
     const next = [];
     for (const parent of level) {
       for (const sub of await listSubfolders(auth, parent.id)) {
-        const k = themeKey(sub.name);
-        if (k && (k === key || k.includes(key) || key.includes(k))) return sub;
+        folders.push({ ...sub, key: themeKey(sub.name) });
         next.push(sub);
       }
     }
     level = next;
+  }
+  for (const key of wanted) {
+    const hit = folders.find((f) => f.key && (f.key === key || f.key.includes(key) || key.includes(f.key)));
+    if (hit) return hit;
   }
   return null;
 }
@@ -409,10 +417,16 @@ async function stitchFromDrive(auth, folderId, outDir, state) {
   // the clips go together. Folders with too few unused clips are skipped.
   let theme = null;
   let pool = [];
-  const ready = themes.filter((t) => t.clips.filter((f) => !used.includes(f.id)).length >= needed);
+  // A story folder is ready with about 5-6 unused clips (10 s each). Its clips
+  // play in upload order, never shuffled, so a story stays a story.
+  const themeNeeded = Math.max(4, Math.ceil(config.stitchTargetSeconds / 10) - 1);
+  const themeCount = Math.ceil(config.stitchTargetSeconds / 10);
+  const ready = themes.filter((t) => t.clips.filter((f) => !used.includes(f.id)).length >= themeNeeded);
+  let picked;
   if (ready.length > 0) {
     theme = shuffled(ready)[0];
     pool = theme.clips.filter((f) => !used.includes(f.id));
+    picked = pool.slice(0, themeCount);
   } else {
     pool = stock.filter((f) => !used.includes(f.id));
     if (pool.length < needed) {
@@ -420,8 +434,8 @@ async function stitchFromDrive(auth, folderId, outDir, state) {
       used = [];
       pool = stock;
     }
+    picked = shuffled(pool).slice(0, needed);
   }
-  const picked = shuffled(pool).slice(0, needed);
   if (theme) console.log(`Stitch: using the "${theme.name}" folder (${picked.length} clips).`);
 
   const downloaded = [];
@@ -436,7 +450,7 @@ async function stitchFromDrive(auth, folderId, outDir, state) {
         console.log(`Stitch: could not use "${f.name}" (${err.message.slice(0, 100)}) -- skipping it.`);
       }
     }
-    const { chosen, total } = chooseClips(probed, config.stitchTargetSeconds, config.stitchMaxClipSeconds);
+    const { chosen, total } = chooseClips(probed, config.stitchTargetSeconds, theme ? 10 : config.stitchMaxClipSeconds);
     if (total < config.stitchTargetSeconds * 0.8) {
       console.log(`Stitch: only ${Math.round(total)}s of readable clips this round -- will try again next cycle.`);
       return;
