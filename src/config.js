@@ -24,6 +24,15 @@ export const config = {
   // script uploads them to GK_TERMINAL (see src/localDrop.js). Blank = off.
   localDropFolder: process.env.LOCAL_DROP_FOLDER || '',
   localDropMinAgeSeconds: Number(process.env.LOCAL_DROP_MIN_AGE_SECONDS) || 120,
+  // Video stacker (src/stitchVideos.js): joins short clips from this Mac
+  // folder into one ~60 s vertical video per run and saves it into
+  // LOCAL_DROP_FOLDER. Blank = off.
+  stitchFolder: process.env.STITCH_FOLDER || '',
+  stitchTargetSeconds: Number(process.env.STITCH_TARGET_SECONDS) || 60,
+  stitchMaxClipSeconds: Number(process.env.STITCH_MAX_CLIP_SECONDS) || 10,
+  stitchPerDay: process.env.STITCH_PER_DAY === undefined || process.env.STITCH_PER_DAY === '' ? 2 : Number(process.env.STITCH_PER_DAY),
+  stitchText: process.env.STITCH_TEXT === undefined ? 'GK Legend Studio' : process.env.STITCH_TEXT,
+  stitchFont: process.env.STITCH_FONT || '/System/Library/Fonts/Supplemental/Arial Bold.ttf',
   canvaClientId: process.env.CANVA_CLIENT_ID || '',
   canvaClientSecret: process.env.CANVA_CLIENT_SECRET || '',
   canvaBrandTemplateId: process.env.CANVA_BRAND_TEMPLATE_ID || '',

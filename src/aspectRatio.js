@@ -18,7 +18,7 @@ const SPAWN_ENV = {
   PATH: [...BREW_PATHS, process.env.PATH || ''].filter(Boolean).join(path.delimiter),
 };
 
-function run(cmd, args) {
+export function run(cmd, args) {
   return new Promise((resolve, reject) => {
     const proc = spawn(cmd, args, { env: SPAWN_ENV });
     let stdout = '';
