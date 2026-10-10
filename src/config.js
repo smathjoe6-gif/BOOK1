@@ -20,6 +20,10 @@ export const config = {
   // just its own GK_TERMINAL ones. Leave blank to skip this and only
   // caption GK_TERMINAL videos as before.
   gkJingFolderId: process.env.GK_JING_FOLDER_ID || '',
+  // Mac folder Grok Bot (or anything local) saves finished videos into; the
+  // script uploads them to GK_TERMINAL (see src/localDrop.js). Blank = off.
+  localDropFolder: process.env.LOCAL_DROP_FOLDER || '',
+  localDropMinAgeSeconds: Number(process.env.LOCAL_DROP_MIN_AGE_SECONDS) || 120,
   canvaClientId: process.env.CANVA_CLIENT_ID || '',
   canvaClientSecret: process.env.CANVA_CLIENT_SECRET || '',
   canvaBrandTemplateId: process.env.CANVA_BRAND_TEMPLATE_ID || '',
