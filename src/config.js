@@ -45,6 +45,12 @@ export const config = {
   stitchDesign: process.env.STITCH_DESIGN !== 'false',
   stitchHook: process.env.STITCH_HOOK || '',
   stitchEndText: process.env.STITCH_END_TEXT === undefined ? 'Follow for more' : process.env.STITCH_END_TEXT,
+  // Automatic matching (src/stitchMatch.js): Gemini labels every stock clip and song
+  // so clips of one kind are stacked together with a song of the same kind.
+  // STITCH_AUTO_MATCH=false = off. Needs GEMINI_API_KEY. Per script cycle it tags up
+  // to STITCH_CLASSIFY_PER_CYCLE clips (plus 2 songs) that were not judged yet.
+  stitchAutoMatch: process.env.STITCH_AUTO_MATCH !== 'false',
+  stitchClassifyPerCycle: Number(process.env.STITCH_CLASSIFY_PER_CYCLE) || 10,
   stitchMusicDriveFolderId: process.env.STITCH_MUSIC_DRIVE_FOLDER_ID || '',
   stitchClipAudioVolume: process.env.STITCH_CLIP_AUDIO_VOLUME === undefined || process.env.STITCH_CLIP_AUDIO_VOLUME === '' ? 0.12 : Number(process.env.STITCH_CLIP_AUDIO_VOLUME),
   canvaClientId: process.env.CANVA_CLIENT_ID || '',
