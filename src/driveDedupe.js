@@ -15,10 +15,10 @@ import { PROTECTED_IDS, isProtected } from './driveTidy.js';
 // Binned files stay recoverable in Drive's Bin for 30 days.
 //
 //   npm run dedupe-drive            (look only)
-//   npm run dedupe-drive -- --do    (do it; at most 500 files per run, run again for more)
+//   npm run dedupe-drive -- --do    (do it; at most 2000 files per run, run again for more)
 
 const FOLDER = 'application/vnd.google-apps.folder';
-const MAX_PER_RUN = 500;
+const MAX_PER_RUN = 2000;
 
 async function listAll(drive, q, fields) {
   const found = [];
