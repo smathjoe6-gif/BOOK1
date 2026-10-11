@@ -18,11 +18,11 @@ const FOLDER = 'application/vnd.google-apps.folder';
 
 export const TARGETS = [
   { name: '01_Active_Projects', rule: /^(01_ACTIVE|ACTIVE_PROJECTS|03_Workflows|Build a workflow|Google AI Studio|GKwebfission|ORGANIZE_MY_VIDEOS)/i },
-  { name: '03_Videos_and_Music', rule: /^(03_VIDEOS|Finish_Work_Posted|NIGH JAM|IGK BUSS)/i },
-  { name: '04_Entertainment_Creative', rule: /^("?Think Tank|"?Omini-Legend|CREATIVE_CONTENT|Gemini Gems|From Canva|Image_Exports|CULTURE_COMMUNITY|04_PICTURES|00_GK_PUBLISHED|BRAND_IDENTITY|03_GK_BRAND|FOLDER_0\d|GK_STUDIO_PUBLIC|GK_Studio_Memory)/i },
-  { name: '05_Business', rule: /^(GK_FINANCIAL|GK_AGENCY|GK_AGEBCT|STUCK_AGENCY|GK_FINAL_DIRECTION|gk_business|Money|Skiller)/i },
-  { name: '06_Documentary_Education', rule: /^(01_DOCUMENTARY|Family_Education|The Code of the Modern|The Guardian Guide|Concrete Legacy)/i },
-  { name: '07_Archive', rule: /^(05_LEGEND_ARCHIVE|01_Vortex_Core|GK_VORTEX_CORE|Guardian Vortex|04_CHAMA_NINE)/i },
+  { name: '03_Videos_and_Music', rule: /^(0\d_VIDEOS|0\d_AUDIO|Finish_Work_Posted|NIGH JAM|IGK BUSS|HIT SONG)/i },
+  { name: '04_Entertainment_Creative', rule: /^(['"]*Think Tank|['"]*Omini-Legend|CREATIVE_CONTENT|Gemini Gems|From Canva|Image_Exports|CULTURE_COMMUNITY|0\d_IMAGES|04_PICTURES|05_PATRIOTIC|00_GK_PUBLISHED|BRAND_IDENTITY|03_GK_BRAND|FOLDER_0\d|GK_STUDIO_PUBLIC|GK_Studio_Memory)/i },
+  { name: '05_Business', rule: /^(GK_FINANCIAL|GK_AGENCY|GK_AGEBCT|0\d_GK_AGENCY|08_OPPORTUNITY|STUCK_AGENCY|GK_FINAL_DIRECTION|gk_business|Money|Skiller)/i },
+  { name: '06_Documentary_Education', rule: /^(01_DOCUMENTARY|0\d_DOCUMENTS|Family_Education|The Code of the Modern|The Guardian Guide|Concrete Legacy)/i },
+  { name: '07_Archive', rule: /^(05_LEGEND_ARCHIVE|01_Vortex_Core|GK_VORTEX_CORE|Guardian Vortex|04_CHAMA_NINE|EVERYTHING FIX|GK_Legend_Rescued|diin2 downloads|gemin foder)/i },
 ];
 const KEEP_AT_TOP = /^(02_Brand_Assets|0[1-7]_(Active_Projects|Videos_and_Music|Entertainment_Creative|Business|Documentary_Education|Archive))$/i;
 
