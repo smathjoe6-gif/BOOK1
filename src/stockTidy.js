@@ -59,6 +59,18 @@ async function getOrCreateFolder(drive, parentId, name) {
   return created.data.id;
 }
 
+// Folders whose loose VIDEOS are pulled into the stock folder (Joe's
+// EVERY-DESKTOP-DOWNLOADS, which is also where his songs live: only video files
+// are touched, songs and everything else stay). A video that is already in the
+// stock (same md5) or already seen in an earlier inbox folder is a duplicate and
+// goes to the Bin; every other video is moved into the stock folder.
+export function inboxFolderIds() {
+  return String(process.env.STITCH_INBOX_FOLDER_IDS ?? '1CxC7BK5neABEU5qKD4ljT9eOAcqp0efl')
+    .split(',')
+    .map((x) => x.trim())
+    .filter(Boolean);
+}
+
 export async function tidyStockFolder(auth, folderId) {
   const drive = google.drive({ version: 'v3', auth });
 
@@ -71,9 +83,44 @@ export async function tidyStockFolder(auth, folderId) {
   for (const place of places) {
     for (const f of await listVideos(drive, place.id)) clips.push({ ...f, parent: place.id, parentShape: place.shape });
   }
-  if (clips.length === 0) return;
-
   let actions = 0;
+  let pulled = 0;
+  let inboxBinned = 0;
+
+  // 0) Pull videos in from the inbox folders (duplicates of the stock go to the Bin).
+  const seenHashes = new Set(clips.map((c) => c.md5Checksum).filter(Boolean));
+  for (const inboxId of inboxFolderIds()) {
+    if (inboxId === folderId) continue;
+    let inbox;
+    try {
+      inbox = await listVideos(drive, inboxId);
+    } catch (err) {
+      console.error(`Stock tidy: could not read inbox folder ${inboxId} (will retry next cycle):`, err.message);
+      continue;
+    }
+    inbox.sort((a, b) => String(a.createdTime || '').localeCompare(String(b.createdTime || '')));
+    for (const v of inbox) {
+      if (actions >= MAX_ACTIONS_PER_RUN) break;
+      try {
+        if (v.md5Checksum && seenHashes.has(v.md5Checksum)) {
+          await drive.files.update({ fileId: v.id, requestBody: { trashed: true }, fields: 'id' }, { timeout: API_TIMEOUT_MS });
+          inboxBinned += 1;
+        } else {
+          await drive.files.update(
+            { fileId: v.id, addParents: folderId, removeParents: inboxId, fields: 'id' },
+            { timeout: API_TIMEOUT_MS }
+          );
+          if (v.md5Checksum) seenHashes.add(v.md5Checksum);
+          clips.push({ ...v, parent: folderId, parentShape: null });
+          pulled += 1;
+        }
+        actions += 1;
+      } catch (err) {
+        console.error(`Stock tidy: could not handle inbox video "${v.name}" (will retry next cycle):`, err.message);
+      }
+    }
+  }
+  if (clips.length === 0) return;
 
   // 1) Exact duplicates (same md5): keep the oldest, Bin the rest.
   const byHash = new Map();
@@ -119,7 +166,9 @@ export async function tidyStockFolder(auth, folderId) {
       console.error(`Stock tidy: could not file "${c.name}" (will retry next cycle):`, err.message);
     }
   }
-  if (binned.size + moved > 0) {
-    console.log(`Stock tidy: moved ${binned.size} exact duplicate(s) to the Bin and filed ${moved} clip(s) into 9x16 / 16x9.`);
+  if (binned.size + moved + pulled + inboxBinned > 0) {
+    console.log(
+      `Stock tidy: moved ${binned.size + inboxBinned} exact duplicate(s) to the Bin, pulled ${pulled} new video(s) in from the downloads folder and filed ${moved} clip(s) into 9x16 / 16x9.`
+    );
   }
 }
