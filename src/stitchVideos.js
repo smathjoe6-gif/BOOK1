@@ -6,6 +6,11 @@ import { run } from './aspectRatio.js';
 import { google } from 'googleapis';
 import { downloadFile } from './drive.js';
 import { expandHome, listFinishedVideos } from './localDrop.js';
+import {
+  HOOKS, LABELS, SONGS_FOR, RateLimited,
+  classifyClipFile, classifySongFile, labelFromName,
+  loadClipTags, loadSongTags, saveClipTag, saveSongTag,
+} from './stitchMatch.js';
 
 // Video stacker: Joe keeps a stack of short clips (Grok Library downloads,
 // stock footage he owns) in STITCH_FOLDER. Each cycle, up to STITCH_PER_DAY
@@ -234,7 +239,7 @@ async function findThemeMusicFolder(auth, rootId, themeName, depth = 3) {
   return null;
 }
 
-async function pickMusic(auth, themeName = '') {
+async function pickMusic(auth, themeName = '', label = null) {
   let folderId = config.stitchMusicDriveFolderId;
   if (!folderId) return null;
   try {
@@ -257,9 +262,23 @@ async function pickMusic(auth, themeName = '') {
       console.log('Stitch: no usable songs in the music folder -- making the video without music.');
       return null;
     }
+    // Songs Gemini has judged: take the kinds that suit these clips, best first.
+    let candidates = usable;
+    const kindLabel = label || labelFromName(themeName);
+    if (kindLabel) {
+      const songTags = loadSongTags();
+      for (const kind of SONGS_FOR[kindLabel] || []) {
+        const match = usable.filter((f) => songTags[f.id]?.label === kind);
+        if (match.length > 0) {
+          candidates = match;
+          console.log(`Stitch: choosing a ${kind} song for the ${kindLabel} clips (${match.length} to pick from).`);
+          break;
+        }
+      }
+    }
     const recent = loadMusicUsed().slice(-5);
-    const fresh = usable.filter((f) => !recent.includes(f.id));
-    const song = shuffled(fresh.length > 0 ? fresh : usable)[0];
+    const fresh = candidates.filter((f) => !recent.includes(f.id));
+    const song = shuffled(fresh.length > 0 ? fresh : candidates)[0];
     const full = await downloadFile(auth, song.id, song.name.replace(/[^\w.-]+/g, '_'));
     const { duration } = await probe(full);
     if (duration < 20) {
@@ -351,6 +370,7 @@ async function designPass(videoPath, outPath, { hook, brand, endText }) {
 // "2_FAMILY_FUN" / "Blacksmith_hiphop" -> the story word shown in the hook.
 export function hookFor(themeName) {
   if (config.stitchHook) return cleanText(config.stitchHook).toUpperCase();
+  if (HOOKS[themeName]) return HOOKS[themeName];
   const word = String(themeName || '')
     .split(/[^A-Za-z]+/)
     .find((w) => w.length >= 4 && !/^(hiphop|somali|slow|cinematic|music|mix|story|fun)$/i.test(w));
@@ -480,15 +500,23 @@ async function stitchFromDrive(auth, folderId, outDir, state) {
     return;
   }
   let used = loadUsedIds();
-  // Prefer ONE theme folder per video (all clips from the same subfolder), so
-  // the clips go together. Folders with too few unused clips are skipped.
+  // Prefer ONE group of clips that belong together: a folder Joe made (clips play
+  // in upload order) or an automatic group (clips Gemini labelled the same kind).
+  // A group is ready with about 5-6 unused clips (10 s each).
   let theme = null;
   let pool = [];
-  // A story folder is ready with about 5-6 unused clips (10 s each). Its clips
-  // play in upload order, never shuffled, so a story stays a story.
   const themeNeeded = Math.max(4, Math.ceil(config.stitchTargetSeconds / 10) - 1);
   const themeCount = Math.ceil(config.stitchTargetSeconds / 10);
-  const ready = themes.filter((t) => t.clips.filter((f) => !used.includes(f.id)).length >= themeNeeded);
+  const clipTags = loadClipTags();
+  const autoGroups = LABELS.map((label) => ({
+    name: label,
+    label,
+    clips: rootClips.filter((c) => clipTags[c.id]?.label === label),
+  }));
+  const manualGroups = themes.map((t) => ({ name: t.name, label: labelFromName(t.name), clips: t.clips }));
+  const ready = [...manualGroups, ...autoGroups].filter(
+    (g) => g.clips.filter((f) => !used.includes(f.id)).length >= themeNeeded
+  );
   let picked;
   if (ready.length > 0) {
     theme = shuffled(ready)[0];
@@ -503,7 +531,7 @@ async function stitchFromDrive(auth, folderId, outDir, state) {
     }
     picked = shuffled(pool).slice(0, needed);
   }
-  if (theme) console.log(`Stitch: using the "${theme.name}" folder (${picked.length} clips).`);
+  if (theme) console.log(`Stitch: using the "${theme.name}" ${LABELS.includes(theme.name) ? 'clips Gemini matched together' : 'folder'} (${picked.length} clips).`);
 
   const downloaded = [];
   const probed = [];
@@ -523,7 +551,7 @@ async function stitchFromDrive(auth, folderId, outDir, state) {
       return;
     }
     console.log(`Stitch: joining ${chosen.length} Drive stock clips (about ${Math.round(total)}s)...`);
-    const music = await pickMusic(auth, theme ? theme.name : '');
+    const music = await pickMusic(auth, theme ? theme.name : '', theme ? theme.label : null);
     let result;
     try {
       result = await buildStitch(chosen, outDir, `${state.day}_${state.made + 1}`, music, theme ? theme.name : '');
@@ -542,6 +570,66 @@ async function stitchFromDrive(auth, folderId, outDir, state) {
   }
 }
 
+// Judges clips and songs that Gemini has not seen yet (a few per cycle, cached
+// forever). Quota answers stop it quietly until the next cycle.
+async function matchBacklog(auth, folderId) {
+  if (!config.stitchAutoMatch || !config.geminiApiKey) return;
+  const started = Date.now();
+  const budgetMs = 150 * 1000;
+  const needsTag = (t) => !t || (t.failed && t.failed < 2);
+  let clipsDone = 0;
+  let songsDone = 0;
+  try {
+    const clipTags = loadClipTags();
+    const clips = (await listDriveStock(auth, folderId)).filter((c) => needsTag(clipTags[c.id]));
+    for (const c of clips.slice(0, config.stitchClassifyPerCycle)) {
+      if (Date.now() - started > budgetMs) break;
+      let full;
+      try {
+        full = await downloadFile(auth, c.id, c.name.replace(/[^\w.-]+/g, '_'));
+        saveClipTag(c.id, await classifyClipFile(full));
+        clipsDone++;
+      } catch (err) {
+        if (err instanceof RateLimited) throw err;
+        console.log(`Stitch: could not judge clip "${c.name}" (${err.message.slice(0, 100)}).`);
+        saveClipTag(c.id, { label: 'OTHER', failed: (clipTags[c.id]?.failed || 0) + 1 });
+      } finally {
+        if (full) fs.rmSync(full, { force: true });
+      }
+    }
+
+    const musicFolder = config.stitchMusicDriveFolderId;
+    if (musicFolder && Date.now() - started < budgetMs) {
+      const songTags = loadSongTags();
+      const songs = (await listSongsDeep(auth, musicFolder)).filter(
+        (f) => Number(f.size) >= MIN_MUSIC_BYTES && !/ssstik/i.test(f.name) && needsTag(songTags[f.id])
+      );
+      for (const song of songs.slice(0, 2)) {
+        if (Date.now() - started > budgetMs) break;
+        let full;
+        try {
+          full = await downloadFile(auth, song.id, song.name.replace(/[^\w.-]+/g, '_'));
+          saveSongTag(song.id, await classifySongFile(full));
+          songsDone++;
+        } catch (err) {
+          if (err instanceof RateLimited) throw err;
+          console.log(`Stitch: could not judge song "${song.name}" (${err.message.slice(0, 100)}).`);
+          saveSongTag(song.id, { label: 'OTHER', failed: (songTags[song.id]?.failed || 0) + 1 });
+        } finally {
+          if (full) fs.rmSync(full, { force: true });
+        }
+      }
+    }
+  } catch (err) {
+    if (err instanceof RateLimited) console.log('Stitch: Gemini quota used up for now -- matching resumes next cycle.');
+    else console.log(`Stitch: matching step failed (${err.message.slice(0, 120)}).`);
+  }
+  if (clipsDone + songsDone > 0) {
+    const tagged = Object.values(loadClipTags()).filter((t) => t.label && t.label !== 'OTHER').length;
+    console.log(`Stitch: judged ${clipsDone} clip(s) and ${songsDone} song(s) (${tagged} clips matched into groups so far).`);
+  }
+}
+
 export async function stitchOnce(auth) {
   const dir = expandHome(config.stitchFolder);
   const driveFolderId = config.stitchDriveFolderId;
@@ -552,6 +640,8 @@ export async function stitchOnce(auth) {
     return;
   }
   fs.mkdirSync(outDir, { recursive: true });
+
+  if (driveFolderId) await matchBacklog(auth, driveFolderId);
 
   const state = loadState();
   if (state.made >= config.stitchPerDay) return;
