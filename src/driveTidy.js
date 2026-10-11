@@ -39,6 +39,7 @@ export const PROTECTED_IDS = new Set([
   '14UWenEm7EeOrhi_YeADKiZhQYD3iNgGi', // Skiller
   '1CUN7F1P8Vp1zwnEnAfBjchIlz_eFz5hW', // Family_Education
   '1_e-3dGFVjdUukjJViLj-YBfWCo3IGzJE', // Money
+  '19Fh6Y4gDXxr7XowyLrtOovW7UU5BovMD', // "diin2 dowwnloads gk" (downloads from Joe's other Google login)
   '1_9noLV6Zt5OLXys4l-WjffqDWqhRYnlD', // Lekker_Globally_Dropshipping
   '1CTyuAHVh_SRJhF6NO72zPLh9EfPmujtZ', // 05_Business_Flow
 ]);

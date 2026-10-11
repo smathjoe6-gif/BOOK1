@@ -65,7 +65,7 @@ async function getOrCreateFolder(drive, parentId, name) {
 // stock (same md5) or already seen in an earlier inbox folder is a duplicate and
 // goes to the Bin; every other video is moved into the stock folder.
 export function inboxFolderIds() {
-  return String(process.env.STITCH_INBOX_FOLDER_IDS ?? '1CxC7BK5neABEU5qKD4ljT9eOAcqp0efl')
+  return String(process.env.STITCH_INBOX_FOLDER_IDS ?? '1CxC7BK5neABEU5qKD4ljT9eOAcqp0efl,19Fh6Y4gDXxr7XowyLrtOovW7UU5BovMD')
     .split(',')
     .map((x) => x.trim())
     .filter(Boolean);

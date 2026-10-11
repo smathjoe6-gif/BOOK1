@@ -87,13 +87,20 @@ async function getOrCreate(drive, name) {
 export async function applyReorg(drive, plan, log = console.log) {
   const ids = {};
   let moved = 0;
+  // files.update wants the real id of the folder to remove, not the word "root".
+  let rootId = 'root';
+  try {
+    rootId = (await drive.files.get({ fileId: 'root', fields: 'id' })).data.id || 'root';
+  } catch {
+    /* fall back to the alias */
+  }
   for (const m of plan.moves) {
     try {
       if (!ids[m.target]) ids[m.target] = await getOrCreate(drive, m.target);
-      await drive.files.update({ fileId: m.folder.id, addParents: ids[m.target], removeParents: 'root', fields: 'id' });
+      await drive.files.update({ fileId: m.folder.id, addParents: ids[m.target], removeParents: rootId, fields: 'id' });
       moved += 1;
     } catch (err) {
-      log(`  could not move "${m.folder.name}" (${err.message.slice(0, 80)}) -- left where it is.`);
+      log(`  could not move "${m.folder.name}": ${String(err.message).slice(0, 200)} -- left where it is.`);
     }
   }
   return moved;
