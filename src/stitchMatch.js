@@ -12,6 +12,7 @@ import { run } from './aspectRatio.js';
 // This is analysis of existing files, not image/video generation.
 
 export const LABELS = [
+  'SOMALI_WOMEN', // Somali women: hijab/jilbaab, women's strength, intelligence, motherhood
   'SOMALI_HERITAGE', // Somali people/culture/dress/places, kaban, Somali language
   'HIPHOP_URBAN', // hip-hop/rap, streets, city, street style, attitude
   'SLOW_EMOTIONAL', // calm, sad, reflective, tender, sunset, slow ballad
@@ -23,7 +24,8 @@ export const LABELS = [
 
 // Which song kinds suit each clip kind, best first.
 export const SONGS_FOR = {
-  SOMALI_HERITAGE: ['SOMALI_HERITAGE', 'SLOW_EMOTIONAL'],
+  SOMALI_WOMEN: ['SOMALI_WOMEN', 'SOMALI_HERITAGE', 'SLOW_EMOTIONAL'],
+  SOMALI_HERITAGE: ['SOMALI_HERITAGE', 'SOMALI_WOMEN', 'SLOW_EMOTIONAL'],
   HIPHOP_URBAN: ['HIPHOP_URBAN'],
   SLOW_EMOTIONAL: ['SLOW_EMOTIONAL', 'SOMALI_HERITAGE'],
   STORY_CINEMATIC: ['STORY_CINEMATIC', 'SLOW_EMOTIONAL'],
@@ -33,6 +35,7 @@ export const SONGS_FOR = {
 };
 
 export const HOOKS = {
+  SOMALI_WOMEN: 'THE GENIUS UNDER THE HIJAB',
   SOMALI_HERITAGE: 'OUR HERITAGE',
   HIPHOP_URBAN: 'TURN IT UP',
   SLOW_EMOTIONAL: 'FEEL THIS',
@@ -41,6 +44,19 @@ export const HOOKS = {
   NATURE_ANIMALS: 'WATCH THIS',
   CRAFT_FOOD: 'WATCH HOW ITS MADE',
 };
+
+// Joe can tell the matcher what a song is about without waiting for Gemini:
+// STITCH_SONG_LABELS="solo=SOMALI_WOMEN;awood=SOMALI_WOMEN" (part of the file
+// name, lowercase = LABEL). Used for songs whose words Gemini may not follow.
+export function songOverride(name) {
+  const raw = process.env.STITCH_SONG_LABELS || '';
+  const lower = String(name || '').toLowerCase();
+  for (const pair of raw.split(';')) {
+    const [key, label] = pair.split('=').map((x) => (x || '').trim());
+    if (key && LABELS.includes(label) && lower.includes(key.toLowerCase())) return label;
+  }
+  return null;
+}
 
 const CLIP_TAGS_PATH = path.join(process.cwd(), 'stitch-clip-tags.json');
 const SONG_TAGS_PATH = path.join(process.cwd(), 'stitch-song-tags.json');
@@ -78,6 +94,7 @@ export function labelFromName(name) {
   // A music-style word wins over a topic word: "blacksmith_hiphop" is a hip-hop story.
   const styleTable = [
     [/^(hiphop|rap|urban|street)$/, 'HIPHOP_URBAN'],
+    [/^(women|woman|hijab|jilbaab|jilbab|girls|ladies|mothers)$/, 'SOMALI_WOMEN'],
     [/^(somali|heritage)$/, 'SOMALI_HERITAGE'],
     [/^(slow|sad|calm|emotional|ballad)$/, 'SLOW_EMOTIONAL'],
     [/^(cinematic|epic)$/, 'STORY_CINEMATIC'],
@@ -145,7 +162,7 @@ function parseLabel(text) {
   const upper = String(text || '').toUpperCase();
   const label = LABELS.find((l) => upper.includes(l)) || null;
   const subject = (String(text).match(/subject"?\s*[:=]\s*"?([^"\n,}]{2,40})/i) || [])[1] || '';
-  return { label: label || 'OTHER', subject: subject.trim() };
+  return { label: label || 'OTHER', subject: subject.trim(), v: 2 };
 }
 
 async function probeDuration(file) {
@@ -156,7 +173,7 @@ async function probeDuration(file) {
 const CLIP_QUESTION =
   'These 3 frames are from one short video, left to right. Decide what KIND of video it is and answer with ONE label from this list, ' +
   `then a short subject (2-4 words):\n${LABELS.join(', ')}.\n` +
-  'SOMALI_HERITAGE = Somali people, dress, places, culture. HIPHOP_URBAN = streets, city, hip-hop attitude. ' +
+  'SOMALI_WOMEN = Somali women (hijab, jilbaab, women\'s strength, intelligence, mothers). SOMALI_HERITAGE = Somali people, dress, places, culture. HIPHOP_URBAN = streets, city, hip-hop attitude. ' +
   'SLOW_EMOTIONAL = calm, sad or tender mood. STORY_CINEMATIC = dramatic story, epic or historical scene. ' +
   'FUNNY_VIRAL = comedy, pranks, kids/family fun, playful. NATURE_ANIMALS = animals, wildlife, landscapes. ' +
   'CRAFT_FOOD = hands making things, cooking, workshops, markets.\n' +
@@ -165,7 +182,7 @@ const CLIP_QUESTION =
 const SONG_QUESTION =
   'Listen to this piece of a song and decide what KIND of song it is. Answer with ONE label from this list, then a short subject (2-4 words):\n' +
   `${LABELS.join(', ')}.\n` +
-  'SOMALI_HERITAGE = Somali language or traditional Somali sound (kaban/oud, dhaanto). HIPHOP_URBAN = rap/hip-hop/trap beat. ' +
+  'SOMALI_WOMEN = lyrics or mood about Somali women (hijab, jilbaab, women\'s strength, intelligence). SOMALI_HERITAGE = Somali language or traditional Somali sound (kaban/oud, dhaanto). HIPHOP_URBAN = rap/hip-hop/trap beat. ' +
   'SLOW_EMOTIONAL = slow, sad or tender ballad. STORY_CINEMATIC = epic, orchestral, dramatic, cinematic. ' +
   'FUNNY_VIRAL = playful, upbeat, bouncy, party. NATURE_ANIMALS = calm ambient/nature. CRAFT_FOOD = warm acoustic, work-song feel.\n' +
   'Answer exactly like: label=SLOW_EMOTIONAL subject=sad kaban ballad';
