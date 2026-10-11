@@ -11,6 +11,7 @@ import {
   classifyClipFile, classifySongFile, labelFromName,
   loadClipTags, loadSongTags, saveClipTag, saveSongTag, songOverride,
 } from './stitchMatch.js';
+import { isShapeFolder, tidyStockFolder } from './stockTidy.js';
 
 // Video stacker: Joe keeps a stack of short clips (Grok Library downloads,
 // stock footage he owns) in STITCH_FOLDER. Each cycle, up to STITCH_PER_DAY
@@ -169,6 +170,17 @@ async function listDriveStock(auth, folderId) {
   } while (pageToken);
   // Oldest upload first: a story folder plays in the order Joe added the clips.
   return found.sort((a, b) => String(a.createdTime || '').localeCompare(String(b.createdTime || '')));
+}
+
+// The loose pool: clips directly in the stock folder plus clips filed in the
+// "9x16 (Vertical)" / "16x9 (Horizontal)" folders (stockTidy.js files them there).
+// Story / theme folders Joe made are separate groups and are not part of it.
+async function listLooseStock(auth, folderId) {
+  let clips = await listDriveStock(auth, folderId);
+  for (const sub of await listSubfolders(auth, folderId)) {
+    if (isShapeFolder(sub.name)) clips = clips.concat(await listDriveStock(auth, sub.id));
+  }
+  return clips.sort((a, b) => String(a.createdTime || '').localeCompare(String(b.createdTime || '')));
 }
 
 const MUSIC_USED_PATH = path.join(process.cwd(), 'stitch-music-used.json');
@@ -499,9 +511,10 @@ async function stitchFromFolder(auth, dir, outDir, state) {
 // been used the cycle starts again.
 async function stitchFromDrive(auth, folderId, outDir, state) {
   const needed = Math.min(MAX_CLIPS, Math.ceil(config.stitchTargetSeconds / config.stitchMaxClipSeconds) + 2);
-  const rootClips = await listDriveStock(auth, folderId);
+  const rootClips = await listLooseStock(auth, folderId);
   const themes = [];
   for (const sub of await listSubfolders(auth, folderId)) {
+    if (isShapeFolder(sub.name)) continue;
     themes.push({ name: sub.name, clips: await listDriveStock(auth, sub.id) });
   }
   const stock = [...rootClips, ...themes.flatMap((t) => t.clips)];
@@ -596,7 +609,7 @@ async function matchBacklog(auth, folderId) {
   let songsDone = 0;
   try {
     const clipTags = loadClipTags();
-    const clips = (await listDriveStock(auth, folderId)).filter((c) => needsTag(clipTags[c.id]));
+    const clips = (await listLooseStock(auth, folderId)).filter((c) => needsTag(clipTags[c.id]));
     for (const c of clips.slice(0, config.stitchClassifyPerCycle)) {
       if (Date.now() - started > budgetMs) break;
       let full;
@@ -656,6 +669,13 @@ export async function stitchOnce(auth) {
   }
   fs.mkdirSync(outDir, { recursive: true });
 
+  if (driveFolderId && config.stitchTidy) {
+    try {
+      await tidyStockFolder(auth, driveFolderId);
+    } catch (err) {
+      console.log(`Stock tidy failed (will retry next cycle): ${err.message.slice(0, 120)}`);
+    }
+  }
   if (driveFolderId) await matchBacklog(auth, driveFolderId);
 
   const state = loadState();

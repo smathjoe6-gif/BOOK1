@@ -50,6 +50,8 @@ export const config = {
   // STITCH_AUTO_MATCH=false = off. Needs GEMINI_API_KEY. Per script cycle it tags up
   // to STITCH_CLASSIFY_PER_CYCLE clips (plus 2 songs) that were not judged yet.
   stitchAutoMatch: process.env.STITCH_AUTO_MATCH !== 'false',
+  // STITCH_TIDY=false = the stock folder no longer tidies itself (exact duplicates to the Bin, clips filed into 9x16 / 16x9).
+  stitchTidy: process.env.STITCH_TIDY !== 'false',
   stitchClassifyPerCycle: Number(process.env.STITCH_CLASSIFY_PER_CYCLE) || 10,
   stitchMusicDriveFolderId: process.env.STITCH_MUSIC_DRIVE_FOLDER_ID || '',
   stitchClipAudioVolume: process.env.STITCH_CLIP_AUDIO_VOLUME === undefined || process.env.STITCH_CLIP_AUDIO_VOLUME === '' ? 0.12 : Number(process.env.STITCH_CLIP_AUDIO_VOLUME),
