@@ -9,7 +9,7 @@ import { expandHome, listFinishedVideos } from './localDrop.js';
 import {
   HOOKS, LABELS, SONGS_FOR, RateLimited,
   classifyClipFile, classifySongFile, labelFromName,
-  loadClipTags, loadSongTags, saveClipTag, saveSongTag,
+  loadClipTags, loadSongTags, saveClipTag, saveSongTag, songOverride,
 } from './stitchMatch.js';
 
 // Video stacker: Joe keeps a stack of short clips (Grok Library downloads,
@@ -268,7 +268,7 @@ async function pickMusic(auth, themeName = '', label = null) {
     if (kindLabel) {
       const songTags = loadSongTags();
       for (const kind of SONGS_FOR[kindLabel] || []) {
-        const match = usable.filter((f) => songTags[f.id]?.label === kind);
+        const match = usable.filter((f) => (songOverride(f.name) || songTags[f.id]?.label) === kind);
         if (match.length > 0) {
           candidates = match;
           console.log(`Stitch: choosing a ${kind} song for the ${kindLabel} clips (${match.length} to pick from).`);
@@ -590,7 +590,8 @@ async function matchBacklog(auth, folderId) {
   if (!config.stitchAutoMatch || !config.geminiApiKey) return;
   const started = Date.now();
   const budgetMs = 150 * 1000;
-  const needsTag = (t) => !t || (t.failed && t.failed < 2);
+  // SOMALI_HERITAGE judged before the SOMALI_WOMEN label existed (no v) is judged again.
+  const needsTag = (t) => !t || (t.failed && t.failed < 2) || (t.label === 'SOMALI_HERITAGE' && !t.v);
   let clipsDone = 0;
   let songsDone = 0;
   try {
@@ -616,7 +617,7 @@ async function matchBacklog(auth, folderId) {
     if (musicFolder && Date.now() - started < budgetMs) {
       const songTags = loadSongTags();
       const songs = (await listSongsDeep(auth, musicFolder)).filter(
-        (f) => Number(f.size) >= MIN_MUSIC_BYTES && !/ssstik/i.test(f.name) && needsTag(songTags[f.id])
+        (f) => Number(f.size) >= MIN_MUSIC_BYTES && !/ssstik/i.test(f.name) && !songOverride(f.name) && needsTag(songTags[f.id])
       );
       for (const song of songs.slice(0, 2)) {
         if (Date.now() - started > budgetMs) break;
