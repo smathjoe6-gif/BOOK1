@@ -121,7 +121,7 @@ async function joinClips(partPaths, listPath, outPath, text) {
     fs.rmSync(joined, { force: true });
     return true;
   } catch (err) {
-    console.log(`Stitch: could not add the text line (${err.message.slice(0, 120)}) -- saving the video without it.`);
+    console.log(`Stitch: could not add the text line (${err.message.slice(-250).replace(/\s+/g, ' ')}) -- saving the video without it.`);
     fs.renameSync(joined, outPath);
     return false;
   }
@@ -342,29 +342,40 @@ export function themeKey(name) {
 async function designPass(videoPath, outPath, { hook, brand, endText }) {
   const { duration } = await probe(videoPath);
   const fontPart = config.stitchFont ? `fontfile='${config.stitchFont.replace(/'/g, '')}':` : '';
-  const text = (label, extra) =>
-    label ? `drawtext=${fontPart}text='${label}':fontcolor=white:borderw=5:bordercolor=black:${extra}` : '';
   // Biggest font that keeps the line inside the 1080 px frame (about 0.74 em, wide bold fonts per character).
   const fit = (label, max) => Math.max(40, Math.min(max, Math.floor(980 / (Math.max(1, String(label || '').length) * 0.74))));
   const hookAlpha = "alpha='if(lt(t,0.3),t/0.3,if(gt(t,2.5),(2.8-t)/0.3,1))'";
-  const parts = [
-    'eq=contrast=1.08:saturation=1.15',
-    'vignette=PI/6',
-    text(hook, `fontsize=${fit(hook, 96)}:x=(w-text_w)/2:y=h*0.14:enable='between(t,0,2.8)':${hookAlpha}`),
-    text(brand, "fontsize=40:x=48:y=96:alpha=0.85"),
-    text(endText, `fontsize=${fit(endText, 76)}:x=(w-text_w)/2:y=h*0.28:enable='gte(t,${Math.max(0, duration - 6).toFixed(2)})'`),
-  ].filter(Boolean);
-  const bar = `color=c=0xE8B84A:s=1080x12:d=${duration.toFixed(2)}:r=30[bar]`;
-  const filter = `[0:v]${parts.join(',')}[v0];${bar};[v0][bar]overlay=x='-w+W*t/${duration.toFixed(2)}':y=0[v]`;
-  await run('ffmpeg', [
-    '-y', '-i', videoPath,
-    '-filter_complex', filter,
-    '-map', '[v]', '-map', '0:a?',
-    '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '21', '-pix_fmt', 'yuv420p',
-    '-c:a', 'copy',
-    '-t', duration.toFixed(2),
-    outPath,
-  ]);
+  const build = (withText) => {
+    const text = (label, extra) =>
+      withText && label ? `drawtext=${fontPart}text='${label}':fontcolor=white:borderw=5:bordercolor=black:${extra}` : '';
+    const parts = [
+      'eq=contrast=1.08:saturation=1.15',
+      'vignette=PI/6',
+      text(hook, `fontsize=${fit(hook, 96)}:x=(w-text_w)/2:y=h*0.14:enable='between(t,0,2.8)':${hookAlpha}`),
+      text(brand, "fontsize=40:x=48:y=96:alpha=0.85"),
+      text(endText, `fontsize=${fit(endText, 76)}:x=(w-text_w)/2:y=h*0.28:enable='gte(t,${Math.max(0, duration - 6).toFixed(2)})'`),
+    ].filter(Boolean);
+    const bar = `color=c=0xE8B84A:s=1080x12:d=${duration.toFixed(2)}:r=30[bar]`;
+    return `[0:v]${parts.join(',')}[v0];${bar};[v0][bar]overlay=x='-w+W*t/${duration.toFixed(2)}':y=0[v]`;
+  };
+  const encode = (filter) =>
+    run('ffmpeg', [
+      '-y', '-i', videoPath,
+      '-filter_complex', filter,
+      '-map', '[v]', '-map', '0:a?',
+      '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '21', '-pix_fmt', 'yuv420p',
+      '-c:a', 'copy',
+      '-t', duration.toFixed(2),
+      outPath,
+    ]);
+  try {
+    await encode(build(true));
+  } catch (err) {
+    // Usually this ffmpeg has no text filter (drawtext) or cannot open the font:
+    // keep the grade + progress bar and drop only the text.
+    console.log(`Stitch: designed look with text failed (${err.message.slice(-250).replace(/\s+/g, ' ')}) -- trying without text.`);
+    await encode(build(false));
+  }
 }
 
 // "2_FAMILY_FUN" / "Blacksmith_hiphop" -> the story word shown in the hook.
@@ -380,7 +391,10 @@ export function hookFor(themeName) {
 // Joins the chosen clips into one video in outDir. Returns { finalName, withText, withMusic, musicName }.
 async function buildStitch(chosen, outDir, stamp, music, themeName = '') {
   const work = fs.mkdtempSync(path.join(os.tmpdir(), 'gk-stitch-'));
-  const finalName = `GK_Stitch_${stamp}.mp4`;
+  // The pipeline skips files whose name ends in _1/_2/... as "extra copies", so
+  // the day and number are joined with "-v" instead.
+  const kind = String(themeName || '').split(/[^A-Za-z]+/).filter(Boolean).map((w) => w[0].toUpperCase() + w.slice(1).toLowerCase()).join('');
+  const finalName = `GK_Stitch${kind ? `_${kind}` : ''}_${stamp}.mp4`;
   const hiddenOut = path.join(outDir, `.stitching-${stamp}.mp4`);
   try {
     const parts = [];
@@ -408,7 +422,7 @@ async function buildStitch(chosen, outDir, stamp, music, themeName = '') {
         fs.renameSync(designed, hiddenOut);
         withText = true;
       } catch (err) {
-        console.log(`Stitch: could not add the designed look (${err.message.slice(0, 160)}) -- saving the plain stitch.`);
+        console.log(`Stitch: could not add the designed look (${err.message.slice(-250).replace(/\s+/g, ' ')}) -- saving the plain stitch.`);
       }
     }
     let withMusic = false;
@@ -463,7 +477,7 @@ async function stitchFromFolder(auth, dir, outDir, state) {
   const music = await pickMusic(auth);
   let result;
   try {
-    result = await buildStitch(chosen, outDir, `${state.day}_${state.made + 1}`, music);
+    result = await buildStitch(chosen, outDir, `${state.day}-v${state.made + 1}`, music);
   } finally {
     if (music) fs.rmSync(music.full, { force: true });
   }
@@ -554,7 +568,7 @@ async function stitchFromDrive(auth, folderId, outDir, state) {
     const music = await pickMusic(auth, theme ? theme.name : '', theme ? theme.label : null);
     let result;
     try {
-      result = await buildStitch(chosen, outDir, `${state.day}_${state.made + 1}`, music, theme ? theme.name : '');
+      result = await buildStitch(chosen, outDir, `${state.day}-v${state.made + 1}`, music, theme ? theme.name : '');
     } finally {
       if (music) fs.rmSync(music.full, { force: true });
     }
