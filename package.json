@@ -16,7 +16,8 @@
     "organize-videos": "node src/organizeVideosByOrientation.js",
     "backfill-covers": "node src/backfillCoverImages.js",
     "start": "node src/index.js",
-    "tidy-drive": "node src/driveTidy.js"
+    "tidy-drive": "node src/driveTidy.js",
+    "reorg-drive": "node src/driveReorg.js"
   },
   "dependencies": {
     "googleapis": "^144.0.0",
