@@ -122,6 +122,11 @@ export function pipeWithTimeout(readable, dest, timeoutMs = DOWNLOAD_TIMEOUT_MS)
     const timer = setTimeout(() => {
       readable.destroy(new Error(`Download timed out after ${Math.round(timeoutMs / 1000)}s`));
     }, timeoutMs);
+    dest.on('error', (err) => {
+      clearTimeout(timer);
+      readable.destroy();
+      reject(err);
+    });
     readable
       .on('end', () => {
         clearTimeout(timer);
@@ -138,11 +143,23 @@ export function pipeWithTimeout(readable, dest, timeoutMs = DOWNLOAD_TIMEOUT_MS)
 // Downloads a file to a temp path and returns that path.
 export async function downloadFile(auth, fileId, fileName, timeoutMs = DOWNLOAD_TIMEOUT_MS) {
   const drive = google.drive({ version: 'v3', auth });
-  const destPath = path.join(os.tmpdir(), `gk-${fileId}-${fileName}`);
+  // Gemini/Grok clips are often named after their whole prompt (200+ characters), which made the
+  // temp path longer than the Mac allows (ENAMETOOLONG) and crashed the whole script on every
+  // cycle (12 Oct 2026). Keep only a short, safe version of the name for the temp file.
+  const ext = path.extname(String(fileName || '')).replace(/[^\w.]/g, '').slice(0, 10);
+  const base = path.basename(String(fileName || 'video'), path.extname(String(fileName || ''))).replace(/[^\w-]+/g, '_').slice(0, 60);
+  const destPath = path.join(os.tmpdir(), `gk-${fileId}-${base}${ext}`);
   const dest = fs.createWriteStream(destPath);
+  dest.on('error', () => {}); // a write error is reported through pipeWithTimeout below, never as an unhandled crash
 
-  const res = await drive.files.get({ fileId, alt: 'media' }, { responseType: 'stream', timeout: API_TIMEOUT_MS });
-  await pipeWithTimeout(res.data, dest, timeoutMs);
+  try {
+    const res = await drive.files.get({ fileId, alt: 'media' }, { responseType: 'stream', timeout: API_TIMEOUT_MS });
+    await pipeWithTimeout(res.data, dest, timeoutMs);
+  } catch (err) {
+    dest.destroy();
+    fs.unlink(destPath, () => {});
+    throw err;
+  }
 
   return destPath;
 }
