@@ -16,6 +16,9 @@ import { loadOAuthClient } from './googleAuth.js';
 //   npm run organize-music                      (look only)
 //   npm run organize-music -- --do              (do it)
 //   npm run organize-music -- --do --include-downloads
+//   npm run organize-music -- --review --do     (EVERYTHING, downloads included, into the vault's
+//                                                "Needs Review" folder; then `npm run listen-music`
+//                                                lets Gemini listen and sort them)
 
 const VAULT_ID = '1jgxpsHcBPqBEED132Z8NyaXdxI7uvL0n';
 const DOWNLOADS_ID = '1CxC7BK5neABEU5qKD4ljT9eOAcqp0efl';
@@ -80,7 +83,8 @@ export function planMusic(songs, tags) {
 
 async function main() {
   const doIt = process.argv.includes('--do');
-  const includeDownloads = process.argv.includes('--include-downloads');
+  const reviewMode = process.argv.includes('--review');
+  const includeDownloads = reviewMode || process.argv.includes('--include-downloads');
   const drive = google.drive({ version: 'v3', auth: loadOAuthClient() });
 
   console.log('Reading the vault and hunting audio files (this can take several minutes)...');
@@ -107,6 +111,18 @@ async function main() {
     frontier = next;
   }
 
+  const unsortedSub = (
+    await listAll(drive, `'${VAULT_ID}' in parents and name = '09_UNSORTED_MUSIC' and mimeType = '${FOLDER}' and trashed = false`, 'id')
+  )[0];
+  if (reviewMode && unsortedSub) inVault.delete(unsortedSub.id); // its songs get a proper listen too
+  const reviewFolder = (await listAll(drive, `'${VAULT_ID}' in parents and mimeType = '${FOLDER}' and trashed = false`, 'id, name')).find((f) =>
+    /^needs review$/i.test(f.name.trim())
+  );
+  if (reviewMode && !reviewFolder) {
+    console.error('No "Needs Review" folder found inside GK_MUSIC_VAULT -- make one first.');
+    process.exit(1);
+  }
+
   const all = await listAll(
     drive,
     `(mimeType contains 'audio/' or name contains '.mp3' or name contains '.wav' or name contains '.m4a' or name contains '.flac') and 'me' in owners and trashed = false`,
@@ -121,7 +137,7 @@ async function main() {
       (includeDownloads || !(f.parents || []).includes(DOWNLOADS_ID))
   );
 
-  const plan = planMusic(songs, loadSongTags());
+  const plan = planMusic(songs, reviewMode ? {} : loadSongTags());
   const counts = {};
   for (const m of plan.move) counts[m.prefix || 'unsorted'] = (counts[m.prefix || 'unsorted'] || 0) + 1;
   const lines = [
@@ -149,7 +165,7 @@ async function main() {
   }
   for (const { file, prefix } of plan.move) {
     if (actions >= MAX_PER_RUN) break;
-    let target = prefix && subByPrefix[prefix] && subByPrefix[prefix].id;
+    let target = reviewMode ? reviewFolder.id : prefix && subByPrefix[prefix] && subByPrefix[prefix].id;
     if (!target) {
       if (!unsortedId) {
         const ex = (await listAll(drive, `'${VAULT_ID}' in parents and name = '09_UNSORTED_MUSIC' and mimeType = '${FOLDER}' and trashed = false`, 'id'))[0];
@@ -160,6 +176,7 @@ async function main() {
       target = unsortedId;
     }
     try {
+      if ((file.parents || []).includes(target)) continue;
       await drive.files.update({ fileId: file.id, addParents: target, removeParents: (file.parents || []).join(','), fields: 'id' });
       actions += 1;
     } catch (err) {
