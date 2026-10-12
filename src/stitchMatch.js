@@ -220,3 +220,26 @@ export async function classifySongFile(audioPath) {
     fs.rmSync(work, { recursive: true, force: true });
   }
 }
+
+const LANGUAGE_QUESTION =
+  'Listen to this piece of a song. Decide the language of the SUNG or SPOKEN words and answer with exactly ONE of: SOMALI, ENGLISH, MIXED, INSTRUMENTAL, UNSURE.\n' +
+  'MIXED = both Somali and English (or another language) in the same song. INSTRUMENTAL = no words. UNSURE = you cannot tell.\n' +
+  'Answer exactly like: language=SOMALI';
+
+// Language of a song's words, from a short snippet (Joe 12 Oct 2026: Somali / English / Mixed vault folders).
+export async function classifySongLanguage(audioPath) {
+  const work = fs.mkdtempSync(path.join(os.tmpdir(), 'gk-lang-'));
+  try {
+    let duration = 0;
+    try {
+      duration = await probeDuration(audioPath);
+    } catch {}
+    const start = duration > 120 ? Math.min(duration * 0.25, duration - 60) : 0;
+    const mp3 = path.join(work, 'snippet.mp3');
+    await run('ffmpeg', ['-y', '-ss', start.toFixed(1), '-t', '45', '-i', audioPath, '-ac', '1', '-ar', '22050', '-b:a', '48k', mp3]);
+    const answer = String(await askGeminiAbout('audio/mp3', fs.readFileSync(mp3).toString('base64'), LANGUAGE_QUESTION)).toUpperCase();
+    return ['SOMALI', 'ENGLISH', 'MIXED', 'INSTRUMENTAL'].find((l) => answer.includes(l)) || 'UNSURE';
+  } finally {
+    fs.rmSync(work, { recursive: true, force: true });
+  }
+}
