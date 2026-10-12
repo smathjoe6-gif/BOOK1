@@ -18,7 +18,8 @@
     "start": "node src/index.js",
     "tidy-drive": "node src/driveTidy.js",
     "reorg-drive": "node src/driveReorg.js",
-    "dedupe-drive": "node src/driveDedupe.js"
+    "dedupe-drive": "node src/driveDedupe.js",
+    "organize-music": "node src/musicVault.js"
   },
   "dependencies": {
     "googleapis": "^144.0.0",
