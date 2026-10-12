@@ -15,10 +15,13 @@ import { classifySongLanguage, RateLimited } from './stitchMatch.js';
 //
 //   npm run listen-music            (listen and show, nothing moves)
 //   npm run listen-music -- --do    (listen and file)
+//   LISTEN_PER_RUN=200 npm run listen-music -- --do    (more songs in one run; stops by itself when Gemini's quota is used up)
 
 const VAULT_ID = '1jgxpsHcBPqBEED132Z8NyaXdxI7uvL0n';
 const FOLDER = 'application/vnd.google-apps.folder';
 const LISTEN_PER_RUN = Number(process.env.LISTEN_PER_RUN || 25);
+const LISTEN_DELAY_MS = Number(process.env.LISTEN_DELAY_MS || 4000);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const HEAD_BYTES = 14 * 1024 * 1024; // enough for ~45 s of wav or ~10 min of mp3
 const CACHE = path.join(process.cwd(), 'music-listen.json');
 
@@ -91,12 +94,35 @@ async function main() {
   const work = fs.mkdtempSync(path.join(os.tmpdir(), 'gk-listen-'));
   let moved = 0;
   const lines = [];
+  // Answers remembered from an earlier look-only run: file those songs now (no new listening needed).
+  if (doIt) {
+    for (const s of songs) {
+      const known = cache[s.id];
+      const target = known && targets[known.language];
+      if (!target) continue;
+      try {
+        await drive.files.update({ fileId: s.id, addParents: target.id, removeParents: review.id, fields: 'id' });
+        moved += 1;
+      } catch (err) {
+        console.error(`  could not file "${s.name}": ${String(err.message).slice(0, 160)}`);
+      }
+    }
+    if (moved) console.log(`Filed ${moved} song(s) from earlier answers.`);
+  }
   try {
     for (const s of todo) {
       const local = path.join(work, `song${path.extname(s.name || '') || '.mp3'}`);
       try {
         await fetchHead(drive, s, local);
-        const language = await classifySongLanguage(local);
+        let language;
+        try {
+          language = await classifySongLanguage(local);
+        } catch (err) {
+          if (!(err instanceof RateLimited)) throw err;
+          console.log('Gemini says too fast -- waiting a minute...');
+          await sleep(65000);
+          language = await classifySongLanguage(local); // a second refusal stops the run (caught below)
+        }
         cache[s.id] = { name: s.name, language };
         fs.writeFileSync(CACHE, JSON.stringify(cache, null, 2));
         lines.push(`${language.padEnd(12)} "${s.name}"`);
@@ -114,6 +140,7 @@ async function main() {
       } finally {
         fs.rmSync(local, { force: true });
       }
+      await sleep(LISTEN_DELAY_MS);
     }
   } finally {
     fs.rmSync(work, { recursive: true, force: true });
