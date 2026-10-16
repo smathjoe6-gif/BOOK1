@@ -212,6 +212,7 @@ export const config = {
   // TOTOLL_HISTORY_DONE. Folders created 27 Sep 2026. Its login lives in
   // its own file (npm run auth-history), so the main token.json is
   // untouched. Set HISTORY_CHANNEL_ENABLED=false to switch it off.
+  historyThumbnails: process.env.HISTORY_THUMBNAILS !== 'false',
   historyChannelEnabled: process.env.HISTORY_CHANNEL_ENABLED !== 'false',
   historyFolderId: process.env.HISTORY_FOLDER_ID || '1dSP5luIoeK0pjkfqu9Zo-UagSaF9Ow4F',
   historyDoneFolderId: process.env.HISTORY_DONE_FOLDER_ID || '1N0BcIlLZ7N1bpVDRlBj3oc623QRL_VzF',

@@ -6,6 +6,7 @@ import { listVideosInFolder, downloadFile, moveToDone } from './drive.js';
 import { google } from 'googleapis';
 import { uploadToYouTube, findOrCreatePlaylist, addVideoToPlaylist, postEngagementComment } from './youtube.js';
 import { writeHistoryMetadataWithAI } from './omniroute.js';
+import { makeThumbnail, setThumbnail } from './historyThumbnail.js';
 
 // Second YouTube channel: football + world history on @TotollsportGK.
 // Joe drops finished long videos (5-30 min, often NotebookLM video
@@ -265,6 +266,21 @@ export async function postNextHistoryVideo(driveAuth) {
     state.postedToday += 1;
     state.uploadedIds = [...state.uploadedIds, file.id].slice(-500);
     saveState(state);
+
+    // A thumbnail failure must never undo or repeat the upload. (YouTube only
+    // accepts custom thumbnails on a verified channel: youtube.com/verify.)
+    if (config.historyThumbnails) {
+      const thumbPath = `${localPath}.thumb.jpg`;
+      try {
+        await makeThumbnail(localPath, meta.title, thumbPath);
+        await setThumbnail(youtubeAuth, result.id, thumbPath);
+        console.log('History channel: thumbnail set');
+      } catch (err) {
+        console.log(`History channel: could not set thumbnail: ${err.message}`);
+      } finally {
+        fs.rm(thumbPath, { force: true }, () => {});
+      }
+    }
 
     // An engagement-comment failure must never undo or repeat the upload.
     try {
