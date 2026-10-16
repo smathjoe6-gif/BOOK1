@@ -118,6 +118,8 @@ async function postToChannel(service, { imageUrl, title, text, kind }) {
     assets: [{ image: { url: imageUrl, metadata: { altText: title.slice(0, 200) } } }],
   };
   if (service === 'facebook') input.metadata = { facebook: { type: 'post' } };
+  // Instagram picture posts (17 Oct 2026: Joe wants pictures on Instagram + Pinterest, not Facebook).
+  if (service === 'instagram') input.metadata = { instagram: { type: 'post', shouldShareToFeed: true } };
   if (service === 'pinterest') {
     const board = (kind === 'WILDLIFE' && config.picturePinterestWildlifeBoardId) || config.bufferPinterestBoardId;
     if (!board) throw new Error('Pinterest needs BUFFER_PINTEREST_BOARD_ID in .env.');
