@@ -1,14 +1,11 @@
 import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
 import { google } from 'googleapis';
-import { config } from './config.js';
 import { run } from './aspectRatio.js';
 
 // YouTube shows a random blurry frame when a video has no thumbnail. This makes
 // a proper 1280x720 one for every history video: a frame from the video (about
 // a third of the way in), darkened at the bottom, with the title in big white
-// letters, then sets it on the uploaded video. Callers wrap this in try/catch:
+// letters (drawn with sharp, not ffmpeg), then sets it on the uploaded video. Callers wrap this in try/catch:
 // a thumbnail problem must never undo or repeat the upload.
 
 // Plain characters only (the title goes into an ffmpeg text file, but odd
@@ -48,35 +45,57 @@ async function videoSeconds(videoPath) {
   }
 }
 
+function escapeXml(t) {
+  return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Draws the title with the "sharp" image library (own text engine, so it does
+// not depend on the ffmpeg build having the drawtext filter -- the Homebrew
+// ffmpeg on Joe's Mac does not). Fonts come from the system (Arial/Helvetica).
+async function addTitle(imagePath, lines, outPath) {
+  const { default: sharp } = await import('sharp');
+  const W = 1280;
+  const H = 720;
+  const size = lines.length >= 3 ? 84 : 100;
+  const lineH = Math.round(size * 1.15);
+  const textH = lineH * lines.length;
+  const bandTop = H - textH - 110;
+  const tspans = lines
+    .map((l, i) => `<text x="60" y="${bandTop + 70 + size + i * lineH - lineH}" class="t">${escapeXml(l)}</text>`)
+    .join('');
+  const svg = Buffer.from(
+    `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">` +
+      `<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">` +
+      `<stop offset="0" stop-color="black" stop-opacity="0"/><stop offset="0.35" stop-color="black" stop-opacity="0.65"/>` +
+      `<stop offset="1" stop-color="black" stop-opacity="0.8"/></linearGradient></defs>` +
+      `<style>.t{font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:${size}px;fill:#fff;stroke:#000;stroke-width:6px;paint-order:stroke}</style>` +
+      `<rect x="0" y="${bandTop - 70}" width="${W}" height="${H - bandTop + 70}" fill="url(#g)"/>` +
+      tspans +
+      `</svg>`
+  );
+  await sharp(imagePath).composite([{ input: svg }]).jpeg({ quality: 90 }).toFile(outPath);
+}
+
 export async function makeThumbnail(videoPath, title, outPath) {
   const secs = await videoSeconds(videoPath);
   const at = secs > 12 ? Math.min(secs * 0.3, 240) : secs > 0 ? secs * 0.4 : 5;
   const base = 'scale=1280:720:force_original_aspect_ratio=increase,crop=1280:720,eq=saturation=1.25:contrast=1.08';
-  const shade = 'drawbox=x=0:y=ih*0.42:w=iw:h=ih*0.58:color=black@0.6:t=fill';
-  const lines = wrapTitle(title);
-  const textFile = path.join(os.tmpdir(), `gk-thumb-${process.pid}-${Date.now()}.txt`);
-  const fontPart = config.stitchFont ? `fontfile='${config.stitchFont.replace(/'/g, '')}':` : '';
-  const grab = (vf) => run('ffmpeg', ['-y', '-ss', String(at), '-i', videoPath, '-frames:v', '1', '-vf', vf, '-q:v', '3', outPath]);
-
+  const framePath = `${outPath}.frame.jpg`;
+  await run('ffmpeg', ['-y', '-ss', String(at), '-i', videoPath, '-frames:v', '1', '-vf', base, '-q:v', '3', framePath]);
   try {
+    const lines = wrapTitle(title);
     if (lines.length) {
-      fs.writeFileSync(textFile, lines.join('\n'));
-      const size = lines.length >= 3 ? 84 : 100;
-      const text =
-        `drawtext=${fontPart}textfile='${textFile}':fontsize=${size}:fontcolor=white:borderw=6:bordercolor=black:` +
-        `line_spacing=10:x=60:y=h-th-60`;
       try {
-        await grab(`${base},${shade},${text}`);
+        await addTitle(framePath, lines, outPath);
         return outPath;
       } catch (err) {
-        // Usually this ffmpeg has no text filter or cannot open the font.
-        console.log(`History channel: thumbnail with text failed (${String(err.message).slice(-200)}) -- using the plain frame.`);
+        console.log(`History channel: thumbnail text failed (${String(err.message).slice(-200)}) -- using the plain frame.`);
       }
     }
-    await grab(base);
+    fs.copyFileSync(framePath, outPath);
     return outPath;
   } finally {
-    fs.rm(textFile, { force: true }, () => {});
+    fs.rm(framePath, { force: true }, () => {});
   }
 }
 

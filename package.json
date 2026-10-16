@@ -12,21 +12,21 @@
     "facebook-redo": "node src/facebookRedo.js",
     "organize-covers": "node src/organizeCoverPool.js",
     "organize-drive": "node src/organizeDriveDuplicates.js",
-    "organize-music": "node src/organizeMusicByLanguage.js",
+    "organize-music": "node src/musicVault.js",
     "organize-videos": "node src/organizeVideosByOrientation.js",
     "backfill-covers": "node src/backfillCoverImages.js",
     "start": "node src/index.js",
     "tidy-drive": "node src/driveTidy.js",
     "reorg-drive": "node src/driveReorg.js",
     "dedupe-drive": "node src/driveDedupe.js",
-    "organize-music": "node src/musicVault.js",
     "listen-music": "node src/musicListen.js"
   },
   "dependencies": {
-    "googleapis": "^144.0.0",
-    "google-auth-library": "^9.15.0",
     "dotenv": "^16.4.5",
+    "google-auth-library": "^9.15.0",
+    "googleapis": "^144.0.0",
     "node-fetch": "^3.3.2",
-    "open": "^10.1.0"
+    "open": "^10.1.0",
+    "sharp": "^0.35.5"
   }
 }
