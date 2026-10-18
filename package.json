@@ -19,7 +19,8 @@
     "tidy-drive": "node src/driveTidy.js",
     "reorg-drive": "node src/driveReorg.js",
     "dedupe-drive": "node src/driveDedupe.js",
-    "listen-music": "node src/musicListen.js"
+    "listen-music": "node src/musicListen.js",
+    "history-thumbnails": "node src/historyThumbnailBackfill.js"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
