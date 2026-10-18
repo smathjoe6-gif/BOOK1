@@ -17,11 +17,13 @@ import { makeThumbnail, setThumbnail } from './historyThumbnail.js';
 //   npm run history-thumbnails                 (show matches, change nothing)
 //   npm run history-thumbnails -- --do         (set thumbnails)
 //   npm run history-thumbnails -- --do --only "Bikila"   (only titles containing that text)
+//   npm run history-thumbnails -- --do --redo              (set them again, e.g. after a look change)
 
 const FOLDER = 'application/vnd.google-apps.folder';
 const STATE = path.join(process.cwd(), 'history-thumbs-done.json');
 const MAX = Number(process.env.HISTORY_THUMB_BACKFILL_MAX || 10);
 const DO = process.argv.includes('--do');
+const REDO = process.argv.includes('--redo'); // ignore history-thumbs-done.json and set them again
 const onlyIdx = process.argv.indexOf('--only');
 const ONLY = onlyIdx > 0 ? String(process.argv[onlyIdx + 1] || '').toLowerCase() : '';
 
@@ -98,7 +100,7 @@ async function main() {
   console.log(`${videos.length} video(s) on the channel, ${files.length} original file(s) in the done folders.`);
   let handled = 0;
   for (const v of videos) {
-    if (done.has(v.id) || (ONLY && !v.title.toLowerCase().includes(ONLY))) continue;
+    if ((done.has(v.id) && !REDO) || (ONLY && !v.title.toLowerCase().includes(ONLY))) continue;
     const m = bestFile(v.title, files);
     if (!m) {
       console.log(`- "${v.title}": no matching file found (skipped)`);
