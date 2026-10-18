@@ -31,6 +31,9 @@ export const config = {
   // Or take the clips straight from a Google Drive folder (stays in Drive,
   // clips are reused round after round). Wins over STITCH_FOLDER if both set.
   stitchDriveFolderId: process.env.STITCH_DRIVE_FOLDER_ID || '',
+  // Beat cuts (src/stitchBeats.js): with a song, cut on its beats; STITCH_BEAT_CUTS=false = old cuts.
+  stitchBeatCuts: process.env.STITCH_BEAT_CUTS !== 'false',
+  stitchBeatSeconds: Number(process.env.STITCH_BEAT_SECONDS) || 30,
   stitchTargetSeconds: Number(process.env.STITCH_TARGET_SECONDS) || 60,
   stitchMaxClipSeconds: Number(process.env.STITCH_MAX_CLIP_SECONDS) || 10,
   stitchPerDay: process.env.STITCH_PER_DAY === undefined || process.env.STITCH_PER_DAY === '' ? 2 : Number(process.env.STITCH_PER_DAY),
