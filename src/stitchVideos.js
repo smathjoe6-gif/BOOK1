@@ -12,6 +12,7 @@ import {
   loadClipTags, loadSongTags, saveClipTag, saveSongTag, songOverride,
 } from './stitchMatch.js';
 import { isShapeFolder, tidyStockFolder } from './stockTidy.js';
+import { analyzeSong, cutLengthFor, planBeatCuts } from './stitchBeats.js';
 
 // Video stacker: Joe keeps a stack of short clips (Grok Library downloads,
 // stock footage he owns) in STITCH_FOLDER. Each cycle, up to STITCH_PER_DAY
@@ -88,7 +89,9 @@ async function normalizeClip(clip, outPath, design = false) {
       "zoompan=z='if(lt(on,10),1.14-0.14*on/10,1)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1080x1920:fps=30," +
       'setsar=1,fade=t=in:st=0:d=0.12:color=white,format=yuv420p[v]'
     : '[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,fps=30,format=yuv420p[v]';
-  const args = ['-y', '-i', clip.full];
+  const args = ['-y'];
+  if (clip.start) args.push('-ss', clip.start.toFixed(3));
+  args.push('-i', clip.full);
   if (!clip.hasAudio) args.push('-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo');
   args.push(
     '-filter_complex', filter,
@@ -325,7 +328,8 @@ async function pickMusic(auth, themeName = '', label = null) {
 async function addMusic(videoPath, music, outPath) {
   const { duration } = await probe(videoPath);
   const maxStart = Math.max(0, music.duration - duration - 3);
-  const start = maxStart > 15 ? 8 + Math.random() * (maxStart - 8) : 0;
+  // beatStart = a beat in the loudest part of the song (stitchBeats.js); the cuts are on the beat from there.
+  const start = Number.isFinite(music.beatStart) ? music.beatStart : maxStart > 15 ? 8 + Math.random() * (maxStart - 8) : 0;
   const fadeOutAt = Math.max(0, duration - 2.5);
   const clipVol = Number.isFinite(config.stitchClipAudioVolume) ? config.stitchClipAudioVolume : 0.12;
   const filter =
@@ -414,7 +418,7 @@ export function hookFor(themeName) {
 }
 
 // Joins the chosen clips into one video in outDir. Returns { finalName, withText, withMusic, musicName }.
-async function buildStitch(chosen, outDir, stamp, music, themeName = '') {
+export async function buildStitch(chosen, outDir, stamp, music, themeName = '') {
   const work = fs.mkdtempSync(path.join(os.tmpdir(), 'gk-stitch-'));
   // The pipeline skips files whose name ends in _1/_2/... as "extra copies", so
   // the day and number are joined with "-v" instead.
@@ -422,6 +426,25 @@ async function buildStitch(chosen, outDir, stamp, music, themeName = '') {
   const finalName = `GK_Stitch${kind ? `_${kind}` : ''}_${stamp}.mp4`;
   const hiddenOut = path.join(outDir, `.stitching-${stamp}.mp4`);
   try {
+    // Beat mode: cut the clips on the song's beats and start the song at its loudest part.
+    if (music && config.stitchBeatCuts) {
+      try {
+        const a = await analyzeSong(music.full, config.stitchBeatSeconds);
+        if (a) {
+          const cut = cutLengthFor(a.period);
+          const segs = planBeatCuts(chosen, cut.seconds, config.stitchBeatSeconds);
+          if (segs) {
+            chosen = segs;
+            music.beatStart = Math.min(a.start, Math.max(0, music.duration - config.stitchBeatSeconds - 3));
+            console.log(`Stitch: beat cuts -- ${Math.round(a.bpm)} BPM, a cut every ${cut.beats} beats (${cut.seconds.toFixed(2)}s), ${segs.length} cuts, song from ${music.beatStart.toFixed(1)}s.`);
+          }
+        } else {
+          console.log('Stitch: no clear beat in this song -- using normal cuts.');
+        }
+      } catch (err) {
+        console.log(`Stitch: beat detection failed (${err.message.slice(0, 120)}) -- using normal cuts.`);
+      }
+    }
     const parts = [];
     for (let i = 0; i < chosen.length; i++) {
       const part = path.join(work, `part-${i}.mp4`);
