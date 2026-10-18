@@ -225,7 +225,7 @@ async function listSongsDeep(auth, folderId, depth = 3) {
 }
 
 // First music folder (searching down from the main one) whose name matches the
-// clip theme: same letters, or one contains the other ("HIP_HOP" ~ "02_HIP_HOP").
+// clip theme exactly, ignoring case, digits and punctuation ("HIP_HOP" ~ "02_HIP_HOP").
 async function findThemeMusicFolder(auth, rootId, themeName, depth = 3) {
   // The whole theme name first, then each word of it ("Blacksmith_hiphop" ->
   // "blacksmith", "hiphop"), so a clip folder can name its music style.
@@ -245,7 +245,9 @@ async function findThemeMusicFolder(auth, rootId, themeName, depth = 3) {
     level = next;
   }
   for (const key of wanted) {
-    const hit = folders.find((f) => f.key && (f.key === key || f.key.includes(key) || key.includes(f.key)));
+    // Exact name only: loose "contains" matching once picked a "Somali rap" folder for
+    // Somali-women clips just because both names had the word "somali".
+    const hit = folders.find((f) => f.key && f.key === key);
     if (hit) return hit;
   }
   return null;
