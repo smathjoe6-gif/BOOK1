@@ -571,6 +571,12 @@ async function main() {
   setInterval(historyCycle, intervalMs);
   console.log(`\nWatching your configured Drive folder${config.mirrorFolderId ? ' (and mirroring with its pair folder)' : ''} — checking every ${config.pollIntervalMinutes} minutes, posting at most one video per check so they never all land at once. Leave this running (Ctrl+C to stop).`);
   setInterval(safeCheckOnce, intervalMs);
+  // TikTok has its own timer (Joe, 18 Oct 2026: 15 minutes between TikTok posts is too slow while the
+  // other networks go out a minute apart). It checks every minute; postNextQueuedTikTok() itself keeps
+  // TIKTOK_MIN_GAP_MINUTES between posts, the daily cap, the Buffer cooldown and the pause.
+  if (config.bufferAccessToken) setInterval(() => {
+    postNextQueuedTikTok(auth).catch((err) => console.error('TikTok queue timer failed (will retry):', err.message));
+  }, 60 * 1000);
 }
 
 main().catch((err) => {

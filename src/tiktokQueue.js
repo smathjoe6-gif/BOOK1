@@ -73,7 +73,19 @@ export function queueTikTok({ fileId, name, caption, md5 }) {
 // while TikTok kept posting week-old ones). The backlog drains in the
 // leftover slots. Safe to call every cycle -- does nothing when the queue is
 // empty.
+let draining = false; // the check cycle and the 1-minute timer must never send at the same time
+
 export async function postNextQueuedTikTok(auth) {
+  if (draining) return;
+  draining = true;
+  try {
+    await drainOne(auth);
+  } finally {
+    draining = false;
+  }
+}
+
+async function drainOne(auth) {
   const state = loadState();
   if (state.queue.length === 0) return;
 
