@@ -54,6 +54,8 @@ export const config = {
   stitchTidy: process.env.STITCH_TIDY !== 'false',
   stitchClassifyPerCycle: Number(process.env.STITCH_CLASSIFY_PER_CYCLE) || 10,
   stitchMusicDriveFolderId: process.env.STITCH_MUSIC_DRIVE_FOLDER_ID || '',
+  // Only songs at least this many days old are used as stitch background music (0 = any).
+  stitchMusicMinAgeDays: Number(process.env.STITCH_MUSIC_MIN_AGE_DAYS ?? 180) || 0,
   stitchClipAudioVolume: process.env.STITCH_CLIP_AUDIO_VOLUME === undefined || process.env.STITCH_CLIP_AUDIO_VOLUME === '' ? 0.12 : Number(process.env.STITCH_CLIP_AUDIO_VOLUME),
   canvaClientId: process.env.CANVA_CLIENT_ID || '',
   canvaClientSecret: process.env.CANVA_CLIENT_SECRET || '',
