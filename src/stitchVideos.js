@@ -207,7 +207,7 @@ async function listSongsDeep(auth, folderId, depth = 3) {
     const res = await drive.files.list(
       {
         q: `'${folderId}' in parents and mimeType contains 'audio/' and trashed = false`,
-        fields: 'nextPageToken, files(id, name, size)',
+        fields: 'nextPageToken, files(id, name, size, createdTime, modifiedTime)',
         pageSize: 1000,
         pageToken,
       },
@@ -251,6 +251,17 @@ async function findThemeMusicFolder(auth, rootId, themeName, depth = 3) {
   return null;
 }
 
+// Joe's rule: songs he posts the same week must not be reused as background
+// music, so only songs at least STITCH_MUSIC_MIN_AGE_DAYS old are used (the older
+// of Drive's created/modified time, since an old file re-uploaded keeps its date).
+function songIsOldEnough(f) {
+  const days = config.stitchMusicMinAgeDays;
+  if (!(days > 0)) return true;
+  const times = [f.createdTime, f.modifiedTime].map((t) => Date.parse(t)).filter((t) => Number.isFinite(t));
+  if (times.length === 0) return true;
+  return Date.now() - Math.min(...times) >= days * 24 * 60 * 60 * 1000;
+}
+
 async function pickMusic(auth, themeName = '', label = null) {
   let folderId = config.stitchMusicDriveFolderId;
   if (!folderId) return null;
@@ -265,13 +276,13 @@ async function pickMusic(auth, themeName = '', label = null) {
       }
     }
     const songs = await listSongsDeep(auth, folderId);
-    const usable = songs.filter((f) => Number(f.size) >= MIN_MUSIC_BYTES && !/ssstik/i.test(f.name));
+    const usable = songs.filter((f) => Number(f.size) >= MIN_MUSIC_BYTES && !/ssstik/i.test(f.name) && songIsOldEnough(f));
     if (usable.length === 0) {
       if (folderId !== config.stitchMusicDriveFolderId) {
         console.log('Stitch: that music folder has no usable songs -- using the main music folder.');
         return pickMusic(auth);
       }
-      console.log('Stitch: no usable songs in the music folder -- making the video without music.');
+      console.log('Stitch: no usable songs (old enough) in the music folder -- making the video without music.');
       return null;
     }
     // Songs Gemini has judged: take the kinds that suit these clips, best first.
@@ -630,7 +641,7 @@ async function matchBacklog(auth, folderId) {
     if (musicFolder && Date.now() - started < budgetMs) {
       const songTags = loadSongTags();
       const songs = (await listSongsDeep(auth, musicFolder)).filter(
-        (f) => Number(f.size) >= MIN_MUSIC_BYTES && !/ssstik/i.test(f.name) && !songOverride(f.name) && needsTag(songTags[f.id])
+        (f) => Number(f.size) >= MIN_MUSIC_BYTES && !/ssstik/i.test(f.name) && songIsOldEnough(f) && !songOverride(f.name) && needsTag(songTags[f.id])
       );
       for (const song of songs.slice(0, 2)) {
         if (Date.now() - started > budgetMs) break;
