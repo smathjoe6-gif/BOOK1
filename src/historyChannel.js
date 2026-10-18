@@ -54,6 +54,8 @@ function titleFromFilename(name) {
   // Strip every trailing extension/dot, not just one: Joe's first upload
   // was named "…Brazil.mp4..mp4" and came out titled "… Brazil.mp4." (27 Sep).
   let t = name.replace(/(\.+(mp4|mov|m4v|webm|mkv|avi))+\.*$/i, '').replace(/\.+$/, '');
+  // NotebookLM file names turn an apostrophe into "_" (Berbera_s_Deep -> Berbera's Deep).
+  t = t.replace(/([A-Za-z0-9])_s(?=[_\s-]|$)/g, "$1's");
   t = t.replace(/[_\-]+/g, ' ');
   t = t.replace(/\b(4k|2k|1080p|720p|480p|360p)\b/gi, '');
   t = t.replace(/\b\d{8,}\b/g, '');
@@ -72,8 +74,8 @@ async function buildMetadata(fileName, topic) {
     console.log(`History channel: AI unavailable (${err.message}), using filename title "${title}"`);
     meta = {
       title,
-      description: `${title}.\n\nThe story behind one of the moments that shaped football and the world, told from start to finish.`,
-      tags: ['history', 'football history', 'world history', 'documentary'],
+      description: `${title}.\n\nThe story behind one of history's great moments, told from start to finish.`,
+      tags: ['history', 'world history', 'documentary'],
     };
   }
   return meta;

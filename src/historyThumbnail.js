@@ -9,7 +9,7 @@ import { run } from './aspectRatio.js';
 
 // Plain characters only (the title goes into an ffmpeg text file, but odd
 // symbols can still break the font), split into at most 3 short lines.
-export function wrapTitle(title, maxChars = 22, maxLines = 3) {
+export function wrapTitle(title, maxChars = 18, maxLines = 3) {
   const words = String(title || '')
     .replace(/[^\p{L}\p{N}\s'&?!.,-]/gu, ' ')
     .toUpperCase()
@@ -55,7 +55,11 @@ async function addTitle(imagePath, lines, outPath) {
   const { default: sharp } = await import('sharp');
   const W = 1280;
   const H = 720;
-  const size = lines.length >= 3 ? 84 : 100;
+  // Shrink the letters until the longest line fits inside the picture (bold
+  // capitals are about 0.78 em wide); long words used to run off the right edge.
+  const longest = Math.max(...lines.map((l) => l.length));
+  const fit = Math.floor((W - 120) / (longest * 0.78));
+  const size = Math.max(52, Math.min(lines.length >= 3 ? 84 : 100, fit));
   const lineH = Math.round(size * 1.15);
   const textH = lineH * lines.length;
   const bandTop = H - textH - 110;
