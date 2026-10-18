@@ -80,14 +80,15 @@ export function chooseClips(clips, targetSeconds, maxClipSeconds) {
   return { chosen, total };
 }
 
-async function normalizeClip(clip, outPath, design = false) {
+async function normalizeClip(clip, outPath, design = false, first = false) {
   // Designed cut: each clip starts zoomed in and settles back over 10 frames
   // (a "punch"), with a very short white flash on the cut. zoompan works on
   // every ffmpeg version, unlike per-frame scale expressions.
   const filter = design
     ? '[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,fps=30,' +
       "zoompan=z='if(lt(on,10),1.14-0.14*on/10,1)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1080x1920:fps=30," +
-      'setsar=1,fade=t=in:st=0:d=0.12:color=white,format=yuv420p[v]'
+      // No white flash on the very first cut: TikTok/Reels use frame 0 as the cover (it came out white, 18 Oct).
+      `setsar=1${first ? '' : ',fade=t=in:st=0:d=0.12:color=white'},format=yuv420p[v]`
     : '[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,fps=30,format=yuv420p[v]';
   const args = ['-y'];
   if (clip.start) args.push('-ss', clip.start.toFixed(3));
@@ -373,7 +374,8 @@ async function designPass(videoPath, outPath, { hook, brand, endText }) {
   const fontPart = config.stitchFont ? `fontfile='${config.stitchFont.replace(/'/g, '')}':` : '';
   // Biggest font that keeps the line inside the 1080 px frame (about 0.74 em, wide bold fonts per character).
   const fit = (label, max) => Math.max(40, Math.min(max, Math.floor(980 / (Math.max(1, String(label || '').length) * 0.74))));
-  const hookAlpha = "alpha='if(lt(t,0.3),t/0.3,if(gt(t,2.5),(2.8-t)/0.3,1))'";
+  // Full strength from frame 0 so the cover frame already shows the hook line.
+  const hookAlpha = "alpha='if(gt(t,2.5),(2.8-t)/0.3,1)'";
   const build = (withText) => {
     const text = (label, extra) =>
       withText && label ? `drawtext=${fontPart}text='${label}':fontcolor=white:borderw=5:bordercolor=black:${extra}` : '';
@@ -449,11 +451,11 @@ export async function buildStitch(chosen, outDir, stamp, music, themeName = '') 
     for (let i = 0; i < chosen.length; i++) {
       const part = path.join(work, `part-${i}.mp4`);
       try {
-        await normalizeClip(chosen[i], part, config.stitchDesign);
+        await normalizeClip(chosen[i], part, config.stitchDesign, i === 0);
       } catch (err) {
         if (!config.stitchDesign) throw err;
         console.log(`Stitch: designed cut failed (${err.message.slice(0, 100)}) -- using a plain cut for this clip.`);
-        await normalizeClip(chosen[i], part, false);
+        await normalizeClip(chosen[i], part, false, i === 0);
       }
       parts.push(part);
     }
