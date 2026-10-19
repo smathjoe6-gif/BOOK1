@@ -223,8 +223,60 @@ Gobannimo, Gurmad, Gaashaan, Guul, Gacan, Geed, Galbeed.
 - "Soomaaliyeey toosoo" (early 1940s); "Qolobaa Calankeed" (music Abdullahi
   Qarshe; national anthem since 2012). Somali Youth League founded 1943 (not
   1947, not "by women").
+- **Abdullahi Qarshe, "Father of Somali music" (Joe, 19 Oct 2026):** the
+  pivotal figure who introduced the kaban (oud) as instrumental
+  accompaniment to Somali poetry — before him, early genres like balwo were
+  largely vocal-only. Giving the kaban a musical structure to Somali metrical
+  poetry directly drove balwo's evolution into the more complex heello
+  genre, and Qarshe is recognized as one of heello's first major
+  interpreters. He went on to found the modern Qaraami genre by being the
+  first to set Qaraami poetry to instrumental music. While working for the
+  British colonial administration and asked to compose a welcome song for a
+  new governor in Berbera, he exploited the officials' unfamiliarity with
+  Somali and instead wrote "Ka kacay!" ("Arise!") — a covert anti-colonial
+  rallying cry hidden inside what the British thought was a welcome song.
+  Later a leading figure at the National Theatre in Mogadishu.
+- **Somali alliteration — the precise rule (Joe, 19 Oct 2026):** applies to
+  almost all Somali verse, classical maanso and hees (song) alike. Every
+  line or half-line (genre-dependent) needs a word starting with the poem's
+  designated sound, AND that word must carry real lexical weight — a noun,
+  verb, adjective or adverb, never a minor grammatical particle used just to
+  "cheat" the rule. Combined with Somali's quantitative metrical system
+  (patterned short/long vowels), this is what gives the verse form its
+  tight, memorable structure. Rare exceptions exist (a poem changing or
+  briefly dropping its sound) but are uncommon — don't treat them as
+  license to loosen the discipline in a GK song.
+- **Buraanbur as political speech, not just celebration (Joe, 19 Oct
+  2026):** buraanbur has a real history of challenging power, not only
+  marking weddings/pride. 1962: when Faduma Alim became the first Somali
+  woman to earn a university degree but was then denied a seat in
+  parliament, her mother chanted a buraanbur voicing collective anguish at
+  how women's sacrifices were being erased by the men "who divided and
+  deceived our nation" — asking "Sisters; was this what we struggled for?"
+  Decades later, poet Adar Abdi Fiidow composed buraanbur explicitly urging
+  Somalis to reject clannism, disarm, and resolve the civil war through
+  dialogue rather than the sword, including lines encouraging wives to
+  preach peace at home. Modern jazz singer Maryan Mursal (Waabeeri →
+  Somaali Jaaz) broke barriers as the first woman to sing Somali jazz and
+  to drive a taxi, deliberately using both to show women could be anything
+  they chose. More recently, Somali women composed a buraanbur in solidarity
+  with the Black Lives Matter movement after George Floyd's murder. Useful
+  grounding for any buraanbur content that wants real weight behind it —
+  don't invent a "protest buraanbur" moment; these are the real, checked
+  ones to draw on or reference.
+- **Regional context, Horn of Africa music as resistance (background only,
+  not GK's own repertoire):** the same pattern — music smuggling political
+  messages past censors — shows up region-wide. Eritrea: Tewolde Redda's
+  "Shigey Habuni" ("Give me my torch") was an anthem against forced
+  federation with Ethiopia; Ateweberhan Segid's "Aslamai Kistanay" warned
+  Christians and Muslims alike against colonial "divide and conquer"
+  tactics. Sudan: Kamal Keila sang social-justice tracks like "African
+  Unity"; Mohammed Wardi was imprisoned over a song criticizing CIA
+  complicity in Patrice Lumumba's 1960 assassination. Not Somali material,
+  so don't use it as a Somali fact — useful only as comparative context if
+  a documentary-lane post ever widens to the broader Horn of Africa.
 
-Sources (forms): Wikipedia "Somali literature", "Dhaanto", "Balwo", "Music of Somalia"; Sahan Journal on dhaanto; Britannica; City Lore "Poetry from Somalia".
+Sources (forms): Wikipedia "Somali literature", "Dhaanto", "Balwo", "Music of Somalia"; Sahan Journal on dhaanto; Britannica; City Lore "Poetry from Somalia"; Francesco Giannattasio on gabay/heello vocal-style taxonomy; 2013 Somali Week Festival programme; WardheerNews on Somali alliterative structure.
 
 Sources: WardheerNews "Paramountcy of Alliteration in Somali Literature";
 Wikipedia "Somali literature", "Buraanbur", "Hawa Jibril", "Qolobaa Calankeed",
