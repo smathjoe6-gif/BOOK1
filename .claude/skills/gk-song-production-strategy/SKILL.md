@@ -364,6 +364,42 @@ work — treat the patriotic/cinematic-pride anthem lane as the highest
 -proof-of-concept lane to lean on when he asks for something "hot" or
 wants to "get back to how I used to produce."
 
+## 12. Arabic–English Pride Anthem Remix mode (Joe, 19 Oct 2026)
+
+A standing *optional* mode — Joe asked for a cinematic Arabic/English dual
+-language remix of the patriotic-anthem lane (section "the one thing to
+remember" daily sound + the catalog-proven anthem lane in section 11).
+**Only the production style and structural shape are captured here — no
+lyric text from Joe's own draft/reference is stored or reused anywhere in
+this skill; any song built in this mode gets entirely new, original
+lyrics in both languages.**
+
+- **Sound:** modern epic hip-hop / Afro-orchestral blend, 90–95 BPM — deep
+  war drums, heavy 808s, Dhaanto percussion, cinematic strings and brass,
+  subtle oud and qanun accents woven in (Middle Eastern soul meeting
+  cinematic modern hip-hop — "a national anthem reborn for a global
+  audience").
+- **Language structure:** verses alternate between melodic English rap
+  and poetic Arabic chant (lead/echo or lead/response between the two,
+  verse to verse) — the hook is anthemic and chant-driven in both
+  languages together, layered with male choir shouts and airy Arabic
+  vocal echoes.
+- **Mood/theme territory:** majestic, proud, resilient, inspirational —
+  identity, honor, legacy, unity; the diaspora/homeland pride arc already
+  proven in Joe's own catalog (section 11), now given a bilingual,
+  internationally-reaching treatment.
+- **Structure shape:** spoken bilingual intro (English line, then its
+  Arabic echo) → anthem hook (both languages interlocked) → Verse 1
+  (English lead, Arabic response lines) → hook repeats, bigger → Verse 2
+  (Arabic lead, English response lines) → emotional half-time bridge →
+  Verse 3 (unity/future-facing) → final hook with a choir feel → spoken
+  bilingual outro.
+- **Caution on the Arabic:** write only simple, correct Modern Standard
+  Arabic and flag it in the song doc's "CHECK FOR JOE" section for native
+  review before anything is generated — same discipline as the real-word
+  -only rule for Somali, just applied to a language this skill has less
+  grounding in.
+
 ## Standing iron rules (shared with `gk-gabay-blueprint`)
 
 - Every public caption/doc ends with the exact footer: `Copyright Notice ©
