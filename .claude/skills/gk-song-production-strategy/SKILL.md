@@ -118,6 +118,22 @@ person or craft*, not a summary of a headline.
 - **The stamp:** the GK logo woven into the audio-visual presentation like a
   signature, never a slapped-on watermark — same rule as `gk-gabay-blueprint`.
 
+## Suno style-tag calibration note (Joe, 19 Oct 2026)
+
+On "Midnimo," Joe reported the lyrics were good but the detailed custom
+Suno Style Tag didn't render well — switching Suno to auto-pick the
+music/voice instead of using the custom tag gave a much better result.
+Takeaway: a highly detailed, very specific style tag can sometimes
+over-constrain Suno and produce a worse result than letting it interpret
+more freely. Going forward, when handing Joe a song doc, it's worth
+noting he can try Suno's auto/no-custom-style option as a fallback if a
+detailed tag doesn't render well — this isn't a sign the tag was
+"wrong," just that Suno doesn't always follow very specific production
+detail reliably. (Also: this session has no audio-playback capability —
+Joe sharing an audio file doesn't let Claude listen to it; feedback on
+how a track turned out has to come as Joe's own description or text
+Suno shows, such as the auto-picked style/genre tags.)
+
 ## Production pipeline confirmed: Joe generates on Suno.com (Joe, 19 Oct 2026)
 
 Joe showed his Suno.com workspace (Dec 2025 history) — confirms the real
