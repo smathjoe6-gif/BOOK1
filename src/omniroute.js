@@ -40,6 +40,37 @@ async function requestOnce(systemPrompt, userPrompt, model = config.omnirouteMod
   }
 }
 
+// Hive's OpenAI-compatible chat endpoint (cheap DeepSeek text model), used when
+// Gemini's free quota is gone. Only used if HIVE_API_KEY is set.
+async function askHive(systemPrompt, userPrompt) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  try {
+    const res = await fetch(config.hiveUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${config.hiveApiKey}` },
+      body: JSON.stringify({
+        model: config.hiveModel,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+      }),
+      signal: controller.signal,
+    });
+    if (!res.ok) {
+      const body = (await res.text().catch(() => '')).replace(/\s+/g, ' ').slice(0, 160);
+      throw new Error(`Hive returned ${res.status}: ${body}`);
+    }
+    const data = await res.json();
+    const text = data.choices?.[0]?.message?.content?.trim();
+    if (!text) throw new Error('Hive gave an empty response');
+    return text;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
 const ANTHROPIC_TIMEOUT_MS = 25000;
 
@@ -178,6 +209,15 @@ async function askAI(systemPrompt, userPrompt) {
         }
       }
       console.log(`Gemini ${model} failed (${(lastErr.message.replace(/\s+/g, ' ')).slice(0, 220)})${model === models[models.length - 1] ? ', trying OmniRoute...' : ', trying the backup model...'}`);
+    }
+  }
+
+  if (config.hiveApiKey) {
+    try {
+      return await askHive(systemPrompt, userPrompt);
+    } catch (err) {
+      lastErr = err;
+      console.log(`Hive failed (${err.message}), trying OmniRoute...`);
     }
   }
 
