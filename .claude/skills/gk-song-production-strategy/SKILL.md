@@ -346,6 +346,24 @@ Patterns observed across Joe's catalog so far:
   forward — write fresh lyrics in this voice and these themes, never
   reused lines from the actual tracks.
 
+**Back-catalog landscape (Joe's YouTube channel PathFoundGK, screenshots
+shown 19 Oct 2026 — titles/view counts only, public metadata, no lyric
+text captured):** confirms the same lanes at real scale. Strongest
+performers are the patriotic/cinematic-pride anthem lane — "I Am Somali"
+(54k views), "The Elite Growth" (60k), "Future" (51k), "Pillars of the
+Horn" (34k), "Somalia Unbroken" (15k), "Mogadishu to Victory" (15k),
+"Somali Spirit Rising" (1.8k) — all built around flag/homeland imagery
+and a rising-against-odds arc, matching section 11's theme notes above.
+Other lanes present in the catalog: romantic/heartbreak ("Qalbiga Iga
+Jabsaday" — The Heart That Broke Me, "Cabdigaaga Caashaq," "After the
+Silence"), documentary/cultural-explainer style ("Hubaal: The Truth,"
+"Codka Jigjiga," "Mogadishu 2035"), and lighter/cultural-comedy shorts
+("for a funniest Somali," "Cuntada Somali iyo Yaanyada"). Joe's own
+read: he wants to get back to the level/energy of his strongest earlier
+work — treat the patriotic/cinematic-pride anthem lane as the highest
+-proof-of-concept lane to lean on when he asks for something "hot" or
+wants to "get back to how I used to produce."
+
 ## Standing iron rules (shared with `gk-gabay-blueprint`)
 
 - Every public caption/doc ends with the exact footer: `Copyright Notice ©
