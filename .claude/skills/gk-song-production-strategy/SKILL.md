@@ -275,6 +275,43 @@ band.
 - Reference example: "Ciyaarta Xaafadda" (The Neighborhood's Dance),
   GK_Viral_Prompts folder, 19 Oct 2026.
 
+## 10. Street Rap — High, Light Male Lead (hushed verse / melodic chorus) mode (Joe, 19 Oct 2026)
+
+A standing *optional* mode, alongside Love Duet (8) and Energy/Funk-Dance
+(9) — Joe shared a reference track (audio + production notes) in this
+style to show the vocal register and arrangement he wants available.
+**Note: only the production/structure shape was captured here — no lyric
+text from Joe's reference track is stored or reused anywhere in this
+skill; any song built in this mode gets entirely new, original lyrics.**
+
+- **Vocal:** a high, light upper-register male lead — close-mic, hushed and
+  intimate on the verses, opening into a bigger melodic delivery on the
+  chorus. Clear, natural pronunciation, restrained vocal processing
+  (polished but not auto-tuned/robotic).
+- **The sound:** Somali Kaban as a lead voice alongside Alindi-inspired
+  textures, dark cinematic piano, controlled 808 bass, punchy hip-hop
+  drums, atmospheric strings, subtle Dhaanto percussion underneath — a
+  cinematic street-anthem blend rather than either the Love Duet's vintage
+  Golden-Age warmth or the Energy mode's funk-disco brightness. Polished
+  studio mix, not lo-fi.
+- **Crowd/chant element:** rhythmic Somali crowd-response chants layered in
+  (call-and-response with a group, not just a solo chorus) — gives it a
+  communal, anthemic lift, especially in the final chorus.
+- **Structure (the shape, not the lyrics):** atmospheric spoken-style
+  intro → rhythmic verse (hushed, close-mic) → melodic pre-chorus build →
+  full melodic chorus (with crowd chant) → harder second verse → chorus
+  repeats, bigger → spoken-word bridge/breakdown (music drops out almost
+  entirely, reflective tone) → a faster "double-time" final verse →
+  biggest final chorus → a short crowd call-and-response chant tag →
+  quiet spoken outro line. This is a longer, more cinematic arc than the
+  other two modes — closer to a street-anthem short film in song form.
+- **Theme territory this mode suits well:** resilience, identity, rising
+  above doubt/struggle, diaspora pride — delivered as a personal, driving
+  narrative rather than a love song or a pure celebration.
+- Not yet run as an actual GK song — captured and ready for the next
+  one-off commission or daily-routine pick in this mode, usual Go-gate
+  applies.
+
 ## Standing iron rules (shared with `gk-gabay-blueprint`)
 
 - Every public caption/doc ends with the exact footer: `Copyright Notice ©
