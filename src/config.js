@@ -140,6 +140,12 @@ export const config = {
   // quota (429). Comma-separated; set GEMINI_FALLBACK_MODEL= (empty) to switch off.
   geminiFallbackModels: (process.env.GEMINI_FALLBACK_MODEL === undefined ? 'gemini-2.5-flash-lite,gemini-3.5-flash-lite' : process.env.GEMINI_FALLBACK_MODEL)
     .split(',').map((m) => m.trim()).filter(Boolean),
+  // Hive (thehive.ai) text model, OpenAI-compatible, tried after the Gemini models
+  // and before OmniRoute. Blank key = off. URL/model can be changed in .env if
+  // Hive's docs differ (the URL here was not checked against live Hive).
+  hiveApiKey: process.env.HIVE_API_KEY || '',
+  hiveModel: process.env.HIVE_MODEL || 'deepseek-ai/deepseek-v4.1-flash-1017',
+  hiveUrl: process.env.HIVE_URL || 'https://api.thehive.ai/api/v3/chat/completions',
   // Which OmniRoute model to ask for captions/titles. "auto" lets OmniRoute
   // pick, but on 30 Sep 2026 that kept returning 502 while only some
   // providers worked -- set this to one exact model id copied from the
