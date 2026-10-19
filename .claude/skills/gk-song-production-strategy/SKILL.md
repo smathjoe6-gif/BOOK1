@@ -138,6 +138,50 @@ Bilaa joojin, build-kiisu waa legend-ka hore
 water right, so the fields can grow / No obstacle stops him, he serves the
 people / Without stopping, his build is the legend of old.)
 
+## 7. Diaspora Street Mode — the "163/164" Scandinavian-Somali setting (Joe, 19 Oct 2026)
+
+A standing *optional* mode, alongside the everyday-trade/heritage concepts in
+section 1 — for when Joe wants the "urban hood abroad" angle instead of a
+Xamar/homeland setting. Not a replacement for the existing concepts; a third
+lane Joe can ask for by name ("do a 163/164 one" or "the Swedish diaspora
+style").
+
+- **The setting:** Swedish-Somali diaspora "Million Program" housing-block
+  neighborhoods (the real-world reference points are areas like Rinkeby and
+  Husby, postcode-coded the way Swedish diaspora rap already names them —
+  "163", "164"). Cold, dark Nordic winter, neon signage, puffer jackets,
+  concrete tower blocks — contrasted with the warmth of a Somali tea shop
+  (Maqaayo) as the one warm interior in an otherwise cold cinematic frame.
+- **Reference artists (setting/scene inspiration only — never voice or
+  likeness imitation, same iron rule as always):** Yasin, Dree Low, 1.Cuz —
+  named here the same way Tubeec/Killer are named elsewhere in this skill
+  set, as a genre/scene anchor, not a target to sound like.
+- **Language blend (3-way, specific to this mode):** Swedish carries the
+  verse/story, English carries the hook (global sing-along reach), Somali
+  carries the "deep" lines aimed at the community back home — the
+  emotional/message layer, not filler. This replaces the usual 2-language
+  pairing only when this mode is explicitly chosen.
+- **The Gabay flip:** same classical ruling-letter Gabay discipline from
+  section 3, but staged as a *beat-drop monologue* — the production drops
+  out mid-song specifically to let one spoken-word Somali Gabay verse
+  breathe alone, unhurried, like a monologue in a film, before the beat
+  re-enters. This is a structural beat, not just a lyrical one — mark it
+  explicitly in the song doc (e.g. "[BEAT OUT — spoken Gabay verse, Somali
+  only]").
+- **The "Lekker" sound (this mode's soundbed, on top of the usual
+  Kaban/Dhaanto/trap base):** a heavy UK-style 808 bass under a melody
+  sampled from Somali Udaan (lute) or flute — "clean but heavy." The English
+  hook stays catchy and simple enough to sing along to with zero Swedish or
+  Somali comprehension.
+- **Visual pairing:** high-contrast drone shots of Stockholm housing-block
+  exteriors cut against handheld-feeling shots inside a Maqaayo (tea glass,
+  steam, warm light) — same cold/warm contrast as the sound design.
+
+This mode is captured and ready to use (for the daily routine or a one-off
+chat commission) but has not yet run — the usual Go-gate applies in full to
+any one-off use, and it is not yet in the daily routine's automatic rotation
+unless/until Joe says to add it there.
+
 ## Standing iron rules (shared with `gk-gabay-blueprint`)
 
 - Every public caption/doc ends with the exact footer: `Copyright Notice ©
