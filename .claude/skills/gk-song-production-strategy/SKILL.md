@@ -346,6 +346,14 @@ Patterns observed across Joe's catalog so far:
   forward — write fresh lyrics in this voice and these themes, never
   reused lines from the actual tracks.
 
+**Patriotic Anthem Songs subfolder (Joe, 19 Oct 2026):** Drive folder
+`17fKtKK6cQSbKPd1i1zKhjy-Qb1ICCI5k` (inside GK_Viral_Prompts
+`1GLeqzy5IpYbpQtN-xll-LcH-AE3_LK8Q`) — save every song built in the
+patriotic/cinematic-pride anthem lane here (sections 1 "GK-identity
+angle" and this lane generally, plus the AR/EN mode in section 12), not
+loose in GK_Viral_Prompts. "Calankayga" and "Pulse of Honor" already
+moved in as the first two entries.
+
 **Back-catalog landscape (Joe's YouTube channel PathFoundGK, screenshots
 shown 19 Oct 2026 — titles/view counts only, public metadata, no lyric
 text captured):** confirms the same lanes at real scale. Strongest
