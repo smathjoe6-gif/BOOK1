@@ -182,6 +182,47 @@ chat commission) but has not yet run — the usual Go-gate applies in full to
 any one-off use, and it is not yet in the daily routine's automatic rotation
 unless/until Joe says to add it there.
 
+## 8. Golden-Age Qaraami Love Duet — confirmed template (Joe, 19 Oct 2026)
+
+A standing *optional* mode, confirmed and approved by Joe after the first
+real run ("Dib U Soo Noqo," GK_Viral_Prompts). Joe's words: "You nail it...
+excellent... that's why. Get this style... it's a nice, excellent." Reach
+for this mode by name whenever Joe asks for a love song, a slow jam, or "that
+style like last time" — it's now a known-good template, not a one-off
+experiment.
+
+- **The setting:** a Golden-Age (1970s Mogadishu National Theatre-era)
+  Qaraami duet — male and female voices trading verses, meeting on a shared
+  chorus, same shape the real Waabeeri/Somaali Jaaz-era bands used.
+- **Concept:** romantic, not patriotic or trade-story — distance, longing,
+  a parting vow, a promise kept; the emotional register is tender and
+  reflective, not triumphant or club-pulse.
+- **Alliteration:** classical xaraf-raac ruling-letter discipline (section
+  3), same as always — pick a letter, anchor it on real, checked vocabulary
+  words only.
+- **Language:** Somali carries the verses and the spoken bridge (this mode
+  stays close to the real tradition's own language, unlike the usual
+  Somali+second-language daily pairing); one short English line folded into
+  the chorus as GK's house hook, kept light so it doesn't dilute the
+  homage.
+- **The sound — get this right, it's the part that broke once already:**
+  explicit East African / Somali dance-band instrumentation — Kaban (oud)
+  as the lead voice in traditional tuning, warm brass horns (trumpet,
+  saxophone) answering the vocal lines, electric bass guitar walking
+  underneath, light hand drum and dry kit groove, studio-clean (not
+  lo-fi) mastering. **Say explicitly in the prompt: no tabla, no sitar, no
+  Bollywood or Hindustani strings, no raga-style ornamentation, not
+  Indian.** The first draft of "Dib U Soo Noqo" used vaguer words
+  ("melismatic," "soaring strings") and Joe heard it as Indian-sounding —
+  always use the explicit East African/Somali wording above, never the
+  vaguer version, for this mode.
+- **Structure:** Verse 1 (male) → Verse 2 (female, answers him) → Chorus
+  (duet) → Bridge (spoken, beat drops out completely) → Chorus again,
+  biggest → Outro (quiet, Kaban pluck alone).
+- Reference example (structure + music prompt, not for copying lyrics):
+  "Dib U Soo Noqo" (Come Back / Return), GK_Viral_Prompts folder,
+  19 Oct 2026.
+
 ## Standing iron rules (shared with `gk-gabay-blueprint`)
 
 - Every public caption/doc ends with the exact footer: `Copyright Notice ©
