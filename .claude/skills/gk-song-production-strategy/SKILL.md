@@ -317,7 +317,11 @@ skill; any song built in this mode gets entirely new, original lyrics.**
 - Every public caption/doc ends with the exact footer: `Copyright Notice ©
   2026 GK Legend Studio. All rights reserved.` + `https://www.youtube.com/@PathFoundGK`.
 - Never imitate a real named artist's voice/likeness — generic style
-  descriptors only.
+  descriptors only. Named reference artists collected so far, for the
+  standard Kaban-trap/hip-hop mode (scene/genre anchors only, same as
+  Tubeec/Killer/Yasin/Dree Low/1.Cuz elsewhere in this skill set): Ilkka,
+  Sharma Boy (Joe, 19 Oct 2026) — chest-voice, aggressive delivery,
+  cinematic pauses, fast syllable runs.
 - Permanent topic exclusion: never make fishing/boats/the sea/coastal-water
   imagery the day's central theme again (it's been overused).
 - Platform-safe titles: avoid words like "Jihaad" in public titles even when
