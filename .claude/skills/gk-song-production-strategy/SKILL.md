@@ -98,6 +98,13 @@ person or craft*, not a summary of a headline.
   given a futuristic carbon-fiber sub-bass resonance — pick deliberately
   per the day's vibe (traditional tuning for reflective/heritage days,
   carbon-fiber futurism for triumphant/club-pulse days).
+- **"The Drop" (Joe, 19 Oct 2026):** on any high-energy song (club/drill/
+  trap-leaning modes especially), the transition from verse into chorus
+  can be built as a hard production drop — bass cuts or builds to a
+  held breath, then slams back in loud under the chorus's first line.
+  Note this explicitly in the song doc where used (e.g. "[PRE-DROP —
+  build] ... [DROP → CHORUS — bass hits hard]") so it's an intentional
+  structural beat, not just a lyric transition.
 - **Percussion:** heavy Dhaanto and traditional drums layered with crisp
   modern trap hi-hats and deep 808 sub-bass. This is the fixed house sound
   (matches the existing Sound/Production Blueprint) — vary secondary
@@ -393,6 +400,16 @@ laughter, distant adhan) rather than a big final hook. Same EN/AR
 bilingual rap-plus-spoken-word shape as sections 11-12, but forward
 -looking rather than looking back at history — a fourth lane alongside
 historical-pride, romantic, and documentary/explainer in Joe's catalog.
+
+**"From Mogadishu to Millions"** — a fifth lane: a **prosperity/success
+-vision** anthem (Hip-Hop x R&B, "Global Vision Anthem" framing), Dhaanto
+rhythm fused with Middle Eastern oud melody, ~100 BPM Global-Trap. Same
+no-lyrics-stored rule.
+
+**"For the Girls" (women's empowerment lane)** — a sixth lane: Somali
++English, chant-driven hook, direct address to Somali women/queens,
+drill/club/Afro-R&B leaning rather than the usual Kaban-trap base. Same
+no-lyrics-stored rule — pattern only.
 
 ## 12. Arabic–English Pride Anthem Remix mode (Joe, 19 Oct 2026)
 
