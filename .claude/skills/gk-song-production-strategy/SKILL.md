@@ -364,6 +364,17 @@ work — treat the patriotic/cinematic-pride anthem lane as the highest
 -proof-of-concept lane to lean on when he asks for something "hot" or
 wants to "get back to how I used to produce."
 
+**"Pillars of the Horn" (أركان القرن)** — another confirmed entry in this
+same catalog (34k views; same note as above, no lyric text stored here).
+Notable pattern: a trilingual structure (English verses, Arabic anthem
+chorus, a Somali-language emotional bridge) in one song, and real Somali
+history woven into the pride-anthem lane — the Adal Sultanate and Ahmed
+Gurey (Axmed Gurey, "the Left-Handed Imam," real 16th-century historical
+figure) as a recurring historical anchor, alongside trade-history imagery
+(Zeila, the Red Sea ports). Useful precedent for section 12's Arabic
+-English mode: Joe's own work already proves a 3-language single song
+works for him, not just 2.
+
 ## 12. Arabic–English Pride Anthem Remix mode (Joe, 19 Oct 2026)
 
 A standing *optional* mode — Joe asked for a cinematic Arabic/English dual
