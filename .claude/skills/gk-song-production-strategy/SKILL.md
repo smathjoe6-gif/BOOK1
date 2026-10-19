@@ -242,6 +242,39 @@ experiment.
   brass horns + bass guitar + hand drum/dry kit, explicitly not
   Indian/Bollywood) regardless of cast or tempo choice.
 
+## 9. Golden-Age Energy/Funk-Dance Mode — the "Dur-Dur / Shareero / Iftin" setting (Joe, 19 Oct 2026)
+
+A standing *optional* mode, alongside the Qaraami Love Duet (section 8) —
+for when Joe wants high energy instead of a slow jam. Reach for it by name
+whenever Joe says "energy one" or names an independent Golden-Age dance
+band.
+
+- **Reference bands (scene/genre inspiration only — never a specific song
+  or a real voice/likeness, same iron rule as always):** Dur-Dur Band,
+  Shareero, Iftin — real Golden-Age Mogadishu groups (see the checked
+  "Golden Age supergroups" fact in `gk-gabay-blueprint`); named here the
+  same way Tubeec/Killer/Yasin are named elsewhere, as a genre anchor, not
+  a target to sound like or a song to adapt.
+- **The sound:** funky bass line, synth stabs, a live horn section, Dhaanto
+  percussion groove underneath — the 1980s Somali funk/disco "cassette
+  era" energy, not the Qaraami ballad's Kaban-led intimacy. Still close
+  with GK's Kaban audio-logo pluck at the very end (brand consistency),
+  even though Kaban isn't the lead voice through the rest of the track.
+- **Tempo:** noticeably faster than the Love Duet mode — roughly 118–128
+  BPM, four-on-the-floor or driving funk groove, built for dancing.
+- **Structure leans chant-driven, not classical-alliterative:** this
+  mirrors the real historical shift documented in `gk-gabay-blueprint`
+  (unaccompanied classical poetry → musical theatre/pop "muusiko") — a
+  short group chant intro/hook, call-and-response Somali + English lines,
+  an instrumental breakdown (horn/synth solo over percussion only) before
+  the final chorus. Full xaraf-raac ruling-letter discipline is optional
+  here, not required — a loose consistent sound is fine, but never invent
+  fake-sounding Somali to hit it; stick to real, common vocabulary.
+- **Language:** Somali chant/verse with a simple, repeatable English hook
+  line — built to be shouted along to on a dance floor, not read as poetry.
+- Reference example: "Ciyaarta Xaafadda" (The Neighborhood's Dance),
+  GK_Viral_Prompts folder, 19 Oct 2026.
+
 ## Standing iron rules (shared with `gk-gabay-blueprint`)
 
 - Every public caption/doc ends with the exact footer: `Copyright Notice ©
