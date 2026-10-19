@@ -2,7 +2,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { config } from './config.js';
 import { loadOAuthClient } from './googleAuth.js';
-import { listNewVideos, listVideosInFolder, downloadFile, moveToDone, mirrorNewVideos, syncLogToDrive } from './drive.js';
+import { uploadLocalDrops } from './localDrop.js';
+import { stitchOnce } from './stitchVideos.js';
+import { listNewVideos, listVideosInFolder, downloadFile, moveToDone, mirrorNewVideos, syncLogToDrive, uploadVerticalCopy } from './drive.js';
 import { findRowForFile, appendGeneratedRow, updateCoverImage } from './sheets.js';
 import { uploadToYouTube, postEngagementComment } from './youtube.js';
 import { generateCaption, isLikelyDuplicateVariant, stripCollisionSuffix } from './autoCaption.js';
@@ -19,6 +21,9 @@ import { ensureVerticalVideo } from './aspectRatio.js';
 import { engagementQuestion } from './engagementQuestion.js';
 import { postNextHistoryVideo } from './historyChannel.js';
 import { sortDoneFoldersByShape } from './doneSorter.js';
+import { isAlreadyPosted, rememberPosted, seedPostedHashes } from './postedHashes.js';
+import { postDuePicture } from './pictureDrops.js';
+import { bufferPostingEnabled, bufferServices, postToBuffer, retryFailedBufferPosts } from './bufferPost.js';
 
 // Independent test rollout of Pinterest posting for GK_TERMINAL videos,
 // capped at config.pinterestDailyLimit attempts per day while Joe's new
@@ -81,7 +86,16 @@ if (!auth.credentials || !auth.credentials.refresh_token) {
 async function processVideoOnce(file) {
   console.log(`\n--- Found: ${file.name} ---`);
 
+  // Same bytes already posted (e.g. a " (1)" re-download of a posted video)?
+  // Park it in DONE instead of posting it again.
+  if (isAlreadyPosted(file.md5Checksum)) {
+    console.log(`"${file.name}" has identical content to a video already posted -- moving to DONE without posting again.`);
+    await moveToDone(auth, file.id);
+    return 'skipped';
+  }
+
   let row = await findRowForFile(auth, file.name);
+  let newRowCover = '';
   const collisionBaseName = stripCollisionSuffix(file.name);
   if (!row && collisionBaseName !== file.name) {
     // Drive/macOS append " (1)", " (2)" etc whenever a file lands with the
@@ -113,6 +127,7 @@ async function processVideoOnce(file) {
     let coverImageUrl = '';
     try {
       coverImageUrl = await getCoverImage(auth, generated.title);
+      newRowCover = coverImageUrl || '';
     } catch (err) {
       console.error(`Could not get a Pinterest cover image for "${file.name}" (falling back to Make's default rotation):`, err.message);
     }
@@ -127,16 +142,30 @@ async function processVideoOnce(file) {
   console.log(`Downloading...`);
   let localPath = await downloadFile(auth, file.id, file.name);
 
+  // Which Drive file Buffer (IG/FB/Pinterest/X/TikTok) fetches: the original,
+  // unless the video had to be converted to 9:16, in which case a copy of the
+  // converted file (a wide original is rejected by Facebook Reels).
+  let postFileId = file.id;
+  const downloadedPath = localPath;
   try {
     localPath = await ensureVerticalVideo(localPath);
   } catch (err) {
     console.error(`Could not check/convert "${file.name}" to vertical 9:16 (posting as-is):`, err.message);
+  }
+  if (localPath !== downloadedPath) {
+    try {
+      postFileId = await uploadVerticalCopy(auth, localPath, file.name);
+      console.log(`Uploaded the 9:16 copy for Buffer (Drive id ${postFileId}).`);
+    } catch (err) {
+      console.error(`Could not upload the 9:16 copy of "${file.name}" (Buffer gets the original file):`, err.message);
+    }
   }
 
   const caption = `${row.capture} ${row.hashtag}`.trim();
 
   console.log('Uploading to YouTube...');
   let youtubePosted = false;
+  let engagementText = '';
   try {
     const yt = await uploadToYouTube(auth, {
       filePath: localPath,
@@ -145,8 +174,12 @@ async function processVideoOnce(file) {
     });
     console.log(`YouTube: posted, id ${yt.id}`);
     youtubePosted = true;
+    // Remember the moment YouTube accepts it: a restart after this point can
+    // never upload the same video again (the md5 guard catches it).
+    rememberPosted(file.md5Checksum, file.name);
     try {
       const question = await engagementQuestion(row.title, row.capture);
+      engagementText = `${question} — GK Legend Studio`;
       await postEngagementComment(auth, yt.id, `${question} — GK Legend Studio`);
       console.log(`YouTube: posted engagement question: "${question}"`);
     } catch (err) {
@@ -164,7 +197,7 @@ async function processVideoOnce(file) {
     if (config.bufferAccessToken) {
       // Queued, not posted here -- postNextQueuedTikTok() in checkOnce()
       // sends it, keeping TikTok under its daily API post limit.
-      queueTikTok({ fileId: file.id, name: file.name, caption });
+      queueTikTok({ fileId: postFileId, name: file.name, caption, md5: file.md5Checksum });
     } else if (loadTikTokToken()) {
       console.log('Posting to TikTok...');
       try {
@@ -178,12 +211,48 @@ async function processVideoOnce(file) {
     }
   }
 
+  // Move to DONE as soon as YouTube has posted and TikTok is queued -- BEFORE
+  // the slow Buffer posts (one minute apart). If the script is restarted
+  // during those minutes the video is already filed away and the networks
+  // not yet done resume from buffer-retry.json, instead of the whole video
+  // being posted again from the top (3 Oct 2026: 3 restarts = Instagram 3x).
+  let movedToDone = false;
+  if (youtubePosted) {
+    rememberPosted(file.md5Checksum, file.name);
+    try {
+      console.log('Moving to DONE folder...');
+      await moveToDone(auth, file.id);
+      movedToDone = true;
+    } catch (err) {
+      console.error('Could not move the video to DONE yet (will try again at the end):', err.message);
+    }
+  }
+
   // Independent test rollout: also post to Pinterest directly from this
   // script (separate from Make.com's own Pinterest posting for GK_JING
   // videos), capped at a few per day while the new trial API access is
   // still being proven out. A failure or a not-yet-logged-in state here
   // never blocks YouTube/TikTok above or the move-to-done below.
-  if (youtubePosted) {
+  const viaBuffer = bufferPostingEnabled() ? bufferServices() : [];
+  if (youtubePosted && viaBuffer.length) {
+    try {
+      // Pinterest's "preview" (cover) image: reuse the cover made for this
+      // video's sheet row, or make one now if the row already existed.
+      let coverUrl = newRowCover || row.cover || '';
+      if (!coverUrl && viaBuffer.includes('pinterest')) {
+        try {
+          coverUrl = (await getCoverImage(auth, row.title)) || '';
+        } catch (err) {
+          console.error('Could not get a Pinterest cover image for the Buffer pin (posting without one):', err.message);
+        }
+      }
+      await postToBuffer(auth, { fileId: postFileId, name: file.name, title: row.title, caption, firstComment: engagementText, coverUrl });
+    } catch (err) {
+      console.error('Buffer posting failed (other posts above still stand):', err.message);
+    }
+  }
+
+  if (youtubePosted && !viaBuffer.includes('pinterest')) {
     if (!loadPinterestToken()) {
       console.log('Not logged in to Pinterest yet — skipping (run "node src/pinterestAuth.js" to connect).');
     } else {
@@ -216,7 +285,7 @@ async function processVideoOnce(file) {
   // X (Twitter) -- a 6th platform for the same GK_TERMINAL videos, no daily
   // cap (unlike Pinterest's trial-access rollout above). A failure here
   // never blocks anything else or stops the move-to-done below.
-  if (youtubePosted) {
+  if (youtubePosted && !viaBuffer.includes('twitter')) {
     if (!config.xApiKey) {
       console.log('X (Twitter) is not configured yet — skipping (set X_API_KEY etc. in .env).');
     } else {
@@ -233,8 +302,10 @@ async function processVideoOnce(file) {
   fs.unlink(localPath, () => {});
 
   if (youtubePosted) {
-    console.log('Moving to DONE folder...');
-    await moveToDone(auth, file.id);
+    if (!movedToDone) {
+      console.log('Moving to DONE folder...');
+      await moveToDone(auth, file.id);
+    }
     console.log(`--- Finished: ${file.name} ---\n`);
   } else {
     console.log(`--- YouTube failed for "${file.name}" -- leaving it in place to retry next cycle ---\n`);
@@ -343,6 +414,18 @@ async function backfillGkJingCaptions() {
 
 async function checkOnce() {
   try {
+    await uploadLocalDrops(auth);
+  } catch (err) {
+    console.error('Local drop folder upload failed (will retry next cycle):', err.message);
+  }
+
+  try {
+    await stitchOnce(auth);
+  } catch (err) {
+    console.error('Video stacker failed (will retry next cycle):', err.message);
+  }
+
+  try {
     await mirrorNewVideos(auth);
   } catch (err) {
     console.error('Mirroring videos between GK_TERMINAL and GK_JING failed:', err.message);
@@ -358,6 +441,12 @@ async function checkOnce() {
     await backfillGkJingCaptions();
   } catch (err) {
     console.error('GK_JING caption backfill check failed:', err.message);
+  }
+
+  try {
+    await seedPostedHashes(auth);
+  } catch (err) {
+    console.error('Duplicate-guard seeding failed (will retry next cycle):', err.message);
   }
 
   console.log(`[${new Date().toLocaleString()}] Checking for new videos...`);
@@ -395,6 +484,20 @@ async function checkOnce() {
     } catch (err) {
       console.error('TikTok queue check failed:', err.message);
     }
+  }
+
+  if (bufferPostingEnabled()) {
+    try {
+      await retryFailedBufferPosts(auth);
+    } catch (err) {
+      console.error('Buffer retry check failed:', err.message);
+    }
+  }
+
+  try {
+    await postDuePicture(auth);
+  } catch (err) {
+    console.error('Picture posting failed (will retry next cycle):', err.message);
   }
 
   console.log('Checking for new YouTube comments to reply to...');
@@ -468,6 +571,12 @@ async function main() {
   setInterval(historyCycle, intervalMs);
   console.log(`\nWatching your configured Drive folder${config.mirrorFolderId ? ' (and mirroring with its pair folder)' : ''} — checking every ${config.pollIntervalMinutes} minutes, posting at most one video per check so they never all land at once. Leave this running (Ctrl+C to stop).`);
   setInterval(safeCheckOnce, intervalMs);
+  // TikTok has its own timer (Joe, 18 Oct 2026: 15 minutes between TikTok posts is too slow while the
+  // other networks go out a minute apart). It checks every minute; postNextQueuedTikTok() itself keeps
+  // TIKTOK_MIN_GAP_MINUTES between posts, the daily cap, the Buffer cooldown and the pause.
+  if (config.bufferAccessToken) setInterval(() => {
+    postNextQueuedTikTok(auth).catch((err) => console.error('TikTok queue timer failed (will retry):', err.message));
+  }, 60 * 1000);
 }
 
 main().catch((err) => {

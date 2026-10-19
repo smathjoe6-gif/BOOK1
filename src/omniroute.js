@@ -6,7 +6,7 @@ const TIMEOUT_MS = 25000;
 const MAX_ATTEMPTS = 3;
 const RETRY_DELAY_MS = 3000;
 
-async function requestOnce(systemPrompt, userPrompt) {
+async function requestOnce(systemPrompt, userPrompt, model = config.omnirouteModel) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
@@ -18,7 +18,7 @@ async function requestOnce(systemPrompt, userPrompt) {
         ...(config.omnirouteApiKey ? { Authorization: `Bearer ${config.omnirouteApiKey}` } : {}),
       },
       body: JSON.stringify({
-        model: config.omnirouteModel,
+        model,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
@@ -82,6 +82,58 @@ async function askAnthropic(systemPrompt, userPrompt) {
   }
 }
 
+const GEMINI_TIMEOUT_MS = 25000;
+
+// Direct Google Gemini call (no OmniRoute needed). Added 6 Oct 2026 after
+// OmniRoute broke three nights running ("Invalid API key" on its own key,
+// then "No active credentials for provider: gemini"). Uses a free Google AI
+// Studio key (aistudio.google.com/apikey) in GEMINI_API_KEY; the key goes in
+// the x-goog-api-key header, which works for both the older AIza... keys and
+// the newer AQ.... ones. Only used if GEMINI_API_KEY is set.
+async function askGemini(systemPrompt, userPrompt, model = config.geminiModel) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
+
+  try {
+    const generationConfig = { maxOutputTokens: 1200 };
+    // 2.5 Flash "thinks" by default and can spend the whole output budget
+    // before writing anything; a short caption doesn't need it.
+    if (/2\.5-flash/.test(model)) generationConfig.thinkingConfig = { thinkingBudget: 0 };
+
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': config.geminiApiKey,
+        },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+          generationConfig,
+        }),
+        signal: controller.signal,
+      },
+    );
+
+    if (!res.ok) {
+      const body = await res.text().catch(() => '');
+      throw new Error(`Gemini API returned ${res.status}: ${body.slice(0, 200)}`);
+    }
+
+    const data = await res.json();
+    const text = (data.candidates?.[0]?.content?.parts || [])
+      .map((p) => p.text || '')
+      .join('')
+      .trim();
+    if (!text) throw new Error('Gemini API gave an empty response');
+    return text;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 // OmniRoute already routes across whichever AI providers Joe has connected
 // on his end -- "model: auto" picks one of them per request. A single failed
 // attempt here (Mac just waking up, a provider cold-starting, one dropped
@@ -96,14 +148,62 @@ async function askAnthropic(systemPrompt, userPrompt) {
 // built-in templates.
 async function askAI(systemPrompt, userPrompt) {
   let lastErr;
-  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-    try {
-      return await requestOnce(systemPrompt, userPrompt);
-    } catch (err) {
-      lastErr = err;
-      if (attempt < MAX_ATTEMPTS) {
-        console.log(`OmniRoute attempt ${attempt}/${MAX_ATTEMPTS} failed (${err.message}), retrying...`);
-        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS * attempt));
+
+  // Direct Gemini first when a key is set: it needs no OmniRoute window open
+  // and no per-night fixing. Any failure falls through to OmniRoute, then the
+  // Anthropic backup, then the templates, exactly as before.
+  if (config.geminiApiKey) {
+    // Google answers 503 "high demand" in short spikes (seen 7 Oct 2026 on
+    // the history channel's single call, which then fell back to a plain
+    // filename title): a couple of short retries nearly always get through.
+    // Google's free-tier quota is counted PER MODEL. On 9 Oct 2026 every
+    // caption/engagement question answered 429 (quota used up) and the posts
+    // went out with template captions, so a 429 now tries a second model
+    // (GEMINI_FALLBACK_MODEL: a comma-separated list, default gemini-2.5-flash-lite then
+    // gemini-3.5-flash-lite, each with its own quota) before OmniRoute.
+    const models = [config.geminiModel, ...config.geminiFallbackModels.filter((m) => m !== config.geminiModel)];
+    for (const model of models) {
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          return await askGemini(systemPrompt, userPrompt, model);
+        } catch (err) {
+          lastErr = err;
+          if (/returned 429/.test(err.message)) break; // quota: retrying this model won't help
+          const transient = /returned (500|502|503|504)|aborted|timeout|fetch failed/i.test(err.message);
+          if (transient && attempt < 3) {
+            await new Promise((resolve) => setTimeout(resolve, 4000 * attempt));
+            continue;
+          }
+          break;
+        }
+      }
+      console.log(`Gemini ${model} failed (${(lastErr.message.replace(/\s+/g, ' ')).slice(0, 220)})${model === models[models.length - 1] ? ', trying OmniRoute...' : ', trying the backup model...'}`);
+    }
+  }
+
+  // Each OmniRoute model in OMNIROUTE_MODELS gets its turn; when one fails the
+  // next takes over. If OmniRoute itself isn't running (connection refused),
+  // trying more of its models is pointless, so go straight on.
+  const omniModels = config.omnirouteModels.length ? config.omnirouteModels : [config.omnirouteModel];
+  let omniDown = false;
+  for (const model of omniModels) {
+    if (omniDown) break;
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      try {
+        return await requestOnce(systemPrompt, userPrompt, model);
+      } catch (err) {
+        lastErr = err;
+        if (/ECONNREFUSED/.test(err.message)) {
+          console.log('OmniRoute is not running (connection refused) -- skipping it.');
+          omniDown = true;
+          break;
+        }
+        if (attempt < MAX_ATTEMPTS) {
+          console.log(`OmniRoute ${model} attempt ${attempt}/${MAX_ATTEMPTS} failed (${err.message}), retrying...`);
+          await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS * attempt));
+        } else {
+          console.log(`OmniRoute ${model} failed (${err.message})${model === omniModels[omniModels.length - 1] ? '' : ', trying the next model...'}`);
+        }
       }
     }
   }
@@ -121,7 +221,13 @@ async function askAI(systemPrompt, userPrompt) {
   throw lastErr;
 }
 
-const CAPTION_SYSTEM_PROMPT = `You are the social media voice of "GK Legend Studio," a brand celebrating Somali heritage and culture through short videos -- but not every video is heritage content, so never force that framing where it doesn't fit. Write warm, punchy, on-brand copy with real emotion -- one or two emoji, never robotic or repetitive-sounding. Also pick exactly 6 hashtags that actually match this specific video's content -- always include #GKLegend and #GKLegendStudio, but only include heritage/culture tags (e.g. #SomaliHeritage, #CulturalPride, #HeritageReimagined) when the content genuinely is about Somali heritage or culture, never as a default. For unrelated content (comedy, animals, tech gags, etc.) pick hashtags that actually fit that content instead.`;
+const CAPTION_SYSTEM_PROMPT = `You are the social media voice of "GK Legend Studio," a brand celebrating Somali heritage and culture through short videos -- but not every video is heritage content, so never force that framing where it doesn't fit. Write warm, punchy, on-brand copy with real emotion -- one or two emoji, never robotic or repetitive-sounding. Also pick exactly 6 hashtags that actually match this specific video's content -- always include #GKLegend and #GKLegendStudio, but only include heritage/culture tags (e.g. #SomaliHeritage, #CulturalPride, #HeritageReimagined) when the content genuinely is about Somali heritage or culture, never as a default. For unrelated content (comedy, animals, tech gags, etc.) pick hashtags that actually fit that content instead.
+
+Hashtag mix (16 Oct 2026, from TikTok Studio: the audience is mostly UK / Sweden / Norway / Finland / Netherlands, Somali diaspora, aged 25-44, and animal videos get the most views): the 6 should be #GKLegend, #GKLegendStudio, then 2 specific tags for what is actually in the video (e.g. animals -> #lion #bigcat #wildlife #animals #dog; craft or food -> the craft or food; a song -> #SomaliMusic), 1 community tag ONLY when the video is truly about Somali culture or music (e.g. #SomaliTikTok, #Somali), and 1 broad discovery tag (e.g. #fyp or #foryou). Never use more than one broad tag, never repeat the same tag twice, and never tag something the video does not show.
+
+Engagement: end the caption with a short, easy question that invites a comment (a feeling, a memory, a choice) -- never a request to 'follow' or 'like'. Where it fits the clip, make it a quick A-or-B vote (e.g. "Whale or elephant? A or B?"): people answer votes far more than open questions, and the votes tell us which kind of video to make next (Joe, 19 Oct 2026).
+
+You cannot see the video, and you only get a filename hint. Never invent facts: do NOT announce news, launches, expansion, growth, collaborations, events or milestones, and never claim anything the hint does not say. (6 Oct 2026: a comedy clip went out captioned "We're thrilled to announce GK Legend Studio is growing" with #Expansion #NewBeginnings #ExcitingNews -- that is exactly what to avoid.) If the hint is a random ID or meaningless, write one short feeling-based line that fits any clip, ending with a light question that invites a comment, and use only #GKLegend, #GKLegendStudio and generic mood tags -- never #Expansion, #NewBeginnings, #ExcitingNews or #Announcement.`;
 
 // Hashtags used to always come from a fixed random pool regardless of what
 // the caption said -- meaning even a good, unique AI caption on an unrelated

@@ -68,13 +68,41 @@ export async function listVideosInFolder(auth, rootFolderId) {
   const res = await drive.files.list(
     {
       q: `(${parentClause}) and mimeType contains 'video/' and trashed = false`,
-      fields: 'files(id, name, mimeType, createdTime)',
+      fields: 'files(id, name, mimeType, createdTime, md5Checksum)',
       orderBy: 'createdTime',
       pageSize: 50,
     },
     { timeout: API_TIMEOUT_MS }
   );
   return res.data.files || [];
+}
+
+// Every video's name + content fingerprint (md5) in a folder and its
+// subfolders, following Drive's paging. Used once to seed the "already
+// posted" list (src/postedHashes.js) from the DONE folders.
+export async function listAllVideoHashes(auth, rootFolderId) {
+  const drive = google.drive({ version: 'v3', auth });
+  const folderIds = await listWatchedFolderIds(drive, rootFolderId);
+  const found = [];
+  for (const folderId of folderIds) {
+    let pageToken;
+    do {
+      const res = await drive.files.list(
+        {
+          q: `'${folderId}' in parents and mimeType contains 'video/' and trashed = false`,
+          fields: 'nextPageToken, files(name, md5Checksum)',
+          pageSize: 1000,
+          pageToken,
+        },
+        { timeout: API_TIMEOUT_MS }
+      );
+      for (const f of res.data.files || []) {
+        if (f.md5Checksum) found.push({ name: f.name, md5: f.md5Checksum });
+      }
+      pageToken = res.data.nextPageToken;
+    } while (pageToken);
+  }
+  return found;
 }
 
 // Lists video files in GK_TERMINAL (this script's own watched folder).
@@ -94,6 +122,11 @@ export function pipeWithTimeout(readable, dest, timeoutMs = DOWNLOAD_TIMEOUT_MS)
     const timer = setTimeout(() => {
       readable.destroy(new Error(`Download timed out after ${Math.round(timeoutMs / 1000)}s`));
     }, timeoutMs);
+    dest.on('error', (err) => {
+      clearTimeout(timer);
+      readable.destroy();
+      reject(err);
+    });
     readable
       .on('end', () => {
         clearTimeout(timer);
@@ -110,11 +143,23 @@ export function pipeWithTimeout(readable, dest, timeoutMs = DOWNLOAD_TIMEOUT_MS)
 // Downloads a file to a temp path and returns that path.
 export async function downloadFile(auth, fileId, fileName, timeoutMs = DOWNLOAD_TIMEOUT_MS) {
   const drive = google.drive({ version: 'v3', auth });
-  const destPath = path.join(os.tmpdir(), `gk-${fileId}-${fileName}`);
+  // Gemini/Grok clips are often named after their whole prompt (200+ characters), which made the
+  // temp path longer than the Mac allows (ENAMETOOLONG) and crashed the whole script on every
+  // cycle (12 Oct 2026). Keep only a short, safe version of the name for the temp file.
+  const ext = path.extname(String(fileName || '')).replace(/[^\w.]/g, '').slice(0, 10);
+  const base = path.basename(String(fileName || 'video'), path.extname(String(fileName || ''))).replace(/[^\w-]+/g, '_').slice(0, 60);
+  const destPath = path.join(os.tmpdir(), `gk-${fileId}-${base}${ext}`);
   const dest = fs.createWriteStream(destPath);
+  dest.on('error', () => {}); // a write error is reported through pipeWithTimeout below, never as an unhandled crash
 
-  const res = await drive.files.get({ fileId, alt: 'media' }, { responseType: 'stream', timeout: API_TIMEOUT_MS });
-  await pipeWithTimeout(res.data, dest, timeoutMs);
+  try {
+    const res = await drive.files.get({ fileId, alt: 'media' }, { responseType: 'stream', timeout: API_TIMEOUT_MS });
+    await pipeWithTimeout(res.data, dest, timeoutMs);
+  } catch (err) {
+    dest.destroy();
+    fs.unlink(destPath, () => {});
+    throw err;
+  }
 
   return destPath;
 }
@@ -309,6 +354,43 @@ export async function uploadPublicImage(auth, localPath, fileName, folderId) {
   // The /thumbnail endpoint is built for exactly this (external, non-browser
   // fetches) and reliably returns the actual image.
   return `https://drive.google.com/thumbnail?id=${file.data.id}&sz=w1000`;
+}
+
+// YouTube already gets the converted 9:16 file (processVideo() uploads it from
+// disk), but Buffer (Instagram/Facebook/Pinterest/X/TikTok) fetches the video
+// from a public Drive link, so it used to get the ORIGINAL wide file --
+// Facebook Reels rejects those ("height must be at least 960px", "aspect ratio
+// too wide"). This uploads the converted file into its own folder
+// (GK_VERTICAL_COPIES, created in My Drive root -- NOT inside a watched
+// folder, so it is never picked up and re-posted) and returns the new file id.
+export async function uploadVerticalCopy(auth, localPath, fileName) {
+  const drive = google.drive({ version: 'v3', auth });
+  const folderName = 'GK_VERTICAL_COPIES';
+  const found = await drive.files.list(
+    {
+      q: `name = '${folderName}' and mimeType = 'application/vnd.google-apps.folder' and 'root' in parents and trashed = false`,
+      fields: 'files(id)',
+      pageSize: 1,
+    },
+    { timeout: API_TIMEOUT_MS }
+  );
+  let folderId = found.data.files?.[0]?.id;
+  if (!folderId) {
+    const created = await drive.files.create(
+      { requestBody: { name: folderName, mimeType: 'application/vnd.google-apps.folder' }, fields: 'id' },
+      { timeout: API_TIMEOUT_MS }
+    );
+    folderId = created.data.id;
+  }
+  const file = await drive.files.create(
+    {
+      requestBody: { name: `vertical-${fileName}`, parents: [folderId] },
+      media: { mimeType: 'video/mp4', body: fs.createReadStream(localPath) },
+      fields: 'id',
+    },
+    { timeout: 10 * 60 * 1000 }
+  );
+  return file.data.id;
 }
 
 // Moves a file into the DONE folder once it's been posted everywhere.

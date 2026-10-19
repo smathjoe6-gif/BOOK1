@@ -4,8 +4,9 @@ import { config } from './config.js';
 import { loadOAuthClient, hasSavedLogin } from './googleAuth.js';
 import { listVideosInFolder, downloadFile, moveToDone } from './drive.js';
 import { google } from 'googleapis';
-import { uploadToYouTube, findOrCreatePlaylist, addVideoToPlaylist } from './youtube.js';
+import { uploadToYouTube, findOrCreatePlaylist, addVideoToPlaylist, postEngagementComment } from './youtube.js';
 import { writeHistoryMetadataWithAI } from './omniroute.js';
+import { makeThumbnail, setThumbnail } from './historyThumbnail.js';
 
 // Second YouTube channel: football + world history on @TotollsportGK.
 // Joe drops finished long videos (5-30 min, often NotebookLM video
@@ -53,6 +54,8 @@ function titleFromFilename(name) {
   // Strip every trailing extension/dot, not just one: Joe's first upload
   // was named "…Brazil.mp4..mp4" and came out titled "… Brazil.mp4." (27 Sep).
   let t = name.replace(/(\.+(mp4|mov|m4v|webm|mkv|avi))+\.*$/i, '').replace(/\.+$/, '');
+  // NotebookLM file names turn an apostrophe into "_" (Berbera_s_Deep -> Berbera's Deep).
+  t = t.replace(/([A-Za-z0-9])_s(?=[_\s-]|$)/g, "$1's");
   t = t.replace(/[_\-]+/g, ' ');
   t = t.replace(/\b(4k|2k|1080p|720p|480p|360p)\b/gi, '');
   t = t.replace(/\b\d{8,}\b/g, '');
@@ -71,16 +74,21 @@ async function buildMetadata(fileName, topic) {
     console.log(`History channel: AI unavailable (${err.message}), using filename title "${title}"`);
     meta = {
       title,
-      description: `${title}.\n\nThe story behind one of the moments that shaped football and the world, told from start to finish.`,
-      tags: ['history', 'football history', 'world history', 'documentary'],
+      description: `${title}.\n\nThe story behind one of history's great moments, told from start to finish.`,
+      tags: ['history', 'world history', 'documentary'],
     };
   }
   return meta;
 }
 
+// Joe's rule (9 Oct 2026): EVERY public GK Legend post carries the copyright
+// line + channel link, history videos included.
+const COPYRIGHT = '© 2026 GK Legend Studio. All rights reserved.\nhttps://www.youtube.com/@PathFoundGK';
+
 function withFooter(description, topic) {
-  const footer = `\n\nSubscribe for more history stories -- football, world and Somali history: https://www.youtube.com/${config.historyChannelHandle}\n\nThis video is for general information and entertainment. Views are the creator's own.\n\n${topic.hashtags}`;
-  return `${description}${footer}`.slice(0, 4900);
+  const footer = `\n\nWhat story should we tell next? Tell us in the comments, and subscribe so you never miss one.\n\nSubscribe for more history stories -- football, world and Somali history: https://www.youtube.com/${config.historyChannelHandle}\n\nThis video is for general information and entertainment. Views are the creator's own.\n\n${COPYRIGHT}\n\n${topic.hashtags}`;
+  // Cut the AI description (never the footer) to fit YouTube's limit.
+  return `${description.slice(0, Math.max(0, 4900 - footer.length))}${footer}`;
 }
 
 // Joe sorts videos by dropping them into a subfolder of TOTOLL_HISTORY
@@ -172,6 +180,34 @@ async function doneFolderFor(driveAuth, topic) {
   }
 }
 
+// A new channel needs conversation under every video (Joe, 5 Oct 2026), so
+// each upload gets a pinned-style first comment with a question. Plain
+// question banks per topic: no AI call, so it can never fail the upload.
+const ENGAGEMENT_QUESTIONS = {
+  sports: [
+    'Which moment from this story still gives you goosebumps? Tell us below.',
+    'Who is the greatest athlete of all time in your eyes, and why?',
+    'Which sporting story should we tell next? Drop a name or a year.',
+  ],
+  world: [
+    'Did you know this story before today? Tell us what surprised you most.',
+    'Which moment in history should we cover next? Give us a year or a name.',
+    'If you could stand in this moment for one hour, what would you ask?',
+  ],
+  somali: [
+    'Does your family have a story that connects to this? Share it below.',
+    'Which part of Somali history should we tell next? Name a place, a person or a year.',
+    'Where are you watching from today? Tell us your city or country.',
+  ],
+};
+
+function engagementFor(topic, videoId) {
+  const bank = ENGAGEMENT_QUESTIONS[topic?.key] || ENGAGEMENT_QUESTIONS.world;
+  let n = 0;
+  for (const ch of String(videoId)) n += ch.charCodeAt(0);
+  return bank[n % bank.length];
+}
+
 let isPosting = false;
 
 export async function postNextHistoryVideo(driveAuth) {
@@ -232,6 +268,29 @@ export async function postNextHistoryVideo(driveAuth) {
     state.postedToday += 1;
     state.uploadedIds = [...state.uploadedIds, file.id].slice(-500);
     saveState(state);
+
+    // A thumbnail failure must never undo or repeat the upload. (YouTube only
+    // accepts custom thumbnails on a verified channel: youtube.com/verify.)
+    if (config.historyThumbnails) {
+      const thumbPath = `${localPath}.thumb.jpg`;
+      try {
+        await makeThumbnail(localPath, meta.title, thumbPath);
+        await setThumbnail(youtubeAuth, result.id, thumbPath);
+        console.log('History channel: thumbnail set');
+      } catch (err) {
+        console.log(`History channel: could not set thumbnail: ${err.message}`);
+      } finally {
+        fs.rm(thumbPath, { force: true }, () => {});
+      }
+    }
+
+    // An engagement-comment failure must never undo or repeat the upload.
+    try {
+      await postEngagementComment(youtubeAuth, result.id, engagementFor(topic, result.id));
+      console.log('History channel: posted engagement question');
+    } catch (err) {
+      console.log(`History channel: could not post engagement question: ${err.message}`);
+    }
 
     if (topic) {
       // A playlist failure must never undo or repeat the upload itself.

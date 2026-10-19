@@ -20,6 +20,46 @@ export const config = {
   // just its own GK_TERMINAL ones. Leave blank to skip this and only
   // caption GK_TERMINAL videos as before.
   gkJingFolderId: process.env.GK_JING_FOLDER_ID || '',
+  // Mac folder Grok Bot (or anything local) saves finished videos into; the
+  // script uploads them to GK_TERMINAL (see src/localDrop.js). Blank = off.
+  localDropFolder: process.env.LOCAL_DROP_FOLDER || '',
+  localDropMinAgeSeconds: Number(process.env.LOCAL_DROP_MIN_AGE_SECONDS) || 120,
+  // Video stacker (src/stitchVideos.js): joins short clips from this Mac
+  // folder into one ~60 s vertical video per run and saves it into
+  // LOCAL_DROP_FOLDER. Blank = off.
+  stitchFolder: process.env.STITCH_FOLDER || '',
+  // Or take the clips straight from a Google Drive folder (stays in Drive,
+  // clips are reused round after round). Wins over STITCH_FOLDER if both set.
+  stitchDriveFolderId: process.env.STITCH_DRIVE_FOLDER_ID || '',
+  // Beat cuts (src/stitchBeats.js): with a song, cut on its beats; STITCH_BEAT_CUTS=false = old cuts.
+  stitchBeatCuts: process.env.STITCH_BEAT_CUTS !== 'false',
+  stitchBeatSeconds: Number(process.env.STITCH_BEAT_SECONDS) || 30,
+  stitchTargetSeconds: Number(process.env.STITCH_TARGET_SECONDS) || 60,
+  stitchMaxClipSeconds: Number(process.env.STITCH_MAX_CLIP_SECONDS) || 10,
+  stitchPerDay: process.env.STITCH_PER_DAY === undefined || process.env.STITCH_PER_DAY === '' ? 2 : Number(process.env.STITCH_PER_DAY),
+  stitchText: process.env.STITCH_TEXT === undefined ? 'GK Legend Studio' : process.env.STITCH_TEXT,
+  stitchFont: process.env.STITCH_FONT || '/System/Library/Fonts/Supplemental/Arial Bold.ttf',
+  // Music under the stacked video: songs (wav/mp3/m4a, at least ~8 MB) in this
+  // Drive folder; blank = no music. The clips' own sound is turned down to
+  // STITCH_CLIP_AUDIO_VOLUME (0 = muted) so random talking never fights the song.
+  // Designed edit on top of the stacked clips (hook text, zoom punch at each cut,
+  // white flash cut, colour grade, GK tag, progress bar, end line). STITCH_DESIGN=false
+  // = plain stitching. STITCH_HOOK blank = made from the story folder name.
+  stitchDesign: process.env.STITCH_DESIGN !== 'false',
+  stitchHook: process.env.STITCH_HOOK || '',
+  stitchEndText: process.env.STITCH_END_TEXT === undefined ? 'Follow for more' : process.env.STITCH_END_TEXT,
+  // Automatic matching (src/stitchMatch.js): Gemini labels every stock clip and song
+  // so clips of one kind are stacked together with a song of the same kind.
+  // STITCH_AUTO_MATCH=false = off. Needs GEMINI_API_KEY. Per script cycle it tags up
+  // to STITCH_CLASSIFY_PER_CYCLE clips (plus 2 songs) that were not judged yet.
+  stitchAutoMatch: process.env.STITCH_AUTO_MATCH !== 'false',
+  // STITCH_TIDY=false = the stock folder no longer tidies itself (exact duplicates to the Bin, clips filed into 9x16 / 16x9).
+  stitchTidy: process.env.STITCH_TIDY !== 'false',
+  stitchClassifyPerCycle: Number(process.env.STITCH_CLASSIFY_PER_CYCLE) || 10,
+  stitchMusicDriveFolderId: process.env.STITCH_MUSIC_DRIVE_FOLDER_ID || '',
+  // Only songs at least this many days old are used as stitch background music (0 = any).
+  stitchMusicMinAgeDays: Number(process.env.STITCH_MUSIC_MIN_AGE_DAYS ?? 180) || 0,
+  stitchClipAudioVolume: process.env.STITCH_CLIP_AUDIO_VOLUME === undefined || process.env.STITCH_CLIP_AUDIO_VOLUME === '' ? 0.12 : Number(process.env.STITCH_CLIP_AUDIO_VOLUME),
   canvaClientId: process.env.CANVA_CLIENT_ID || '',
   canvaClientSecret: process.env.CANVA_CLIENT_SECRET || '',
   canvaBrandTemplateId: process.env.CANVA_BRAND_TEMPLATE_ID || '',
@@ -62,17 +102,53 @@ export const config = {
   // BUFFER_ACCESS_TOKEN blank to fall back to the direct TikTok API instead.
   bufferAccessToken: process.env.BUFFER_ACCESS_TOKEN || '',
   bufferTikTokProfileId: process.env.BUFFER_TIKTOK_PROFILE_ID || '',
+  // Instagram/Facebook/Pinterest/X posting through Buffer (src/bufferPost.js).
+  // Comma list, e.g. "instagram,facebook,pinterest,x". Blank = off.
+  // newest (default) or oldest: which queued video goes to TikTok next.
+  tiktokOrder: process.env.TIKTOK_ORDER === 'oldest' ? 'oldest' : 'newest',
+  // Pause between one network and the next when posting a video via Buffer.
+  bufferGapSeconds: Number.isFinite(Number(process.env.BUFFER_GAP_SECONDS)) && process.env.BUFFER_GAP_SECONDS !== undefined && process.env.BUFFER_GAP_SECONDS !== '' ? Number(process.env.BUFFER_GAP_SECONDS) : 60,
+  // Picture posts for Facebook/Pinterest from Drive (src/pictureDrops.js).
+  // PICTURE_FOLDER_ID = a Drive folder holding HERITAGE and WILDLIFE
+  // subfolders of finished post pictures. Blank = off.
+  pictureFolderId: process.env.PICTURE_FOLDER_ID || '',
+  // Instead of Drive, read the pictures straight from Canva folders:
+  // "HERITAGE=<canva folder id>,WILDLIFE=<canva folder id>".
+  pictureCanvaFolders: process.env.PICTURE_CANVA_FOLDERS || '',
+  pictureSlots: process.env.PICTURE_SLOTS || '09:00,13:00,19:00',
+  pictureServices: process.env.PICTURE_SERVICES || 'facebook,pinterest',
+  picturePinterestWildlifeBoardId: process.env.PICTURE_PINTEREST_WILDLIFE_BOARD_ID || '',
+  bufferPostServices: process.env.BUFFER_POST_SERVICES || '',
+  // shareNow = post the moment the video is processed (default); addToQueue =
+  // let Buffer spread posts over each channel's own posting times.
+  bufferPostMode: ['addToQueue', 'shareNext'].includes(process.env.BUFFER_POST_MODE) ? process.env.BUFFER_POST_MODE : 'shareNow',
+  bufferInstagramType: process.env.BUFFER_INSTAGRAM_TYPE || 'reel',
+  bufferFacebookType: process.env.BUFFER_FACEBOOK_TYPE || 'reel',
+  bufferPinterestBoardId: process.env.BUFFER_PINTEREST_BOARD_ID || '',
   xaiApiKey: process.env.XAI_API_KEY || '',
   // API key for the local OmniRoute AI gateway (http://localhost:20128) --
   // copy it from OmniRoute's Dashboard -> Endpoints after connecting a
   // provider. Leave blank if OmniRoute isn't installed; captions/replies
   // just fall back to the built-in templates in that case.
   omnirouteApiKey: process.env.OMNIROUTE_API_KEY || '',
+  // Direct Google Gemini key (free, from aistudio.google.com/apikey), used
+  // for captions/titles/replies BEFORE OmniRoute so the script no longer
+  // depends on OmniRoute running. Leave blank to keep the old behaviour.
+  geminiApiKey: process.env.GEMINI_API_KEY || '',
+  geminiModel: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+  // Backup Gemini models, tried in this order when the main one runs out of free
+  // quota (429). Comma-separated; set GEMINI_FALLBACK_MODEL= (empty) to switch off.
+  geminiFallbackModels: (process.env.GEMINI_FALLBACK_MODEL === undefined ? 'gemini-2.5-flash-lite,gemini-3.5-flash-lite' : process.env.GEMINI_FALLBACK_MODEL)
+    .split(',').map((m) => m.trim()).filter(Boolean),
   // Which OmniRoute model to ask for captions/titles. "auto" lets OmniRoute
   // pick, but on 30 Sep 2026 that kept returning 502 while only some
   // providers worked -- set this to one exact model id copied from the
   // OmniRoute dashboard (a provider that tests green) to pin it.
   omnirouteModel: process.env.OMNIROUTE_MODEL || 'auto',
+  // Every OmniRoute model to try, in order, when the one before it fails (add a
+  // new free model here as soon as OmniRoute offers one). Comma-separated;
+  // defaults to just OMNIROUTE_MODEL.
+  omnirouteModels: (process.env.OMNIROUTE_MODELS || process.env.OMNIROUTE_MODEL || 'auto').split(',').map((m) => m.trim()).filter(Boolean),
   // Model id OmniRoute expects for its free "Veo AI Free" video provider.
   // Confirm the exact string via OmniRoute's Playground -> Copy cURL (the
   // Model field shown there) if this default ever stops working.
@@ -141,10 +217,11 @@ export const config = {
   // TOTOLL_HISTORY_DONE. Folders created 27 Sep 2026. Its login lives in
   // its own file (npm run auth-history), so the main token.json is
   // untouched. Set HISTORY_CHANNEL_ENABLED=false to switch it off.
+  historyThumbnails: process.env.HISTORY_THUMBNAILS !== 'false',
   historyChannelEnabled: process.env.HISTORY_CHANNEL_ENABLED !== 'false',
   historyFolderId: process.env.HISTORY_FOLDER_ID || '1dSP5luIoeK0pjkfqu9Zo-UagSaF9Ow4F',
   historyDoneFolderId: process.env.HISTORY_DONE_FOLDER_ID || '1N0BcIlLZ7N1bpVDRlBj3oc623QRL_VzF',
   historyTokenFile: process.env.HISTORY_TOKEN_FILE || 'token-history.json',
-  historyDailyLimit: Number(process.env.HISTORY_DAILY_LIMIT || 1),
+  historyDailyLimit: Number(process.env.HISTORY_DAILY_LIMIT || 2),
   historyChannelHandle: process.env.HISTORY_CHANNEL_HANDLE || '@TotollsportGK',
 };
