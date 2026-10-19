@@ -24,7 +24,20 @@ examples (all in Drive folder GK_Viral_Prompts `1GLeqzy5IpYbpQtN-xll-LcH-AE3_LK8
    lines exactly as sent — no "fixes". If a word looks like a typo (e.g.
    "ururkaoo", "Atkutaba"), leave it and ask in one line.
 2. **Somali words Claude may use on its own:** only real, well-known ones
-   (see vocabulary below) or ones fact-checked from a named source.
+   (see vocabulary below) or ones fact-checked from a named source. **Why
+   this is an iron rule, not a style preference** (Joe, 19 Oct 2026 — source:
+   "Autopsy of an Algorithmic Hallucination," a forensic breakdown of a real
+   YouTube auto-caption run on a Somali track): when an AI system has no real
+   data for a low-resource language like Somali, it doesn't fail cleanly —
+   it pattern-matches the input to the nearest *high-resource* language it
+   does have deep data for (in that case, Arabic script) and confidently
+   outputs fluent-looking nonsense (the deck's example: real Somali vocals
+   came out as a looping "راعي راعي راعي" — invented ghost text, not a real
+   transcription). This is the exact same failure mode as an LLM inventing
+   fake-sounding "Somali" phrasing instead of real words — confident-looking
+   output standing in for data that was never there. It's why this skill
+   insists on only real, checked vocabulary: the fix isn't "try harder," it's
+   "never let the model freewheel in a language it doesn't actually have."
 3. **Nothing is generated (audio/image/video) until Joe says "Go" /
    "Generate now".** Before that it's text only.
 4. **Every public caption ends with the footer:**
@@ -170,6 +183,42 @@ Gobannimo, Gurmad, Gaashaan, Guul, Gacan, Geed, Galbeed.
   one dancer per family (shawl over face, one-leg step), ululation; used in the
   1940s–50s to rally resistance to colonial rule. Hawa Jibril (1920–2011),
   Mudug plateau, first poem at 12.
+- **Golden Age state-sponsored "supergroups" (Joe, 19 Oct 2026):** after
+  Maxamed Siyaad Barre's 1969 coup, the government took direct control of
+  the arts — commandeering the National Theatre in Mogadishu (opened 1967,
+  a gift from China's Chairman Mao Zedong) and attaching major bands
+  (Waabeeri, Shareero, Iftin, Horseed, Somaali Jaaz, Onkod, Halgan) to the
+  government, military or police, unlike independent groups like the
+  Dur-Dur Band — their repertoire was heavily patriotic/propagandised. This
+  era drove a shift from unaccompanied poetry to musical theatre ("muusiko"),
+  and trained key figures: Maryan Mursal ("first lady of Somali jazz,"
+  Waabeeri → Somaali Jaaz), Abdullahi Qarshe, Ali Feiruz, Magool, Hassan
+  Sheikh Mumin, Abdi Ali ("Bacalwaan"). The bands also had nightclub/hotel
+  residencies in "swinging Mogadishu" (Somaali Jaaz at the Jubba and
+  Al-Uruba hotels, Iftin at the Lido nightclub, Shareero at the Jazira
+  hotel) alongside the state theatre circuit. Useful background for
+  Documentary-lane/history content — don't reproduce any band's actual
+  song lyrics in a caption or doc; summarize the history, don't quote the
+  art.
+- **Balwo origin (Joe, 19 Oct 2026):** founded by Abdi Sinimo, a Somali
+  lorry driver from the Reer Nuur subclan of the Gadabuursi, born out of a
+  spontaneous moment of frustration (c. 1943–1945) when his truck broke
+  down in the bush near Zeila — he sang a short poem of distress ("Belwooy,
+  belwooy…"), named the new style balwo ("misfortune"), and it became an
+  instant public hit that spread to other poets and directly led to the
+  more complex heello genre. Simple, personal lyricism about love, passion
+  and suffering — the first modern break from classical gabay formality.
+- **Why real Somali vocabulary is a hard rule, not a style choice (Joe,
+  19 Oct 2026):** the real song "Dardaaran" by Mohamed BK and Nimco Yaasiin
+  (2015) is the actual case study behind a forensic write-up Joe shared
+  ("Autopsy of an Algorithmic Hallucination") showing a YouTube auto-caption
+  system transcribing real Somali vocals as looping, invented Arabic-script
+  nonsense ("راعي راعي راعي…") because it had no real Somali data and
+  pattern-matched to the nearest high-resource language instead of failing
+  cleanly. Same failure mode as an LLM inventing fake-sounding "Somali"
+  lines — confident output standing in for data that isn't there. This is
+  the grounding for the standing rule above: only real, checked vocabulary,
+  never invented-but-plausible-sounding Somali.
 - Flag: sky-blue with a white five-pointed star. Independence/union 1 July 1960.
 - "Soomaaliyeey toosoo" (early 1940s); "Qolobaa Calankeed" (music Abdullahi
   Qarshe; national anthem since 2012). Somali Youth League founded 1943 (not
