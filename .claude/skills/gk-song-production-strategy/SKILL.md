@@ -312,6 +312,40 @@ skill; any song built in this mode gets entirely new, original lyrics.**
   one-off commission or daily-routine pick in this mode, usual Go-gate
   applies.
 
+## 11. Joe's own catalog — learning his voice (Joe, 19 Oct 2026)
+
+Joe confirmed the two reference tracks he shared ("Weli Waa Taaganahay"
+and "Tomahawk") are his own original work, written and posted by him
+roughly a year ago — his own IP, his to share. He wants future "give me
+something hot" / "give me energy" requests to draw on the real patterns
+in his own back catalog, not a generic guess at "Somali trap." **Still
+following the same practice as every other reference in this skill: no
+full lyric text is stored here — only the observed patterns**, so a
+future session can write *new* songs that sound like Joe's own voice
+without ever quoting his old ones verbatim.
+
+Patterns observed across Joe's catalog so far:
+- **Recurring motifs/vocabulary:** Xamar (Mogadishu) as home-ground,
+  Alindi and Kaban as the cultural-anchor pair, the GK Legend "stamp"
+  worked directly into a verse (not just the outro), real business/brand
+  names folded into bars when relevant (e.g. lekkerglobally.com,
+  PathFoundGK), a single strong central metaphor/object carrying the
+  whole song's title and hook (e.g. a weapon/tool-as-resilience symbol).
+- **Theme territory:** resilience against doubt, being underestimated
+  then rising, discipline/faith (a parent's blessing, du'a) as the real
+  source of strength, pride in origin without hostility to anyone, legacy
+  framed as something earned through struggle, not luck.
+- **Delivery:** chest-voice, aggressive but controlled, cinematic pauses
+  for weight, bursts of fast syllable-dense flow inside an otherwise
+  measured verse — matches the Ilkka/Sharma Boy reference in section 10's
+  iron-rule entry.
+- **Structure habit:** a spoken cinematic intro line before the beat
+  fully drops, a bridge that goes fully spoken over just the Kaban, and a
+  final verse that speeds up before the biggest last chorus.
+- Use this as the real grounding for "hot"/"energy" requests going
+  forward — write fresh lyrics in this voice and these themes, never
+  reused lines from the actual tracks.
+
 ## Standing iron rules (shared with `gk-gabay-blueprint`)
 
 - Every public caption/doc ends with the exact footer: `Copyright Notice ©
