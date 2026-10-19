@@ -118,6 +118,17 @@ person or craft*, not a summary of a headline.
 - **The stamp:** the GK logo woven into the audio-visual presentation like a
   signature, never a slapped-on watermark — same rule as `gk-gabay-blueprint`.
 
+## Song doc formatting: clean copy-paste into Suno's Style box (Joe, 19 Oct 2026)
+
+Joe's Suno screenshot showed the Style box had picked up the trailing
+"LYRICS (original, GK Legend Studio):" section header along with the
+actual music prompt — he'd copied past the end of the Music Prompt
+section into the next one. Fix going forward: every song doc's "MUSIC
+PROMPT (Suno Style Tag)" section ends with a clear, unmistakable
+delimiter line of its own (e.g. a line reading exactly `--- END STYLE
+TAG ---`) directly before the next section header, so copying "down to
+the delimiter" never catches the next section's label by accident.
+
 ## Suno style-tag calibration note (Joe, 19 Oct 2026)
 
 On "Midnimo," Joe reported the lyrics were good but the detailed custom
