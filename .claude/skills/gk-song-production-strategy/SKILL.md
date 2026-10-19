@@ -383,6 +383,17 @@ figure) as a recurring historical anchor, alongside trade-history imagery
 -English mode: Joe's own work already proves a 3-language single song
 works for him, not just 2.
 
+**"Mogadishu 2035: The Pearl Awakens"** — a third confirmed entry (same
+note: no lyric text stored). This one is a distinct sub-theme worth
+tracking separately from the historical-pride lane: a **future-vision**
+anthem — a rebuilt, thriving Mogadishu (glass towers, tech/youth
+imagery, Liido Beach), explicitly anti-tribalism/anti-fitna, a peace
+-over-conflict message, ending on a soft spoken outro (children's
+laughter, distant adhan) rather than a big final hook. Same EN/AR
+bilingual rap-plus-spoken-word shape as sections 11-12, but forward
+-looking rather than looking back at history — a fourth lane alongside
+historical-pride, romantic, and documentary/explainer in Joe's catalog.
+
 ## 12. Arabic–English Pride Anthem Remix mode (Joe, 19 Oct 2026)
 
 A standing *optional* mode — Joe asked for a cinematic Arabic/English dual
