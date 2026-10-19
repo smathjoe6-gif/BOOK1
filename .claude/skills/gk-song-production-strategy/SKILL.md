@@ -222,6 +222,25 @@ experiment.
 - Reference example (structure + music prompt, not for copying lyrics):
   "Dib U Soo Noqo" (Come Back / Return), GK_Viral_Prompts folder,
   19 Oct 2026.
+- **Cast options (Joe, 19 Oct 2026):** this mode isn't duet-only. Three
+  valid shapes — pick per song, or ask Joe which he wants:
+  - **Duet** (the confirmed default): male verse, female verse, shared
+    chorus, as above.
+  - **Solo male:** one voice carries the whole arc — still verse/chorus/
+    bridge/outro, just no second voice answering. Works well for a song
+    addressed *to* someone rather than exchanged *with* them.
+  - **Solo female:** same shape, female lead.
+- **Tempo/mood is NOT fixed to one setting** — 76 BPM / D minor ("Dib U Soo
+  Noqo") is a confirmed-good reference point, not the only allowed tempo.
+  Vary it song to song the same way vibe rotates elsewhere in this skill:
+  slower and more spacious for a heavier/more mournful theme, a touch
+  faster and lighter for a hopeful one. Joe specifically okayed reaching
+  for a **blues-tinged coloring** sometimes (bent Kaban notes, a looser,
+  more rubato feel against the brass/bass-and-drum base) as one mood option
+  within this mode — not every song, just when the theme calls for that
+  heavier, bluesier ache. Keep the core instrumentation rule fixed (Kaban +
+  brass horns + bass guitar + hand drum/dry kit, explicitly not
+  Indian/Bollywood) regardless of cast or tempo choice.
 
 ## Standing iron rules (shared with `gk-gabay-blueprint`)
 
