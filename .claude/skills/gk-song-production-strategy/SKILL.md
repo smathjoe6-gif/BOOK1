@@ -118,6 +118,25 @@ person or craft*, not a summary of a headline.
 - **The stamp:** the GK logo woven into the audio-visual presentation like a
   signature, never a slapped-on watermark — same rule as `gk-gabay-blueprint`.
 
+## Production pipeline confirmed: Joe generates on Suno.com (Joe, 19 Oct 2026)
+
+Joe showed his Suno.com workspace (Dec 2025 history) — confirms the real
+end-to-end flow: this skill writes the Suno Style Tag + lyrics in a song
+doc → Joe pastes them into Suno.com himself to generate the actual audio.
+Nothing here needs to change about how song docs are built; this just
+confirms why the "MUSIC PROMPT (Suno Style Tag)" section of every song
+doc matters — it's the literal input Joe uses. One of his own saved Suno
+style specs, visible in the screenshot (generic production/style text,
+not lyrics, same as any other Suno tag in this skill) is a useful
+calibration example: "Afro-Orchestral Drill x Arabic Fusion," 140 BPM,
+D minor — slow emotional piano intro layered with ocean waves and
+distant city ambience, dropping into UK drill drums with sliding 808
+bass (dark but clean), cinematic strings and heroic brass stabs on the
+hook, Arabic vocal chops and chant-style ad-libs with heavy reverb for a
+spiritual, historical atmosphere. This is consistent with — and a good
+reference level of detail for — the Suno Style Tags this skill already
+writes; match this level of production specificity going forward.
+
 ## The Go-gate (one-off commissions only)
 
 For a song Joe commissions live in chat, draft lyrics/structure/ruling-letter
