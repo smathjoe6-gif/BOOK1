@@ -612,6 +612,42 @@ aesthetics, commanding rather than selling. This is a tone target for the
 *written material*, not a personality change for how Claude talks to Joe
 day-to-day.
 
+## 16. Street Reality / Wake-Up Call mode (Joe, 20 Oct 2026)
+
+Joe's follow-up to Visionary Empire — same strength and pump, but aimed at
+youth with a real social-conscience message instead of pure triumph.
+
+- **Mood/theme territory:** a wake-up call, not a celebration — the hard
+  truths of street life for real: drug struggle, unemployment, a grown man
+  still living with his mother decades on, the cycle that traps people.
+  Not glorifying any of it — the point is tough-love education, waking the
+  listener up to reality so they choose a different path (this pairs with
+  the Visionary Empire mode's "escape the trap, build the empire instead"
+  arc — this mode is the warning, that mode is the way out).
+  **Never glorify drug use/dealing or crime — depict the cost, not the
+  appeal**, same boundary as everywhere else in this skill set.
+- **Delivery/regional flavor:** still strong, pumping energy — Joe named
+  "Midwest/Milwaukee style" and "East Coast/West Coast" as the regional
+  flow references (scene/genre anchors only, never imitating a specific
+  named artist's voice — same rule as every reference artist in this
+  skill). Reads as grounded, real, street-level storytelling delivery
+  rather than the stadium-chant bravado of Visionary Empire.
+- **Production:** Dhaanto rhythm woven into the beat underneath the
+  modern trap/hip-hop production (Joe specifically asked for Dhaanto
+  here) — keep the Somali rhythmic identity present even in a US-flavored
+  street-rap mode, same house-sound-signature discipline as every other
+  mode.
+- **Structure:** works well as a verse-driven, storytelling structure
+  (less hook-repetition-heavy than Visionary Empire) — each verse can
+  carry a different piece of the reality check (money/unemployment, the
+  trap of staying home too long, the cost of the streets), building to a
+  turn where the song calls the listener to wake up and rise, rather than
+  ending in despair.
+- **When to reach for it:** Joe asks for something that speaks directly to
+  youth about real struggles, a "wake them up" or "educate them" message,
+  or references needing the next song to carry weight/reality rather than
+  pure celebration.
+
 ## Standing iron rules (shared with `gk-gabay-blueprint`)
 
 - Every public caption/doc ends with the exact footer: `Copyright Notice ©
