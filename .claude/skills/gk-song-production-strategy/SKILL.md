@@ -719,6 +719,20 @@ youth with a real social-conscience message instead of pure triumph.
   of a Street Reality song when Joe's brief leans toward a hard-stakes
   warning rather than a softer call to rise.
 
+## Kaban must pop — a standing production rule (Joe, 20 Oct 2026)
+
+The Kaban can't just sit as background texture — every song needs at
+least one deliberate moment where it hits strongly and is unmistakably
+the feature, not just color underneath the beat. This is on top of (not
+a replacement for) the existing house-sound rules: the closing "audio
+logo" pluck (brand guide, CLAUDE.md) and a Kaban line entering on the
+hook/outro in modes like Visionary Empire and Street Reality. When
+writing a Suno style tag, make sure at least one specific moment is
+called out by name for the Kaban to really pop — a solo break, a
+beat-drop where everything else cuts out except the Kaban, or a hard
+accented phrase riding right on top of the hook — not just "Kaban
+present throughout."
+
 ## Respect-for-women theme (Joe, 20 Oct 2026)
 
 A standing content thread Joe wants available across songs, especially the
