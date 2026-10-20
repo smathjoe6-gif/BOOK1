@@ -493,6 +493,71 @@ lyrics in both languages.**
   -only rule for Somali, just applied to a language this skill has less
   grounding in.
 
+## 13. Dark Drill Fusion mode — UK Drill × Arabic Trap × Somali Rap (Joe, 20 Oct 2026)
+
+Joe's correction after "Macalinka Dalka" (Teacher of the Nation) landed flat
+— a "macalin"/teacher-trade story read as slow, older, and not something a
+younger street audience reaches for. Joe shared his own track "Habeenka
+Magaalada" as the direct contrast — pattern captured here, no lyric text
+stored (same rule as every other reference track):
+
+- **Tempo/production:** 142-143 BPM, modern UK drill drum programming
+  (punchy kick, sharp marching snare, fast hi-hat rolls), deep sliding/
+  distorted 808, minimal-melody and hypnotic/loop-based rather than a sung
+  chorus hook. Middle Eastern maqam-scale melodic coloring (not Western
+  major/minor pop melody): eerie oud phrases, ney flute, tabla percussion,
+  haunting synth pads, low brass stabs, ominous ambient textures.
+  **Explicitly NO emotional/melodic piano lead** — that reads soft, not
+  street.
+- **Mood/theme territory:** gritty underground street/hood-realism energy,
+  nighttime-city atmosphere, cinematic tension, "cold and dangerous," raw
+  and aggressive but controlled (never glorifying real violence) — this is
+  the energy lane for when Joe asks for something "with no energy" fixed,
+  "drill," "hood," or references younger/street audiences specifically.
+- **Delivery:** aggressive, raw chest-voice rap delivery (not sung/
+  melismatic), threatening-but-controlled tone, gang-style ad-libs,
+  sparse/hypnotic repetition rather than a big melodic hook.
+- **Structure shape:** short spoken/ad-libbed intro naming the GK Legend
+  Studio brand and setting the nighttime-city scene in a few fragments →
+  Hook (short, chant-like, repeated, not melodically "sung") → Verse 1 →
+  Bridge (half-time, moodier, spoken-word texture) → Hook repeats →
+  Verse 2 → short spoken/ad-libbed outro that circles back to the brand
+  name and a closing image (e.g. "they rise out of the dark"). Brand
+  identity is carried verbally through the intro/outro ad-libs, not just
+  visually — fold that into video/caption work for this mode too.
+- **Language:** this mode works equally in Somali or a Somali+other-language
+  blend (Joe's example used a second language alongside Somali) — pick per
+  the day's language-cycle rule in section 2, same as every other mode.
+- **When to reach for it:** any time Joe says a song feels too soft, too
+  "elder"/teacher-coded, not energetic, or specifically asks for drill/
+  street/hood/younger-audience energy — this is the lane, not a louder
+  version of the standard Kaban-trap mode.
+
+## 14. Bilingual Direct-Translation mode (English + Somali, inline translation)
+
+Captured from a second reference Joe shared alongside the Dark Drill Fusion
+note — pattern only, no lyric text stored:
+
+- **Structure:** English verse(s) carrying the main narrative/message,
+  then a chorus/hook that states the same core line in English and then
+  immediately gives its own Somali translation right in the lyric (not a
+  separate language verse elsewhere in the song — the translation sits
+  right next to the English line it mirrors), then a dedicated Somali rap
+  verse (not just translated — written with its own rhythm/cadence,
+  referencing real vocabulary-table concepts like Dhaanto, Alindi, calan).
+- **Mood/theme territory:** global-facing unity/anti-division message —
+  contrasting world conflict/noise against GK's own call for peace,
+  heritage, and shared legacy; more "message anthem" than street or
+  romantic.
+- **Production:** cinematic modern 808 layered against an acoustic Kaban
+  pluck line (soulful, not aggressive) — a softer, more anthemic bed than
+  the Dark Drill Fusion mode above; keep the two modes distinct, don't
+  blend their production specs unless Joe asks for that explicitly.
+- **When to reach for it:** when Joe wants a song to carry an explicit
+  message for a non-Somali-speaking audience too (the translation is the
+  point — it has to be legible to listeners who don't speak Somali), as
+  opposed to the diaspora-only in-group feel of most other modes.
+
 ## Standing iron rules (shared with `gk-gabay-blueprint`)
 
 - Every public caption/doc ends with the exact footer: `Copyright Notice ©
