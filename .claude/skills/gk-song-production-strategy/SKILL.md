@@ -12,6 +12,47 @@ metadata:
 
 # GK Song Production Strategy
 
+## Style index — read this first so nothing taught gets lost
+
+Joe is actively training this skill style by style, session by session
+(his words, 20 Oct 2026: "I'm training you. Don't forget every style.").
+Every mode below is permanent once added — never drop, shrink, or quietly
+merge one mode into another, even if two modes feel similar. Quick index
+of every mode built so far, so a session can jump straight to the right
+one instead of re-deriving it:
+
+- §7 Diaspora Street ("163/164" Swedish-Somali)
+- §8 Golden-Age Qaraami Love Duet (confirmed template)
+- §9 Golden-Age Energy/Funk-Dance (Dur-Dur/Shareero/Iftin reference)
+- §12 Arabic–English Pride Anthem Remix
+- §13 Dark Drill Fusion (UK Drill x Arabic Trap x Somali Rap)
+- §14 Bilingual Direct-Translation (EN/Somali message-anthem)
+- §15 Visionary Empire/Executive Flow (stadium-chant variant included)
+- §16 Street Reality/Wake-Up Call (must hit as hard as §15 — see its note)
+- **Benadiri mode — PENDING (Joe, 20 Oct 2026):** Joe explicitly flagged
+  this as still owed — the Banaadiri/Xamari coastal-Mogadishu sound
+  (reference: Axmed Shariif Killer solo mode / Killer + Qosol Wanaag duet
+  dynamic, per CLAUDE.md's brand guide) needs its own full mode built out
+  the way the others have been, once Joe finds a way to show the
+  reference material. Don't let this slide — raise it again if a session
+  goes by without Joe circling back to it.
+- **Rock mode — PENDING (Joe, 20 Oct 2026):** Joe said he still has to
+  "put you that thing" for rock — not yet taught, flag as owed the same
+  way as Benadiri above.
+- **Dhaanto Fusion Matrix (Joe, 20 Oct 2026) — a generative principle, not
+  a single fixed mode:** Dhaanto's rhythm/percussion identity (already the
+  house signature running through nearly every mode above) can be paired
+  with a different genre's texture on top to produce a new sub-style each
+  time — Joe named Dhaanto+Reggae, Dhaanto+Reggaeton, Dhaanto+Hip-Hop, and
+  Dhaanto+Rap as combinations that each "pop up" something distinct. Read
+  this as permission to actively propose a Dhaanto+[genre] pairing when a
+  brief calls for something fresh rather than always reaching for an
+  already-named mode — keep the Dhaanto percussion pattern as the
+  constant and let the named genre supply the melodic/production texture
+  on top (reggae = skank guitar/offbeat, reggaeton = dembow pattern,
+  hip-hop/rap = trap or boom-bap drums — same discipline as every other
+  mode: scene/genre texture only, never imitating a named artist).
+
 Why this exists: rotating the poetic-form *label* each day (Gabay one day,
 Jiifto the next) was not enough — every song still had the same skeleton
 (spoken Kaban intro → stat-heavy verse → "word! word!" call-response hook →
