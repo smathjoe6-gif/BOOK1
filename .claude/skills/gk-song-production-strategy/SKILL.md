@@ -643,6 +643,20 @@ youth with a real social-conscience message instead of pure triumph.
   trap of staying home too long, the cost of the streets), building to a
   turn where the song calls the listener to wake up and rise, rather than
   ending in despair.
+- **Must hit as hard as Visionary Empire from the first line (Joe, 20 Oct
+  2026 — "Toos Xaafadda" first draft read too slow/flat compared to
+  "Kursiga Xukunka"):** this mode carries a message, but it is NOT a
+  softer or slower song for it. Same hard beat-drop energy, same strong
+  vocal hit on the intro, same impact Joe wants from Visionary Empire —
+  the difference is the subject matter, not the production intensity.
+  **Hook comes early, not buried after a slow setup verse.** Never open
+  verse 1 on a flat, mundane complaint line ("I don't have a job...") —
+  that reads slow and deflates the energy immediately. Open on impact:
+  a striking image, a hard-hitting truth stated with power, or straight
+  into the hook, THEN the verses carry the real-talk detail. The feeling
+  the listener should get is encouraged and impressed — like the song is
+  hitting them with street-and-success energy — not just informed of a
+  problem. Message and impact are not in tension; deliver both at once.
 - **When to reach for it:** Joe asks for something that speaks directly to
   youth about real struggles, a "wake them up" or "educate them" message,
   or references needing the next song to carry weight/reality rather than
