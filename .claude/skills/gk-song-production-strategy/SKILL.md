@@ -733,6 +733,12 @@ beat-drop where everything else cuts out except the Kaban, or a hard
 accented phrase riding right on top of the hook — not just "Kaban
 present throughout."
 
+**Pentatonic scale (Joe, 20 Oct 2026):** the Kaban's melodic lines/solo
+moments should be written on a pentatonic scale — name it explicitly in
+the Suno style tag ("Kaban solo in a pentatonic scale/run") wherever a
+featured Kaban moment is called for, alongside the existing traditional-
+tuning language already used elsewhere in this skill.
+
 ## Respect-for-women theme (Joe, 20 Oct 2026)
 
 A standing content thread Joe wants available across songs, especially the
