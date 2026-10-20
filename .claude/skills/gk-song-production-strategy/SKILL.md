@@ -664,6 +664,21 @@ youth with a real social-conscience message instead of pure triumph.
   of a Street Reality song when Joe's brief leans toward a hard-stakes
   warning rather than a softer call to rise.
 
+## Respect-for-women theme (Joe, 20 Oct 2026)
+
+A standing content thread Joe wants available across songs, especially the
+Street Reality/Wake-Up Call mode (section 16) and any message-driven track:
+respect for women is grounded in the real relationships in a man's life —
+she is someone's mother, wife, sister — honor her on that basis. Alongside
+it, Joe wants songs to call women toward groundedness and commitment in
+their own choices rather than scattering themselves across many people/
+situations. **Write this with real care, not judgment or crude language:**
+frame it as mutual respect and steadiness (a value the song asks of
+everyone, men included, elsewhere in the same verse/bridge), never as
+shaming or a slur-adjacent putdown — if a line reads harsh or one-sided
+when drafted, soften it before it goes in a doc, and flag the softened
+version to Joe rather than guessing he's fine with a sharper edit.
+
 ## Standing iron rules (shared with `gk-gabay-blueprint`)
 
 - Every public caption/doc ends with the exact footer: `Copyright Notice ©
