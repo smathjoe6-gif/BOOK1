@@ -49,6 +49,7 @@ examples (all in Drive folder GK_Viral_Prompts `1GLeqzy5IpYbpQtN-xll-LcH-AE3_LK8
    standing firm — no blood, no fighting shown.
 7. **Platform-safe titles:** words like "Jihaad" (even meaning "struggle") get videos flagged/down-ranked — keep them in the doc, use an English title in public captions, and tell Joe.
 8. **Don't show real poets' faces** (e.g. Hawa Jibril) — "inspired by" only.
+9. **No thumbnail images (Joe, 20 Oct 2026): "we don't need any more thumbnails."** Only generate the images a post actually needs (e.g. the two post images + the text doc) — never a separate thumbnail design.
 
 ## How a gabay works (check Joe's verse against this)
 
@@ -118,10 +119,15 @@ conflicts with what has been shown to work, the house-safe version wins
    Kaban is fine as a future-forward accent), Dhaanto rhythm in the music
    prompt; real named places and light: sunrise over Bakool or the
    southern plains, mist on the highlands, deep blue ocean shelf.
-3. **The GK stamp** — metal or embroidered GK logo placed ON something in
-   the scene: hardware, buckle, garment hem, saddle, drum rim, Kaban body.
-   ⚠️ Never an overlaid/"ambient" watermark — brand guide: a signature on
-   the painting, not a watermark slapped on top.
+3. **The GK stamp — MANDATORY, never skip (Joe, 20 Oct 2026: the Dirac
+   streetwear images had no logo at all — never again).** Every single
+   generated image/video, no exceptions, needs a GK Legend emblem placed ON
+   something in the scene: hardware, buckle, garment hem, saddle, drum rim,
+   Kaban body, collar, stitching. Before calling a design "done," check the
+   prompt text itself names where the GK mark sits — if the prompt doesn't
+   say it, the image won't have it. ⚠️ Never an overlaid/"ambient"
+   watermark — brand guide: a signature on the painting, not a watermark
+   slapped on top.
 4. **Technical spec** — 9:16 vertical; anamorphic lens flare; volumetric
    light (dust, mist or smoke catching the light); high-contrast grade with
    obsidian blacks, liquid gold and terracotta; ultra-detailed textile
