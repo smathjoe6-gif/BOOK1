@@ -647,6 +647,22 @@ youth with a real social-conscience message instead of pure triumph.
   youth about real struggles, a "wake them up" or "educate them" message,
   or references needing the next song to carry weight/reality rather than
   pure celebration.
+- **Added theme — AI/technology as the real opportunity (Joe, 20 Oct
+  2026):** the specific modern stakes for this mode — youth who learn
+  AI/technology now have real opportunity; youth who don't will get left
+  behind while their own friends who did learn it succeed, and they're
+  still doing the same thing on the block. Pair this with the mortality/
+  legacy angle Joe gave in the same note: life isn't forever, everyone
+  dies, so the real question is what you leave behind (echoes the
+  Visionary Empire mode's legacy theme, but from the warning side).
+- **Signature rhetorical device — the "won't wake up until" list (Joe, 20
+  Oct 2026):** a repeated line structure naming the consequences someone
+  waits for before they change — "you won't wake up until you see it,
+  until you get hurt, until you end up in jail, until your own hands get
+  torn away from what you were building" — then a closing "think about it
+  before you get there." Use this device in the bridge or closing stretch
+  of a Street Reality song when Joe's brief leans toward a hard-stakes
+  warning rather than a softer call to rise.
 
 ## Standing iron rules (shared with `gk-gabay-blueprint`)
 
