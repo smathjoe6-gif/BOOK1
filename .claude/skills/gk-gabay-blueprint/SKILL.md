@@ -206,6 +206,16 @@ Gobannimo, Gurmad, Gaashaan, Guul, Gacan, Geed, Galbeed.
   Documentary-lane/history content — don't reproduce any band's actual
   song lyrics in a caption or doc; summarize the history, don't quote the
   art.
+- **Theater culture as a standing content theme (Joe, 20 Oct 2026):** this
+  National Theatre/musical-theatre history above (the 1967 Mogadishu
+  National Theatre, the shift to "muusiko," the state theatre circuit,
+  nightclub residencies in "swinging Mogadishu") is now a reach-for-it-by-
+  name theme — use it whenever Joe asks for something in a "theater
+  culture" direction: documentary-lane Drive docs on the real history, or
+  a song/video concept that leans into theatrical staging energy (the
+  stage, the spotlight, the performance tradition) grounded in these real,
+  checked facts — never invented theater history, and never reproducing
+  any band's actual lyrics.
 - **Balwo origin (Joe, 19 Oct 2026):** founded by Abdi Sinimo, a Somali
   lorry driver from the Reer Nuur subclan of the Gadabuursi, born out of a
   spontaneous moment of frustration (c. 1943–1945) when his truck broke
