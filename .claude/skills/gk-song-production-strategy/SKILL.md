@@ -558,6 +558,43 @@ note — pattern only, no lyric text stored:
   point — it has to be legible to listeners who don't speak Somali), as
   opposed to the diaspora-only in-group feel of most other modes.
 
+## 15. Visionary Empire/Executive Flow mode (Joe, 20 Oct 2026)
+
+Captured from a third reference track Joe shared ("100 MPH" theme) —
+pattern only, no lyric text stored:
+
+- **Mood/theme territory:** fast, sharp, aggressive but forward-looking —
+  not street/hood-dark like section 13, not a message-anthem like section
+  14. This is triumphant ambition/empire-building: beating the system,
+  long-range vision (a stated multi-year plan/legacy, e.g. "the next
+  twenty years"), executive/strategist self-image, breaking out of a
+  trap/cage into control and ownership. Confident and victorious, not
+  defensive.
+- **Delivery:** very fast flow, built around a 100-mph/high-speed motif
+  (rapid delivery matching a literal speed image), shifting into an even
+  faster double-time pocket for the second verse to signal escalating
+  momentum/victory.
+- **Language:** English-led with Somali words/phrases dropped in mid-line
+  for emphasis and texture (real vocabulary-table words only, same rule
+  as everywhere else) rather than full alternating-language verses —
+  code-switching, not translation.
+- **Structure shape:** verse 1 at a hard, driving pace → cinematic
+  "road-cadence" chorus with heavy 808s that names the GK brand/visual
+  imagery directly (chest piece, banner, Alindi gold, Kaban) → verse 2 in
+  double-time, victory-flow, naming the long-range vision explicitly →
+  outro where the beat/bass drops out, leaving a distorted/echoing solo
+  Kaban string under a few short spoken victory lines that close on the
+  GK Legend Studio name.
+- **GK stamp in-lyric, not just visual:** this mode explicitly name-drops
+  GK brand imagery (banner, chest piece, Alindi gold) inside the chorus
+  itself — carry that same explicit brand imagery into the matching
+  video/visual prompt so the lyric and the visual stamp reinforce each
+  other (mandatory GK visual stamp rule in `gk-gabay-blueprint` still
+  applies on top of this).
+- **When to reach for it:** Joe asks for something "100 mph," visionary/
+  ambitious, business-empire or legacy-plan themed, or wants fast
+  escalating energy that ends triumphant rather than tense/dark.
+
 ## Standing iron rules (shared with `gk-gabay-blueprint`)
 
 - Every public caption/doc ends with the exact footer: `Copyright Notice ©
