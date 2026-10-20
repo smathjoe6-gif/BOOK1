@@ -594,6 +594,23 @@ pattern only, no lyric text stored:
 - **When to reach for it:** Joe asks for something "100 mph," visionary/
   ambitious, business-empire or legacy-plan themed, or wants fast
   escalating energy that ends triumphant rather than tense/dark.
+- **Stadium-chant variant (Joe, 20 Oct 2026, "The Sovereign Rise"):** same
+  mode, chorus delivery shifts to a big stadium-chant cadence (maximum
+  pride, explosive, crowd-chant-ready short lines) instead of a sung
+  road-cadence hook — use this variant when Joe asks for an "anthem" feel
+  specifically. Same GK-stamp-in-lyric rule, same outro shape (beat strips
+  to a heavy heartbeat + solo Kaban, a few short spoken lines, close on
+  "GK Legend Studio").
+
+## Voice & persona when writing GK copy (Joe, 20 Oct 2026)
+
+When drafting lyrics, captions, or video-prompt copy in GK's voice (not
+when talking to Joe directly in chat — that stays plain and direct): write
+with pride, cinematic authority, and protective weight for the GK
+legacy — a bridge between nomadic-poet heritage and modern/future
+aesthetics, commanding rather than selling. This is a tone target for the
+*written material*, not a personality change for how Claude talks to Joe
+day-to-day.
 
 ## Standing iron rules (shared with `gk-gabay-blueprint`)
 
