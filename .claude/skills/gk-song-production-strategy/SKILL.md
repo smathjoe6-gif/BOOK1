@@ -12,6 +12,20 @@ metadata:
 
 # GK Song Production Strategy
 
+## Never recycle the same lyric line across rewrites — write genuinely fresh content every time (Joe, 21 Oct 2026)
+
+Across the Hooyo rewrites, the opening line "Saddex sano ayaan ku arag waayay"
+(three years I haven't seen you) survived unchanged through several
+rewrites while only the production notes/structure changed around it.
+Joe's correction: changing the arrangement, BPM, or adding new sections
+is NOT the same as writing a new song — if a rewrite keeps the same
+core lyric lines Joe already said weren't landing, from his side it
+looks like nothing changed, however different the surrounding notes
+are. Every real rewrite needs genuinely new lyric content, especially
+the opening line, not the same line carried forward under new staging.
+If a specific line/image was never actually flagged as the problem,
+confirm with Joe before assuming it's safe to keep reusing it.
+
 ## A real du'a/prayer block + communal backing vocals, confirmed by two outside AI tools (Joe, 21 Oct 2026)
 
 Joe ran the identical Hooyo brief through ChatGPT and DeepSeek side by
