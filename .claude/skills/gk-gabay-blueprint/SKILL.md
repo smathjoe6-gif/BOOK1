@@ -86,6 +86,66 @@ track it's fine to draw actual lines from it, not just the pattern —
 still check with Joe before quoting a line publicly, same as any other
 verse source.
 
+**Batch 2 (added same day, 21 Oct 2026)** — Alindi texture / Kaban
+acoustics / "unyielding GK Modern Legend standard" theme:
+
+**Part 1 — Five Classical Gabay**
+
+1. *Hiddaha iyo Halkudheg* (The Heritage and the Motto) — vowel-locked:
+   "Nin rag ahu halkuu udub u xidho, waa ogyahay halkee / Arlaadaan
+   carraheed ku yaal, waana loo oggolyahaye / Alindiga la tolayoiyo
+   xariir, waa asaaskii e / Anagoo ah ehelkii sharaftoo, aannaan
+   oggolaaneyn / Inaan meel marinno taariikhda, awowyaasheen
+   abaahayood."
+2. *Maansada iyo Muunki* (The Poetry and the Melody) — M-locked:
+   "Maansadu waa tii dhaloo, maanka suubisaye / Kaban yahay kuwii soo
+   hor maray, maamuus kuu hayne / Halkii lagaga guurotoiyo maanta
+   geesaha e / Magacaaga GK baa sudhan, muunki iyo seerke e / Modern
+   Legend-ka aan taagannahay, waa mid sugan dhab ahe."
+3. *Geesiga Arlaadi* (The Hero of the Land) — vowel-locked: "Arlaadii
+   nabaddaydii baa, lagu ogaadeene / Odayashii horjoogey baa, aayaha
+   u sooce / Eraygii la tuuroow ma galo, eex iyo abaare / Inaynu isku
+   duubnawnayoo, ehel la leennahay e / Ubadkiinna soo kacaya iyo, ab
+   Abtirsiinyow e!"
+4. *Waaq iyo Wanaagga* (The Creator and the Goodness) — W-locked:
+   "Waaqii abuurayay adduunyada, wuu inooq qoray e / Waddooyinka la
+   marayaa waa, weji ku caan ah e / Waayaha adduunyada maanta iyo,
+   wacdiga maansada e / Warkaygu waa mid waafaqsan oo, wacan ku soo
+   socda e / Waaya-arag rag baa kicitimoo, waxtar u keenay e."
+5. *Sharafta Reer GK* (The Honor of the GK Household) — Sh-locked:
+   "Sharaftii adduunyada la siiyay, shubane mooyaane / Sheekooyinka
+   aan meel marin, lagama shaaciyee / G iyo K waa calaamaddii, guudka
+   laga sooce / Shacabkiinna maanta jooga iyo, shalayto wixii taalley
+   / Waaq baa u hiiliyey oo, shumac u shidaye."
+
+**Part 2 — Five Traditional Buraanbur**
+
+1. *Hibo iyo Halyeey* (Talent and the Legend) — H-locked: "Hallow baa
+   la yiri maansadii, halyeeygii dhashaye / Hodan baannu nahay reer
+   GK, hiddaha keenaye / Haweenkii xidhmada xirtayoo, harqaan lagu
+   tumaye / Hibo iyo aqoon bay wataan, hooyadiis dhalaye!"
+2. *Alindi iyo Xariir* (Alindi and Silk) — vowel-locked: "Alindiga la
+   joogiyo xariir, waa mid oran jiife / Inaynu isku duubnawnayoo,
+   ehel la leennahay e / Ubaxii dalkeennaa baxayoo, uurka laga sooce /
+   Albaabada furaha loo hayiyo, ehelkii sharafta e!"
+3. *Guntiino iyo Sharaf* (Guntiino and Honor) — G-locked: "Guntiinada
+   la xirtayoo, garabka loo saare / Gashaantihii la joogiyo gabdhaha,
+   guusha soo hoyrye / Geesigii arlaadii dhashaa, guuleystay maanta e
+   / Gobonnimada reer GK, guri waliba gaarey!"
+4. *Dhaanto iyo Kaban* (Dhaanto and the Kaban) — mixed Dh/K-locked:
+   "Dhaantadii la tumayayoo, dheddig iyo labe e / Dhexdaadaada loo
+   jeediyoo, dhab u haysanaye / Kaban yahay adduunyadaada iyo, kiishka
+   maansada e / Dhedo iyo abaartaannu marin, dhalashadiis ahe!"
+5. *Himilo iyo Guul* (Ambition and Victory) — H-locked: "Himiladiinnii
+   baannu helay, hoos u eegid ahe / Haybaddii sharaftaydii baa,
+   hagaysa reerkeenna / Hadda iyo weliba dambena, waa hodan adduunke /
+   GK waa astaantaadu oo, guusha haystaye!"
+
+Note: Batch 1's Gabay #1 and Batch 2's Gabay #1 ("Xididka iyo Hiddaha" /
+"Hiddaha iyo Halkudheg") share the same opening stanza almost verbatim
+— likely Joe reusing a favourite stanza as a recurring motif rather than
+a mistake; use either freely, don't "fix" the overlap without asking.
+
 ## Iron rules
 
 1. **Joe writes the Somali. Claude never invents Somali verse.** Keep Joe's
