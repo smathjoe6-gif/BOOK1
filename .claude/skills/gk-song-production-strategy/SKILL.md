@@ -12,6 +12,39 @@ metadata:
 
 # GK Song Production Strategy
 
+## A real du'a/prayer block + communal backing vocals, confirmed by two outside AI tools (Joe, 21 Oct 2026)
+
+Joe ran the identical Hooyo brief through ChatGPT and DeepSeek side by
+side and judged both better than our version at that point. Comparing
+both outputs (never storing their lyric text — pattern only, same
+no-reproduction rule as any reference track) surfaced two techniques
+both tools converged on independently, which is a strong signal they're
+real, expected features of this song type, not a style gimmick:
+
+- **Give the du'a/prayer a real, dedicated block — don't just texture
+  the song with faith.** Both tools closed the song on an explicit
+  prayer for the mother (long life, health, Jannatul Firdaws), given
+  its own section near the end, carrying real emotional weight — not
+  a passing reference woven into a verse. For Hooyo-tribute songs,
+  include a clearly-labeled prayer/du'a section as a structural beat,
+  the way real Somali mother-tribute songs often do.
+- **Backing/communal vocals ("aah" harmonies, call-and-response echo
+  of a line like the mother's name) in the chorus**, not a single lead
+  voice throughout. This matches real buraanbur/communal-song tradition
+  and makes a personal tribute read as "everyone's mother," not just
+  one person's. Note this in the Suno style tag as a backing-vocal /
+  choir layer under the chorus specifically.
+- **What NOT to copy from either tool**: DeepSeek's version used a slow
+  60-70 BPM, "almost whispered" delivery throughout — reject this. It's
+  exactly the soft/thin delivery already corrected against (see below,
+  "don't go too soft"). The medium-energy, 92 BPM, full-voiced call
+  stands; a real du'a block and backing harmonies both work fine at
+  medium energy — they don't require going soft.
+- A short, clearly-labeled spoken-word moment *as one bounded section*
+  (not the whole song, and not used in place of actually singing) is
+  fine — consistent with the already-corrected Suno tool lesson below.
+  Both outside tools used a brief spoken/intro moment this way.
+
 ## Open on the universal ache, not the gentle image — and don't go too soft (Joe, 21 Oct 2026)
 
 Final content lesson from the "Hooyo" rewrites: even with the right
