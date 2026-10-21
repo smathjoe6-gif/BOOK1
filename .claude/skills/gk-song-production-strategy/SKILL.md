@@ -12,6 +12,24 @@ metadata:
 
 # GK Song Production Strategy
 
+## Core theme is appreciation/blessing + "Jannah beneath her feet" — not a life-event timeline (Joe, 21 Oct 2026)
+
+Joe rejected a stanza listing "when I grew up, when I fell, when I got
+married" as generic and meaningless — a timeline of events is not the
+same as honoring her. The real theme, per Joe and matching what worked
+in ChatGPT's version: **you can never repay or match what she did —
+you are not on her level — so the song's job is appreciation and
+blessing, not narrating a life story.** The specific, central image to
+use (a known hadith, real and widely cited — not invented): **Jannah
+(Paradise) lies beneath the mother's feet.** This should be a core
+recurring theme throughout the song, not a line tacked onto a closing
+prayer — e.g. a stanza stating plainly "what you gave me I cannot
+repay you, I am not on your level, Paradise is beneath your feet, and
+that is the truth," woven in alongside the du'a/prayer block (see
+below), not separate from it. Avoid generic "stages of life" stanzas
+(grew up / fell / married / etc.) entirely for this song type — they
+read as filler, not tribute.
+
 ## A mother-tribute song is not a love song — ground it in literal maternal acts, not reciprocal/romantic phrasing (Joe, 21 Oct 2026)
 
 Two concrete content errors Joe caught in the same Hooyo rewrite,
