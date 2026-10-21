@@ -38,14 +38,27 @@ generally to any emotionally personal song, not just Hooyo tracks:
   ever plays — so the hardest-hitting line goes first, every time, on
   every song, not just the high-energy modes.
 
-## Suno rendered as spoken word, not sung — formatting lesson (Joe, 21 Oct 2026)
+## Suno rendered as spoken word, not sung — CORRECTED root cause (Joe, 21 Oct 2026)
 
 Joe generated a song doc on Suno and it came out as flat spoken English
-narration with no melody, not an actual sung song. Root cause: the doc
-had literal "speak to the listener" framing (a narrated instruction like
-"close your eyes, see her face") and alternated Somali/English line by
-line — Suno appears to have read that as a cue to narrate/translate
-rather than sing. Fix, apply to every future song doc:
+narration with no melody. **First diagnosis was wrong and has been
+corrected:** it was NOT the "close your eyes" rhetorical-address line
+itself, and that device is fine and wanted — Joe explicitly asked for it
+back in a later revision, written as the singer's own sung line direct
+to the listener ("close your eyes, think of your mother, how could I
+live without you") rather than a narrator's aside. **The real cause,
+confirmed from Joe's screenshots:** he had pasted the song doc into
+Suno's **Speech** tool (text-to-speech/narration) instead of the
+**Songs** tool (music generation) — the "SPEECH" label on every dead
+result and the Script/Tone fields in his screenshot confirmed this.
+Always check which Suno tool is in use before diagnosing a flat result
+as a lyric-writing problem — ask Joe to confirm he's on the Songs tab,
+Lyrics box for the lyrics, Style box for the style tag, before assuming
+the song doc itself needs a content rewrite.
+
+The line-by-line Somali/English alternation WAS still a real, separate
+issue worth avoiding (translation-reading risk independent of which
+tool is used) — that part of the fix below stays:
 - **Lyrics meant to be sung go in ONE language per line, Somali-primary
   unless the mode calls for English-led.** If Joe needs the English
   meaning for his own reference, put it in parentheses directly under
