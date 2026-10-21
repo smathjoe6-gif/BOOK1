@@ -18,6 +18,74 @@ examples (all in Drive folder GK_Viral_Prompts `1GLeqzy5IpYbpQtN-xll-LcH-AE3_LK8
 - "The Sovereign Shield (Gurmadka iyo Gobannimada)" 4-part film — `1nPp9Ug2IU2xt_n_jUISXNveRPvARCdMpctKIYRKJKjc`
 - Strong Buraanbur prompts — `1Lkm4r_j5CbDta7qqQbYeR5JSYN9P6QRELK7d9YGTuHU`
 
+## GK Classical Poetry Library (Joe's own collection, added 21 Oct 2026)
+
+Joe gave this set directly as GK Legend Studio's own poetry library (his
+material, not a third-party reference) — stored here in full for the
+brand to draw on and for Claude to learn the ruling-letter pattern from.
+Five Gabay + five Buraanbur, each locked to one ruling sound
+(xaraf-raac), as the "How a gabay works" rule above requires:
+
+**Part 1 — Five Classical Gabay**
+
+1. *Xididka iyo Hiddaha* (The Root and the Heritage) — vowel-locked:
+   "Nin rag ahu halkuu udub u xidho, waa ogyahay halkee / Arlaadaan
+   carraheed ku yaal, waana loo oggolyahaye / Alindiga la tolayoiyo
+   xariir, waa asaaskii e / Anagoo ah ehelkii sharaftoo, aannaan
+   oggolaaneyn / Inaan meel marinno taariikhda, awowyaasheen
+   abaahayood."
+2. *Kaban iyo Kheyraad* (The Kaban and the Legacy) — K-locked: "Kaban
+   yahay adduunyadaada iyo, kiishka maansada e / Kolba tii la jaanqaadda
+   guud, waa kow iyo taami e / Kor u qaad halkii ay ka timid,
+   guutooyinkii hore e / Kibir iyo aqoon aan lahayn, kuma xirnoo garab
+   e / Nin kastuu ka soo jeedo asalkaa, lagu xisaabtamaaye."
+3. *Geesiga Koonfureed* (The Southern Hero) — Q-locked: "Koonfurtaan
+   qorraxdu ay ka soo baxdo, qadarin bay leede / Qabiil iyo qoys bay ka
+   dhalatay, qaran la yaabane / Qarankaynu leennahayna waa, qori iyo
+   qawl adag e / Qofkii doonaow maanka geli, qaddarinta ay leede /
+   Qoyskiinna GK waa astaan, qarniyo raagaysaaye."
+4. *Waaq iyo Waayaha Cusub* (The Era and the New Dawn) — W-locked:
+   "Waaqii abuurayay adduunyada, wuu inooq qoray e / Waddooyinka la
+   marayaa waa, weji ku caan ah e / Waayaha adduunyada maanta iyo,
+   wacdiga maansada e / Warkaygu waa mid waafaqsan oo, wacan ku soo
+   socda e / Waaya-arag rag baa kicitimoo, waxtar u keenay e."
+5. *Modern Legend iyo Maankayaga* (Modern Legend & Our Mind) — M-locked:
+   "Maankaygu waa kii bartoo, maamus ku abqaalaye / Modern Legend-ka aan
+   taagannahay, waa mid soo jire e / Meelaha la joogaba astaan,
+   lagama maarmaan ah e / Magacaaga GK baa ku xardhan, muunki iyo
+   seerke e / Marnaba lagama guurotooo, waa mid sugan dhab ahe."
+
+**Part 2 — Five Traditional Buraanbur**
+
+1. *Taarka Kaban iyo Hodanka* (The Strands of Kaban and Wealth) —
+   H-locked: "Hallow baa la yiri maansadii, halyeeygii dhashaye / Hodan
+   baannu nahay reer GK, hiddaha keenaye / Haweenkii xidhmada
+   xirtayoo, harqaan lagu tumaye / Hibo iyo aqoon bay wataan, hooyadiis
+   dhalaye!"
+2. *Alindi iyo Sharaf* (Alindi and Honor) — vowel-locked: "Arlaadii
+   nabaddaydii baa, lagu ogaadeene / Alindiga la joogiyo xariir, waa
+   mid oran jiife / Inaynu isku duubnawnayoo, ehel la leennahay e /
+   Ubadkiinna soo kacaya iyo, ab Abtirsiinyow e!"
+3. *Geesiga Guulaystay* (The Victorious Hero) — G-locked: "Guul baa
+   dhalata oo maanta, geesi soo kace e / Guryahaana loo soo degey,
+   gacan ku rimis ahe / Guntiinada la xirtayoo, garabka loo saare / G
+   iyo K waa calaamaddii, guudka laga sooce!"
+4. *Dhaanto iyo Ciyaarta* (Dhaanto and the Dance) — Dh-locked:
+   "Dhaantadii la tumayayoo, dheddig iyo labe e / Dhexdaadaada loo
+   jeediyoo, dhab u haysanaye / Dhedo iyo abaartaannu marin,
+   dhalashadiis ahe / Dhulka hoostiisii baannu jirro, dhawri
+   doonnaaye!"
+5. *Himilo iyo Himey* (Ambition and Legacy) — H-locked: "Heesaha la
+   tiriyiyo habkii, haadka loo kacaye / Himiladiinnii baannu helay,
+   hoos u eegid ahe / Haybaddii sharaftaydii baa, hagaysa reerkeenna /
+   Hadda iyo weliba dambena, waa hodan adduunke!"
+
+This is GK's own material (brand references itself: "reer GK", "Modern
+Legend-ka", "Magacaaga GK", "G iyo K"), so unlike a third-party reference
+track it's fine to draw actual lines from it, not just the pattern —
+still check with Joe before quoting a line publicly, same as any other
+verse source.
+
 ## Iron rules
 
 1. **Joe writes the Somali. Claude never invents Somali verse.** Keep Joe's
