@@ -12,6 +12,35 @@ metadata:
 
 # GK Song Production Strategy
 
+## Suno rendered as spoken word, not sung — formatting lesson (Joe, 21 Oct 2026)
+
+Joe generated a song doc on Suno and it came out as flat spoken English
+narration with no melody, not an actual sung song. Root cause: the doc
+had literal "speak to the listener" framing (a narrated instruction like
+"close your eyes, see her face") and alternated Somali/English line by
+line — Suno appears to have read that as a cue to narrate/translate
+rather than sing. Fix, apply to every future song doc:
+- **Lyrics meant to be sung go in ONE language per line, Somali-primary
+  unless the mode calls for English-led.** If Joe needs the English
+  meaning for his own reference, put it in parentheses directly under
+  the Somali line and label the whole lyric block "NOT to be sung,
+  translation note only" — never alternate sung-Somali/sung-English line
+  by line, that reads as a cue to talk-through a translation.
+- **Never write a line that instructs the listener/vocalist to do
+  something** (e.g. "close your eyes," "picture her face") as if it's
+  stage narration — that gets sung or spoken literally and breaks the
+  song's voice. Direct address and raw imagery (section above) still
+  apply — just keep it as something the singer says AS the song, not an
+  aside to the listener about how to listen.
+- **State explicitly in the Suno style tag that the vocal is fully SUNG
+  with a real melody, not spoken word or narration** — don't assume this
+  is obvious; say it outright, especially for intimate/reflective modes
+  where a hushed delivery could otherwise read as spoken-word to the
+  model.
+- Keep bracketed section directions ([Stanza 1], [Bridge], [Outro])
+  production-only — BPM/instrument cues, not phrased as something a
+  vocalist would read aloud.
+
 ## Style index — read this first so nothing taught gets lost
 
 Joe is actively training this skill style by style, session by session
