@@ -117,6 +117,38 @@ and what Joe asked for directly:
   subject is a person someone has a real relationship with (mother,
   father, a lost loved one, home itself) — this makes the song land on
   anyone listening, not just a Somali/homeland audience.
+
+**Confirmed real reference pattern — Somali Hooyo-tribute songs (Joe, 21
+Oct 2026, "Suldaan Seeraar — Hooyo Ha Iilan Hooyoy," DJ Rockets Lyrics
+video):** Joe showed screenshots of this real, popular track's on-screen
+lyrics specifically to show the correct technique — pattern captured
+here, no lyric text stored or reproduced (same rule as every other
+reference in this skill):
+- **Structure:** short four-line stanzas, each one stacking a vivid
+  comparison/image for the mother (treasure, world, guide, the ground
+  everything else stands on), and every stanza closes on the SAME short
+  refrain line. The refrain isn't a separate hook section bolted onto a
+  verse/chorus skeleton — it IS the structure, repeating after every
+  stanza and carrying the emotional anchor by sheer repetition.
+- **Faith woven in as lived detail, not cited as a lesson:** her prayers,
+  her devotion, her faith appear as images of who she is and what she
+  does, not as an explained teaching or a quoted source. This is the
+  opposite move from this skill's earlier (wrong) attempt to fix a flat
+  draft by adding hadith citations — here the faith content is simply
+  part of describing her, same register as describing her hands or her
+  home.
+- **Biological/life-stage truth as real imagery:** carrying the child,
+  nursing the child — stated plainly as fact, not softened into
+  abstraction. Confirms the "concrete stage-of-life imagery" lesson
+  above is exactly right, and shows the specific register to pitch it
+  in (plain, direct, unembellished fact, not poetic distance).
+- **When Joe asks for a "Hooyo song" or references this track/style by
+  name, use this exact structural device** (quatrain + repeated closing
+  refrain line, comparison-stacking praise, faith and biology as lived
+  detail) rather than the usual verse/hook/bridge shape used elsewhere
+  in this skill — it's a distinct, confirmed-good structure for this
+  specific subject, the same way the Qaraami Love Duet (section 8) is a
+  confirmed template for its own subject.
 - **When Joe says a draft "doesn't make sense" or "you didn't change
   anything," that means the FEELING is missing, not that a fact was
   wrong.** Don't respond by adding more research or more citations —
