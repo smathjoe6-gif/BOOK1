@@ -88,6 +88,41 @@ discipline from now on:
   default checkpoint before finalizing any theme, every time, not only
   when Joe flags a miss.
 
+**Critical follow-up correction, same day — citing a fact is NOT the same
+as making someone feel it (Joe, 21 Oct 2026):** the first fix above was
+still wrong. Adding real hadith citations to "Hooyada Xaafadda" made it
+more scholarly, not more felt — Joe's exact words: "you didn't change
+anything... you cannot compare anything... it has to feel the mother."
+A citation is a support, never the device itself. What actually works,
+and what Joe asked for directly:
+- **Concrete, second-person, stage-of-life imagery** — not a concept
+  talked about, a person talked TO. For a mother: she protected you as
+  an infant, she looked after you growing up, she was still there after
+  you married and built your own life — specific physical images (a
+  wound cleaned before you finished crying, worry and prayer continuing
+  long after you left home), not abstractions like "sacrifice" or
+  "honor" sitting alone.
+- **The incomparability has to be stated concretely, not asserted.**
+  Joe's own example: you can travel to Belgium, to Saudi Arabia, ten
+  times over — nobody else on any of those trips ever wakes up at
+  midnight for you the way she does. That specific, almost mundane
+  image (a real person checking on you at 3am) hits harder than any
+  abstract claim that "no one compares."
+  Use this same technique for other subjects too: don't just assert a
+  thing is special/unmatched — show one small, specific, true-to-life
+  moment that proves it.
+- **The listener must feel the subject, not learn about it — "doesn't
+  matter if you are a woman or a man."** Write in direct second-person
+  address ("you," not "she is honored by her community") whenever the
+  subject is a person someone has a real relationship with (mother,
+  father, a lost loved one, home itself) — this makes the song land on
+  anyone listening, not just a Somali/homeland audience.
+- **When Joe says a draft "doesn't make sense" or "you didn't change
+  anything," that means the FEELING is missing, not that a fact was
+  wrong.** Don't respond by adding more research or more citations —
+  respond by making the imagery more specific and more direct-address.
+  These are different failure modes and need different fixes.
+
 Why this exists: rotating the poetic-form *label* each day (Gabay one day,
 Jiifto the next) was not enough — every song still had the same skeleton
 (spoken Kaban intro → stat-heavy verse → "word! word!" call-response hook →
