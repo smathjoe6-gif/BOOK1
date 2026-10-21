@@ -53,6 +53,41 @@ one instead of re-deriving it:
   hip-hop/rap = trap or boom-bap drums — same discipline as every other
   mode: scene/genre texture only, never imitating a named artist).
 
+## Every topic must carry real, researched meaning — not just a word as a title (Joe, 21 Oct 2026)
+
+Joe's correction after "Hooyada Xaafadda" (21 Oct Kaban Rap Drop): the song
+used "Hooyo" (mother) as a loose title/motif for a nurse-caregiver story,
+but never actually grounded itself in what "Hooyo" is supposed to carry —
+real weight, real meaning. Joe's words: "every subject has to have the
+things you talking... every song has to have meaning, or the society."
+He should never have to re-explain this per song — it's a standing
+discipline from now on:
+
+- **Don't pick a concept and float free of its real substance.** If the
+  concept touches motherhood, draw on the real, known reference points
+  that actually carry that weight: the Islamic teachings honoring
+  mothers (e.g. the well-known hadith placing Paradise at the feet of
+  mothers, the Qur'anic emphasis on a mother's sacrifice and the duty of
+  kindness to parents — check and cite real sources, same fact-discipline
+  as everywhere else in this skill, never invent a "teaching"), the
+  universal child's-duty themes (gratitude, care in old age, honoring her
+  sacrifice), and/or a specific international angle if the brief is going
+  global rather than homeland-specific. The concept has to connect
+  concretely to the subject's real cultural, religious, or societal
+  meaning — not just use the word as a flavor/title.
+- **This generalizes beyond "Hooyo."** Any theme this skill reaches for
+  (a trade, a historical moment, a social-conscience topic, a patriotic
+  anthem) needs the same discipline: know what the subject actually
+  means to people — the real tradition, teaching, value, or social weight
+  behind it — and build the song around that substance, not around a
+  catchy word wearing the subject's name. A title alone is not a concept.
+- **Do this automatically, without Joe having to spell it out per song.**
+  The research/grounding step (section 1's concept pick, this skill's
+  fact-check discipline, and `gk-gabay-blueprint`'s checked-facts
+  practice) already exists for exactly this reason — apply it as a
+  default checkpoint before finalizing any theme, every time, not only
+  when Joe flags a miss.
+
 Why this exists: rotating the poetic-form *label* each day (Gabay one day,
 Jiifto the next) was not enough — every song still had the same skeleton
 (spoken Kaban intro → stat-heavy verse → "word! word!" call-response hook →
