@@ -12,6 +12,28 @@ metadata:
 
 # GK Song Production Strategy
 
+## A mother-tribute song is not a love song — ground it in literal maternal acts, not reciprocal/romantic phrasing (Joe, 21 Oct 2026)
+
+Two concrete content errors Joe caught in the same Hooyo rewrite,
+apply both as standing rules for any Hooyo/mother-tribute song:
+- **Never write a line that trades on reciprocity/romantic logic**
+  ("do you remember me the way I remember you") — that is love-song
+  structure, not mother-song structure. A mother's love in this genre
+  is described as unconditional and one-directional from before you
+  could even reciprocate: she remembers you from the day you were
+  born, from when you were in her womb — not "the way you remember
+  her." Ground every "does she remember/love me" idea in that framing,
+  never a symmetrical exchange.
+- **Never use a vague developmental-stage word like "youth" for
+  infancy.** When the song is about being a baby/infant, say so
+  literally and specifically: her carrying you (womb/pregnancy), her
+  staying awake through the night while the father was out at work,
+  her nursing you, her being the one who physically cared for an
+  infant who could do nothing for itself. "Youth" reads as
+  teenage/growing-up, which is a completely different life stage from
+  what Joe means by "when I was nothing" — always ask which specific
+  age/stage before picking a word like that.
+
 ## Never recycle the same lyric line across rewrites — write genuinely fresh content every time (Joe, 21 Oct 2026)
 
 Across the Hooyo rewrites, the opening line "Saddex sano ayaan ku arag waayay"
