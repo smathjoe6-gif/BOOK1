@@ -138,6 +138,62 @@ invented replacement line)
    hagaysa reerkeenna / Hadda iyo weliba dambena, waa hodan adduunke /
    GK waa astaantaadu oo, guusha haystaye!"
 
+**Batch 3 (added same day, 21 Oct 2026)** — Weddings, Rains, and Family
+Glory / Celebration, Rain, and Kinship Rhythm theme:
+
+**Part 1 — Five Classical Gabay**
+
+1. *Arooska Sharafta* (The Wedding of Honor) — G-locked: "Aroosyahow
+   guryahaaga waa, guul la kowsadiye / Gashaantiida iyo geesigii, waa
+   isla gaareene / Guntiinada la xirtayoo xariir, giddi la soocaaye /
+   G iyo K waa calaamaddii, guudka laga sooce / Reer GK sharaftoodu
+   waa, gobannimo raagaysaaye."
+2. *Roobabka Barwaaqada* (The Rains of Abundance) — R-locked: "Raxmaankii
+   abuurayay adduunyada, raali noqotee / Roobkii da'ayoo dhulkii,
+   ranku doogeene / Arlaadaan carraheed mar labaad, ruux ku
+   noolaaday / Raxaysoo xooluhu daaqayaan, reeruhu degeene / Runtiis
+   waa barwaaqo iyo, risiq soo degay maanta e."
+3. *Qoyska iyo Qaraabada* (Family and Kinship) — Q-locked: "Qoyskii ku
+   abqaalmay sharaf, qaddarun baa leede / Qaraabada isu timid oo,
+   qowlku yahay meel e / Qalbigoodu waa mid suuban oo, qaran dhisayaaye
+   / Qorraxdoo soo baxdaayoo kale, qoysku waa nuure / Qarniyo badan ha
+   raago oo, qasdigisu ha gaaree."
+4. *Arooska Geesiga* (The Hero's Wedding Feast) — G-locked: "Gaardiska
+   la marayiyo habkii, guusha laogaade / Gabadhii la doortiyo halkaa,
+   guudka laga sooce / Kaban yahay dhawaaqiyo muunkii, guuxaya
+   dhexdeeda / Gacmo iyo gacmo is qabsaday, waa guul adduunyade / Guri
+   baa dhismayoo maanta, geesigii helay e."
+5. *Barwaaqada iyo Beeraha* (The Blessing of the Harvest) — B-locked:
+   "Beerihii abaartaayay ee, baaba' ku ahaaday / Biyaha soo rogmaday
+   iyo dalkii, baaxaddii helay e / Bur iyo caano laga sheegayiyo,
+   baahiyi ka guurtay / Barwaaqada dalkeennaa timaad, bashqadaha keene
+   / Bishaarada reer GK baa, bilicsanaan dhowra e."
+
+**Part 2 — Four Traditional Buraanbur** (a fifth, "Dhaantada Arooska,"
+was flagged as a near-exact duplicate of Batch 2's "Dhaanto iyo Kaban"
+— ask Joe before keeping/dropping it, same as the earlier duplicate)
+
+1. *Arooskii Farxadda* (The Joyful Wedding) — H-locked: "Hallow baa la
+   yiri guurkiyo, gabdhaha loo tage e / Hodan baannu nahay reer GK,
+   hiddaha keenaye / Haweenkii xidhmada xirtayoo, harqaan lagu tumaye
+   / Arooskan la joogiyo dheddiga, guusha la ogaade!"
+2. *Soo Dhaweynta Roobka* (Welcoming the Rain) — R-locked: "Roobkii
+   da'ayoo dhulkii, doogku ka baxaye / Raxaysoo xooluhu dhergeen,
+   reeruhu degeene / Rabbigii mahadkiisii baa, lagu ogaadeene / Risaqii
+   alle soo degayoo, raaxo la helaaye!"
+3. *Qoyska Hodanka Ah* (The Wealthy Family Bond) — Q-locked: "Qoyskii
+   dhashay ee sharaftii, soo hooyey maanta e / Qaraabada isu timid ee,
+   qosolku deeqayaye / Quruxdaada iyo haybaddii, qalbigu raacay e /
+   Qarniyo badan ha waaro oo, qoysku ha barwaaqoobo!"
+4. *Sharafta Reer GK* (The Honor of GK Family) — mixed H/Alindi-locked:
+   "Haybaddii sharaftaydii baa, hagaysa reerkeenna / Hadda iyo weliba
+   dambena, waa hodan adduunke / Alindiga la xirtayiyo xariir, waa mid
+   oran jiife / GK waa astaantaadu oo, guusha haystaye!" — note: lines
+   1, 2 and 4 are shared with Batch 2's "Himilo iyo Guul" (only line 3
+   is new) — likely the same recurring-closing-couplet pattern as
+   elsewhere in this library; flagged, not removed, since it's a
+   partial reuse (a formulaic closing), not a full duplicate.
+
 ## Iron rules
 
 1. **Joe writes the Somali. Claude never invents Somali verse.** Keep Joe's
