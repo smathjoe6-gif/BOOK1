@@ -89,15 +89,12 @@ verse source.
 **Batch 2 (added same day, 21 Oct 2026)** — Alindi texture / Kaban
 acoustics / "unyielding GK Modern Legend standard" theme:
 
-**Part 1 — Five Classical Gabay**
+**Part 1 — Four Classical Gabay** (a fifth, "Hiddaha iyo Halkudheg," was
+removed 21 Oct 2026 — its opening stanza duplicated Batch 1's Gabay #1,
+"Xididka iyo Hiddaha," so Joe had it dropped rather than patched with an
+invented replacement line)
 
-1. *Hiddaha iyo Halkudheg* (The Heritage and the Motto) — vowel-locked:
-   "Nin rag ahu halkuu udub u xidho, waa ogyahay halkee / Arlaadaan
-   carraheed ku yaal, waana loo oggolyahaye / Alindiga la tolayoiyo
-   xariir, waa asaaskii e / Anagoo ah ehelkii sharaftoo, aannaan
-   oggolaaneyn / Inaan meel marinno taariikhda, awowyaasheen
-   abaahayood."
-2. *Maansada iyo Muunki* (The Poetry and the Melody) — M-locked:
+1. *Maansada iyo Muunki* (The Poetry and the Melody) — M-locked:
    "Maansadu waa tii dhaloo, maanka suubisaye / Kaban yahay kuwii soo
    hor maray, maamuus kuu hayne / Halkii lagaga guurotoiyo maanta
    geesaha e / Magacaaga GK baa sudhan, muunki iyo seerke e / Modern
@@ -140,11 +137,6 @@ acoustics / "unyielding GK Modern Legend standard" theme:
    baannu helay, hoos u eegid ahe / Haybaddii sharaftaydii baa,
    hagaysa reerkeenna / Hadda iyo weliba dambena, waa hodan adduunke /
    GK waa astaantaadu oo, guusha haystaye!"
-
-Note: Batch 1's Gabay #1 and Batch 2's Gabay #1 ("Xididka iyo Hiddaha" /
-"Hiddaha iyo Halkudheg") share the same opening stanza almost verbatim
-— likely Joe reusing a favourite stanza as a recurring motif rather than
-a mistake; use either freely, don't "fix" the overlap without asking.
 
 ## Iron rules
 
