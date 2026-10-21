@@ -12,6 +12,32 @@ metadata:
 
 # GK Song Production Strategy
 
+## Open on the universal ache, not the gentle image — and don't go too soft (Joe, 21 Oct 2026)
+
+Final content lesson from the "Hooyo" rewrites: even with the right
+structure, Somali-sung, and real imagery, a draft that opened on a
+gentle image (her hands protecting you as a baby) still read as too
+soft to grab a listener before they scroll past. Joe's fix, apply
+generally to any emotionally personal song, not just Hooyo tracks:
+- **Open on the rawest, most universal version of the ache, not a tender
+  scene-setting image.** For a mother-tribute song specifically: lead
+  with direct separation/longing (years since you've seen her, starting
+  to forget her face) — the exact feeling real people expressed in the
+  comments Joe showed, not a soft "when you were a baby" opener. Gentle
+  stage-of-life imagery still belongs in the song — just later, once the
+  hook has already hit.
+- **"Reflective" and "intimate" do not mean thin or whisper-soft.** A
+  personal song still needs medium energy and real instrumental presence
+  (drum/Kaban audible under every stanza, not isolated to a bridge or
+  refrain) — Joe's words: "the sound has to be Somali, not soft... plus
+  energy." A hushed, delicate arrangement risks losing the listener
+  before the emotional payoff lands, however good the writing is.
+- **The retention principle from the daily routine's own rules applies
+  here too, explicitly stated as feedback this time:** if the first few
+  seconds don't hit, the listener skips before the good part at the end
+  ever plays — so the hardest-hitting line goes first, every time, on
+  every song, not just the high-energy modes.
+
 ## Suno rendered as spoken word, not sung — formatting lesson (Joe, 21 Oct 2026)
 
 Joe generated a song doc on Suno and it came out as flat spoken English
