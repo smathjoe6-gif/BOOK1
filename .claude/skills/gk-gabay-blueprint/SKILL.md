@@ -645,6 +645,37 @@ that implies it's a confirmed traditional form:
 - **Guurow** — low, humming, hypnotic, half-spoken half-chanted in a
   lower register; deep, atmospheric, late-night acoustic resonance.
 
+**Example verses (Joe, 22 Oct 2026, same session)** — Somali/English
+code-switched (new for this library; everything earlier was pure
+Somali) showing how each form's delivery actually sounds in practice:
+
+- **Geeraar**: "Kacaanka dhiigga, cagta saar oo ride! Gacanta ku hay
+  Kaban, gubashada Alindiga! Hore u soco oo oogada dhiib, goobtaada
+  qabo oo guusha qaad! GK stamp on the frontline track, fast-paced
+  rhythm with no turning back!" — ⚠️ "Kacaanka" (the Revolution, the
+  term for Siad Barre's 1969 coup) is a politically loaded word like
+  "Jihaad" elsewhere in this skill: fine in the doc, use an English
+  title/caption if this one goes public.
+- **Biciidley**: Leader "Arlaadi basasha, yaa dhisanaya?!" / Response
+  "Waa GK Legend oo dhidibka taagaya!" / Leader "Alindi gashahan, yaa
+  huwanaya?!" / Response "Waa qoyska sharafta leh ee geesiga ah!" /
+  Chorus "Kaban acoustics ringing loud and true, southern shield wall
+  built for me and you!"
+- **Jiifto**: "Xusuusta diiwaanka, taariikhda soo celisay, meesii ay
+  abaartu iyo dagaalku joogeen. Waxaan soo marnay dariiq adag oo
+  sharaf leh, annagoo Alindi ku xidhnayna jiilasha dambe. Kaban
+  strings are playing the tale of our land, a legacy carved by an
+  unyielding hand."
+- **Buraanbur-Dagaaleed**: "Hayaay oo hayaay, geesigu waa kan taagan!
+  Ha yaraanin dhiirrigelinta, ha muujin cabsi iyo tabar-darri!
+  Guntiino iyo sharaf leh, hooyada soo saartay calanka! GK stamp
+  shining bright on the hill, an unbreakable power that time cannot
+  kill!"
+- **Guurow**: "Habeenku waa dagan yahay, taladuna waa culus tahay.
+  Hooska Kaban wuxuu dejinayaa quluubta, halka qorshaha mustaqbalkana
+  la dejinayo. Silent strategies in the dead of night, shaping the
+  future before the morning light."
+
 ❌ Dhaanto is **not** "from Bay and Bakool" — it comes from the Somali Region
 of Ethiopia (Wikipedia "Dhaanto", Sahan Journal).
 
