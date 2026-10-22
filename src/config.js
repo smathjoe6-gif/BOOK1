@@ -29,6 +29,10 @@ export const config = {
   // Logo / shield stamped in the top-right corner of every person-story video: a PNG (ideally transparent)
   // on this Mac, e.g. ~/gk-automation/gk-logo.png. Blank or a missing file = no logo.
   storyLogoFile: process.env.STORY_LOGO_FILE || '',
+  // Optional per-gender corner pictures (a man / a woman wearing GK). A story whose Canva design title ends
+  // with [M] uses STORY_LOGO_MAN, [F] uses STORY_LOGO_WOMAN; otherwise (or if the file is missing) STORY_LOGO_FILE.
+  storyLogoMan: process.env.STORY_LOGO_MAN || '',
+  storyLogoWoman: process.env.STORY_LOGO_WOMAN || '',
   storySecondsPerPage: Number(process.env.STORY_SECONDS_PER_PAGE) > 0 ? Number(process.env.STORY_SECONDS_PER_PAGE) : 4.5,
   localDropMinAgeSeconds: Number(process.env.LOCAL_DROP_MIN_AGE_SECONDS) || 120,
   // Video stacker (src/stitchVideos.js): joins short clips from this Mac

@@ -38,6 +38,7 @@ function saveState(state) {
 // "Mohamed Sulayman Tubeec Instagram carousel" -> "Mohamed_Sulayman_Tubeec_story"
 export function storyFileName(title, designId) {
   const person = String(title || '')
+    .replace(/\[[MF]\]\s*$/i, ' ')
     .replace(/\b(instagram|facebook|post|carousel|story|design|untitled)\b/gi, ' ')
     .replace(/[^A-Za-z0-9]+/g, ' ')
     .trim()
@@ -77,14 +78,24 @@ export function slideshowFilter(n, secs, fade, logoIndex = -1) {
   return { filter: parts.join(';'), total };
 }
 
-function logoPath() {
-  const p = expandHome(config.storyLogoFile);
-  return p && fs.existsSync(p) ? p : '';
+// "Abdi Bile [M]" -> 'M', "Hawa Jibril [F]" -> 'F', anything else -> ''.
+export function storyGender(title) {
+  const m = /\[([MF])\]\s*$/i.exec(String(title || '').trim());
+  return m ? m[1].toUpperCase() : '';
 }
 
-async function buildSlideshow(pagePaths, outPath, music) {
+function logoPath(gender = '') {
+  const pick = gender === 'M' ? config.storyLogoMan : gender === 'F' ? config.storyLogoWoman : '';
+  for (const candidate of [pick, config.storyLogoFile]) {
+    const p = expandHome(candidate);
+    if (p && fs.existsSync(p)) return p;
+  }
+  return '';
+}
+
+async function buildSlideshow(pagePaths, outPath, music, gender = '') {
   const secs = config.storySecondsPerPage;
-  const logo = logoPath();
+  const logo = logoPath(gender);
   const logoIndex = logo ? pagePaths.length : -1;
   const { filter, total } = slideshowFilter(pagePaths.length, secs, FADE_SECONDS, logoIndex);
   const args = ['-y'];
@@ -127,7 +138,7 @@ export async function storyVideosOnce(auth) {
       const music = await pickInstrumental(auth);
       const name = storyFileName(design.name, design.id);
       const tmpOut = path.join(work, name);
-      await buildSlideshow(pages, tmpOut, music);
+      await buildSlideshow(pages, tmpOut, music, storyGender(design.name));
       fs.copyFileSync(tmpOut, path.join(outDir, name));
       state.done.push(design.id);
       made += 1;
