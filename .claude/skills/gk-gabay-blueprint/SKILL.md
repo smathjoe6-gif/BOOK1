@@ -194,6 +194,223 @@ was flagged as a near-exact duplicate of Batch 2's "Dhaanto iyo Kaban"
    elsewhere in this library; flagged, not removed, since it's a
    partial reuse (a formulaic closing), not a full duplicate.
 
+**Batch 4 — Geeraar (added 22 Oct 2026)** — "Momentum, Bravery, and
+Studio Sovereignty" theme. Joe sent 10; 6 were heavy repeats (3-5 of 5
+lines reused verbatim, just reordered/retitled) of poems already in
+this library ("Xididka Alindi" ~ Batch 1 Gabay 1; "Guusha Modern
+Legend" partial ~ Batch 1 Gabay 5; "Hiigsi iyo Himilo" ~ Batch 2
+Buraanbur 5; "Kibirka iyo Sharafta" ~ Batch 1 Gabay 2 reordered;
+"Reer GK iyo Raxmada" ~ Batch 3 Gabay 2; "Aragtidii Hore" ~ Batch 2
+Gabay 3; "Guusha Ugu Dambeysa" ~ Batch 1 Buraanbur 3) — dropped per the
+same call Joe made on the two earlier duplicate cases. Only the 4
+genuinely new ones are saved:
+
+1. *Hiriga Kaban iyo Hoggaanka* (The Kaban String and Leadership) —
+   G-locked: "Geesigii arlaadii dhashoo, gaardis ku socdaaye / Gubni
+   iyo hubaal bay waddadu, noo gargaareene / Kaban yahay geddii lagu
+   tumayoo, guuxa leh dhexdeeda / G iyo K waa calaamaddii, guudka laga
+   sooce / Go'aankaynu leennahay waa mid, gees ka gees ah e!"
+2. *Guusha Modern Legend* (The Victory of Modern Legend) — mixed
+   locked: "Modern Legend-ka aan taagannahay, waa mid soo jire e /
+   Meelaha la joogaba astaan, lagama maarmaan ah e / Garaadkii ragguu
+   leeyahayoo, guusha soo hoyrye / Gaarihii la doortiyo halkaa, guudka
+   laga sooce / GK waa astaantaadu oo, guusha haystaye!" — note: lines
+   1-2 reuse Batch 1 Gabay 5's lines 2-3; lines 3-5 are new.
+3. *Dhaanto iyo Dhiirigelin* (Dhaanto and Encouragement) — D/G mixed:
+   "Dhaantadii la tumayayoo, dheddig iyo lab e / Dhexdaadaada loo
+   jeediyoo, dhab u haysanaye / Gashaantiida iyo geesigii, waa isla
+   gaareene / Guntiinada la xirtayoo xariir, giddi la soocaaye /
+   Garaadkeenna weynaa ku jira, guudka duniduye!" — opening couplet is
+   the now-familiar Dhaanto formula reused across the library.
+4. *Waran iyo Wanaag* (Spear and Virtue) — W/G mixed: "Warankii la
+   qaatiyo niman, gaashaanka rogaye / Waaqii abuurayay adduunyada, wuu
+   inooq qoray e / Waddooyinka la marayaa waa, weji ku caan ah e / G
+   iyo K calaamaddii bay, guudka saarane / Gobonnimada reer GK, guri
+   waliba gaarey!"
+
+**Batch 5 — Jiifto (added 22 Oct 2026)** — "Historical Reflection,
+Moral Wisdom, and Studio Legacy" theme, all J-locked, genuinely new
+content (no heavy overlap found against the rest of the library):
+
+1. *Taariikhda Raagaysa* (The Lasting History): "Jiifto aan
+   tiriyaayoo, jihooyinka u dirayaa / Jadwalkii awowyaasheen, jidkiisii
+   ma luminayne / Alindiga xariirta ah, jidhkayagu wuxuu xidhayoo /
+   Jagooyinka sarreysaa, jaalkayaga waa degeene / Jeesjees ma oggolin
+   oo, jaranjaradii waan fuulnay!"
+2. *Kaban iyo Jiidista Qoyska* (Kaban and Family Unity): "Kaban yahay
+   jilaalkii, jidadkii aan marnayow / Jiqda geedka hoostiyo, jannadii
+   arlaad baad / Jidka toosan haysta oo, jacayl iyo wanaag baa /
+   Jilbaha la isku saarayoo, jilib waliba waa heshiiyoo / Jibaarkiisa
+   maansadu, waa mid ji ji leede!"
+3. *Geesiyihii Hore* (The Ancient Heroes): "Jiidayaashii hore ee,
+   jilayaasha dunidiyo / Jihaadii horjoogaha, jago sharaf leh siiyow /
+   Jidba waa la maraayoo, jinsigii dhashaa baa / Jirdhibkii la soo
+   maray, maanka ku hayaayoo / Jiifadan aan tirinayaba, waa jajab ku
+   taalla e!" — "Jihaadii" here means struggle/vanguard in the
+   historical-heroes sense; keep it in the doc only, use an English
+   title in any public caption (same platform-safety rule as always
+   for this word).
+4. *Barwaaqada Arlaadi* (The Abundance of the Land): "Roobkii
+   jilaalkii, jirooyinka u di'iyeyoo / Jardiinooyinka cagaarshaa,
+   jiifto loogu heesaye / Jirridii abaartaydii, meel fog ayay ka
+   carartoo / Jeesada xooluhu daaqayaan, waa jibaad barwaaqo e /
+   Jidkiisii wacaanaa, reer GK u joogaye!"
+5. *Arooskii iyo Farxadda* (The Wedding and Joy): "Jiidashada
+   arooskiyo, gabdhaha jaranjarada taagan / Jiibta iyo sacabkiyo,
+   jawiga la qurxiyeyoo / Jiilaalkii ka guurayey, jannadii haweenkuye
+   / G iyo K calaamaddii, guudka lagu sharraxayoo / Jidadkii guushaa
+   loo maray, waa jilaal wanaagsane!"
+6. *Maansada iyo Magaca* (Poetry and Reputation): "Maansadu waa jidkii,
+   lagu gaaro joog dheere / Jibaar iyo laxan baan, jilicsanaanta
+   eegayne / Modern Legend waddadiisa, jidbo looma heesoo / Jihada aan
+   hayaanna waa, mid jannada u jeedoo / Jiifadan aan tirinayaba, waa
+   jaangooyadiis e!"
+7. *Haybadda Sharafta* (The Dignity of Honor): "Haybad iyo wanaag baa,
+   jidka noo tilmaamaya / Jajab ma laha hal-abuurku, waa mid jiroo
+   taagne / Jiilaal iyo barwaaqo baa, jaranjarada noo ah e / Jidka
+   nabadgelyada baannu, jecel nahay adduunyada / Jibbaada reer GK, waa
+   mid jiq ah maanta e!"
+8. *Aqoonta iyo Asalka* (Knowledge and Origins): "Asalkii hore iyo
+   jidka, awowyaasheen dhigay / Jihadiisa ma lunsanin, waa mid jiib leh
+   maanta e / Kaban yahay jilaalkii, jihooyinka u jeediyo / Jidba waa
+   la gaarayoo, jaahilnimadu waa tagtay / Jariidaddan maansada, waa
+   jaranjaro guule!"
+9. *Himilada iyo Hiigsiga* (Ambition and Vision): "Himiladii la
+   hiigsaday, jidka toosan haysaaye / Jiiftooyin aan tiri, waa jidka
+   lagu faano / Jidadkii dunida jooga, jilibkayagu wuu maray /
+   Jaranjaradii sharaftaa, lagu jeexay taariikhdane / Jagooyinka
+   sareenna waa, reer GK oo leh e!"
+10. *Guusha Ugu Dambeysa* (The Ultimate Victory, Jiifto version —
+    distinct from Batch 1's identically-titled Buraanbur): "Guul baa
+    la joogaa, jidkii loo halgamayayoo / Jiifto iyo maanso baa, lagu
+    jeexay maanta e / Jilib iyo qaraabo baa, isku jiran si suubanoo /
+    Jidka Modern Legend baa, dunida gariiriyeyoo / Jidba waa la
+    gaarayoo, jannadu waa halkiis e!"
+
+**Batch 6 — Dhaanto / Biciidley call-and-response (added 22 Oct
+2026)** — a new structural format for this library: Lead / Response /
+Chorus (performance arrangement, not straight verse), built for live
+call-and-answer delivery. ⚠️ Half of these are labelled "Biciidley,"
+which is still the unverified/possibly-invented form flagged in the
+Forms catalog below — kept here as sent, but do not use "Biciidley" in
+a public caption or claim it as a checked historical form until a real
+source confirms it; "Dhaanto" is the safe, checked label to use
+instead if needed.
+
+1. *Dhiirigelinta Koonfureed* (The Southern Drive) — Dhaanto: Lead
+   "Dhaantada la tumayoo dheddig iyo labe e!" / Response "Dhaantooy!
+   Dhaantooy, waa dhalashadiis e!" / Lead "Dhexdaadaada loo jeediyoo
+   dhab u haysanaye!" / Response (repeat) / Chorus "Alindiga la
+   xirtayiyo xariir, waa mid oran jiife, reer GK guusha haystaye!"
+2. *Hiriga Arlaadi* (The Pulse of the Land) — Biciidley ⚠️: Lead
+   "Biciidleyda loo kacayoo cooshaddu la guuxaye!" / Response
+   "Biciidley! Biciidley, waa badbaadadiis e!" / Lead "Kaban yahay
+   adduunyadaada iyo kiishka maansada e!" / Response (repeat) / Chorus
+   "G iyo K calaamaddii bay guudka saarane, gobannimada reer GK!"
+3. *Roobka iyo Barwaaqada* (Rain and Abundance) — Dhaanto: Lead
+   "Raxmaankii abuurayay adduunyada, roobkii da'aye!" / Response
+   "Horey u wade! Horey u wade, barwaaqo keenaye!" / Lead "Xooluhu
+   dhergeen oo dhulkii doog ka baxaye!" / Response (repeat) / Chorus
+   "Reer GK sharaftoodu waa, gobannimo raagaysaaye!"
+4. *Geesigii Guuleystay* (The Victorious Hero) — Biciidley ⚠️: Lead
+   "Geesigii arlaadii dhashaa guuleystay maanta e!" / Response
+   "Odayoow! Odayoow, guusha keen maanta e!" / Lead "Guntiinada la
+   xirtayiyo garabka loo saare!" / Response (repeat) / Chorus "Modern
+   Legend waddadiisa, dunidu gariiriyeyoo!"
+5. *Arooskii Farxadda* (The Celebration Dance) — Dhaanto: Lead
+   "Arooskan la joogiyo gabdhaha guusha ogaade!" / Response "Dhaantooy!
+   Dhaantooy, waa arooskisi e!" / Lead "Haweenkii xidhmada xirtayoo
+   harqaan lagu tumaye!" / Response (repeat) / Chorus "Hodan baannu
+   nahay reer GK, hiddaha keenaye!"
+6. *Kaban iyo Kheyraad* (Kaban and Heritage, call-and-response version
+   — distinct from Batch 1's identically-titled Gabay) — Biciidley ⚠️:
+   Lead "Kaban yahay guuxiyo muunkii geesaha ka baxaye!" / Response
+   "Biciidley! Biciidley, waa muunkii dhabta e!" / Lead "Asalkii
+   awowyaasheen waa mid adag maanta e!" / Response (repeat) / Chorus
+   "GK waa astaantaadu oo, guusha haystaye!"
+7. *Taariikhda iyo Asalka* (History and Roots) — Dhaanto: Lead
+   "Taariikhda soo jirtay ee aan marnaba luminayne!" / Response "Hayow!
+   Hayow, taariikhdaada hay!" / Lead "Xididkeenu waa adag yahay meel
+   walba oo la joogo!" / Response (repeat) / Chorus "Alindiga xariirta
+   ah, jidhkayagu wuxuu xidhayoo!"
+8. *Hiigsi iyo Himilo* (Vision and Ambition, call-and-response version)
+   — Biciidley ⚠️: Lead "Himiladiinnii baannu helay hoos u eegid ahe!"
+   / Response "Jiroow! Jiroow, hiigsigii gaar e!" / Lead "Haybaddii
+   sharaftaydii baa hagaysa reerkeenna!" / Response (repeat) / Chorus
+   "G iyo K waa calaamaddii, guudka laga sooce!"
+9. *Reer GK iyo Sharafta* (The GK Family Honor) — Dhaanto: Lead "Reer
+   GK sharaftoodu waa mid qarniyo raagaysa!" / Response "Dhaantooy!
+   Dhaantooy, sharaf baa leh e!" / Lead "Qaraabada isu timid oo
+   qowlku yahay meel e!" / Response (repeat) / Chorus "Hadda iyo
+   weliba dambena, waa hodan adduunke!"
+10. *Guusha Ugu Dambeysa* (The Final Triumph, call-and-response
+    version — third poem to use this title, all distinct forms) —
+    Biciidley ⚠️: Lead "Guul baa la joogaa oo adduunyada
+    gariirisaye!" / Response "Biciidley! Biciidley, guusha waa tan
+    e!" / Lead "Jilib iyo qaraabo baa isku jiran si suubanoo!" /
+    Response (repeat) / Chorus "Modern Legend waddadiisa, jannadu waa
+    halkiis e!"
+
+**Batch 7 — Balwo / Qaraami (added 22 Oct 2026)** — the library's first
+Balwo and Qaraami pieces (short, intimate love-song forms per the Forms
+catalog below). All reuse the library's now-established formulaic
+couplets (Kaban lines, "Hadda iyo weliba dambena, waa hodan adduunke",
+"G iyo K waa calaamaddii...", etc.) at the normal 1-2 line level seen
+throughout this library — none are heavy (3+ line) duplicates of a
+single earlier poem, so all 10 are kept:
+
+1. *Hiriga Kaban* (The String of the Kaban) — Balwo: "Kaban yahay
+   hurdo waa, habeenkii adduunyada e / Hankaagu waa kii dhaloo, hoos u
+   eegid ahe / Jacaylku waa hibo oo, halbowhaha ku jira e / Hadda iyo
+   weliba dambena, waa hiddaha reerkeenna / GK waa astaantaadu oo,
+   huruud iyo xariir leh!"
+2. *Indhaha Nuurkooda* (The Light of the Eyes) — Qaraami: "Indhahaagii
+   bilicda badnaa, ee ilwaaddu kaa muuqato / Asalka arlaad iyo
+   hiddaha, ubadkiisu kuu ooyaye / Alindiga xariirta ah, ee jidhkaaga
+   saaran / Inaan ku jeclaaday waa, arin aan la qarinayne / Odhaahdaada
+   maansadu, waa ubadkii maankayge!"
+3. *Caashaqa Asalka* (The Origin of Love) — Balwo: "Caashaqaa ku
+   haysatoo, habeenkii ma seexadee / Kaban yahay hooyadaa, hiddahaaga
+   dhowra e / Heesahan aan tirinayaba, waa hibo alle siiyee / Hadda
+   iyo weliba dambena, waa hilowga naftayde / Haweenayda loo dhalayoo,
+   haybadooda leh!"
+4. *Hillaaca Baadiye* (The Flash of the Countryside) — Qaraami:
+   "Hillaacii bannaanka ka baxay, ee badbaadada keenay / Barwaaqada
+   dalkeenna iyo, bilicda arlaada daawan / Kaban yahay hilowgii,
+   halkan kuugu yaallayoo / Hadalkaagu waa malab, hoobaluhu u heesaan /
+   GK wuxuu dhisayoo, hiddaha kor u taagay!"
+5. *Heesta Habeenka* (The Night Melody) — Balwo: "Habeenkan dagan iyo
+   kaban, hoos u dhacaya muunkiis / Halgamayaashii hore iyo, hiddaha
+   reerkeenna / Haybaddaada baa leh, hankaagu waa mid sarreeye / Hadda
+   iyo weliba dambena, waa hooyada maansada / Hibo alle noo keenayoo,
+   haysashadeeda leh!"
+6. *Jaceylka Dhabta ah* (True Love) — Qaraami: "Jaceylku waa dhib iyo
+   dheef, dhexdaadaada loo maro / Kaban yahay dhawaaqiyo muunkii,
+   geesaha ka baxaye / Dhedo iyo abaartaannu marin, dhalashadiis ahe /
+   Dhexdaadaada loo jeediyoo, dhab u haysanaye / G iyo K calaamaddii
+   bay, guudka saarane!" — lines 3-4 are the familiar Dhaanto formula
+   reused across several earlier pieces.
+7. *Hilowga Nafta* (The Soul's Longing) — Balwo: "Hilow baan qabaa oo,
+   habeenkii ku raacaaye / Kaban yahay hannaankii, hiddaha u
+   roonaaye / Halkaad joogtaba astaan, lagama maarmaan u tahay / Hadda
+   iyo weliba dambena, waa hodan adduunke / GK waa magacaasoo, hiigsi
+   sare leh!"
+8. *Hoyga Sharafta* (The Home of Honor) — Qaraami: "Hoygii sharaftiyo
+   hiddaha, hooyadiis dhalaye / Halgamayaashii soo maray, haybad bay
+   leeyihiine / Alindiga la xirtayiyo xariir, waa mid oran jiife /
+   Inaynu isku duubnawnayoo, ehel la leennahay e / Hadda iyo weliba
+   dambena, waa hodan adduunke!"
+9. *Himilada Qoyska* (The Family Vision) — Balwo: "Himiladiinnii
+   baannu helay, hoos u eegid ahe / Haybaddii sharaftaydii baa, hagaysa
+   reerkeenna / Kaban yahay hankaagiyo, hooyada maansada e / Hadda iyo
+   weliba dambena, waa hiddaha qaalige / GK waa astaantaadu oo, guusha
+   haystaye!"
+10. *Gabagabada Guusha* (The Conclusion of Victory) — Qaraami: "Guul
+    baa la joogaa oo, gariiriyey adduunyada / Kaban yahay
+    hal-abuurkii, hiddaha kor u taagay / Modern Legend waddadiisa,
+    jannadu waa halkiis e / G iyo K waa calaamaddii, guudka laga
+    sooce / Hadda iyo weliba dambena, waa hodan adduunke!"
+
 ## Iron rules
 
 1. **Joe writes the Somali. Claude never invents Somali verse.** Keep Joe's
