@@ -18,6 +18,31 @@ examples (all in Drive folder GK_Viral_Prompts `1GLeqzy5IpYbpQtN-xll-LcH-AE3_LK8
 - "The Sovereign Shield (Gurmadka iyo Gobannimada)" 4-part film — `1nPp9Ug2IU2xt_n_jUISXNveRPvARCdMpctKIYRKJKjc`
 - Strong Buraanbur prompts — `1Lkm4r_j5CbDta7qqQbYeR5JSYN9P6QRELK7d9YGTuHU`
 
+## Quick trigger reference — what Joe means when he just says the word (22 Oct 2026)
+
+Joe's own framing: this whole library exists so that when he names a form
+in the future, Claude already knows the sound and the use, without
+re-explaining each time. Read this list first when a request just names a
+form — full detail (verses, delivery notes, examples) is below.
+
+| Joe says | It means | Sound/use |
+|---|---|---|
+| **Gabay** | Classical, male-voiced, formal, weighty; one alliteration sound through the whole poem | Anthems, patriotic songs, documentaries |
+| **Buraanbur** | Women's form — village pride, family, celebration, *and* real historical protest/morale-raising | Wedding/pride songs, celebration, collective voice |
+| **Geeraar** | Fast, urgent, war/travel poetry, recited at speed (traditionally on horseback) | Rally/battle-prep energy, trailers, high-momentum edits |
+| **Jiifto** | Measured storytelling verse — historical record, moral lesson, saga around a fire | Documentary/historical-retrospective backbone |
+| **Dhaanto** | Folk dance + percussion, camel-inspired steps/claps, from the Somali Region of Ethiopia | High-energy dance edits, celebration |
+| **Biciidley** ⚠️ | Joe's framing: southern/shield-wall call-and-response — still unverified as a real historical form, usable for sound direction only, never stated as fact publicly | Deep call-and-response, southern drum energy |
+| **Balwo** | Short, intimate, personal love-song form (the historical root of Heello) | Romantic tracks |
+| **Qaraami** | Golden-age romantic/nostalgic Kaban ballads | Luxury heritage drops, romantic tracks |
+| **Heello** | Modernized structural form that grew out of Balwo | Contemporary-sounding songs, present-day GK sound |
+| **Buraanbur-Dagaaleed** ⚠️ | Joe's framing: wartime Buraanbur variant, women raising morale at the frontline — mechanics unverified, standard Buraanbur's own history IS checked | High-energy piercing vocals, ululation/takbeer accents |
+| **Guurow** | Night-vigil/strategic-counsel form, reflective and hypnotic | Moody late-night ambient tracks, "blueprint/strategy" mood |
+| **Hees / Shirib / Shir** | Pastoral work-songs; southern call-and-chant dance; council/gathering | Herding scenes; chant/drill edits; governance/defence scenes |
+
+Full verses, delivery notes and worked examples for every form above are
+in the sections below.
+
 ## GK Classical Poetry Library (Joe's own collection, added 21 Oct 2026)
 
 Joe gave this set directly as GK Legend Studio's own poetry library (his
