@@ -591,6 +591,39 @@ on skin.
 
 ❌ **Do NOT use (couldn't verify, may be invented):** "Biciidley", "Heyraan",
 "Heedhow", "Masafo". For herding/travel songs say **hees** instead.
+
+## Production-application notes (Joe, 22 Oct 2026) — his framing, not independently checked
+
+Joe sent detailed "Form & Function" + "Modern Legend Application" write-ups
+for 5 forms, useful for *production/style direction* (sound, mood, use
+case) but containing specific historical claims (exact regions, wartime
+procedures, named mechanisms) that haven't been verified against a named
+source — keep these as Joe's own creative framing, not as checked facts
+for a documentary-lane caption, per the "facts get checked" iron rule.
+
+- **Geeraar** — fast, rhythmic war/travel poetry, recited on horseback for
+  momentum/tactics. Matches the already-checked ✅ entry above. Studio use:
+  galloping percussion + hip-hop/rap delivery, battle-prep anthem energy.
+- **Biciidley** — ⚠️ still unverified (see ❌ list above). Joe's framing:
+  southern/inter-riverine (Bay, Bakool, Lower Shabelle) mobilization
+  cadence, drums + call-and-response to "lock the line." Fine as a sound
+  direction (sub-bass Kaban + heavy southern drums); do not state the
+  historical claims as fact anywhere public until sourced.
+- **Jiifto** — lyrical narrative verse for historical record/moral lessons
+  after conflict. Matches the checked ✅ entry (storytelling/travel songs).
+  Studio use: cinematic storytelling tracks, historical-retrospective
+  backbone.
+- **Buraanbur-Dagaaleed** ("wartime Buraanbur") — ⚠️ not in the checked
+  list; standard Buraanbur itself IS checked and does have real documented
+  political/morale-raising history (see "Buraanbur as political speech"
+  below), but this specific wartime-variant name and its described
+  mechanics (women at the camp edge, praising/shaming to control morale)
+  need a named source before use as fact. Studio use: high-energy vocal
+  harmonies over electronic rhythms + Alindi visuals.
+- **Guurow** — likely the same word as "guuraw" already listed above as
+  real-but-unchecked. Joe's framing: night/campfire strategic-counsel form,
+  reflective and measured. Studio use: moody late-night ambient Kaban +
+  spoken word, framed as GK's own strategic/blueprint track.
 ❌ Dhaanto is **not** "from Bay and Bakool" — it comes from the Somali Region
 of Ethiopia (Wikipedia "Dhaanto", Sahan Journal).
 
