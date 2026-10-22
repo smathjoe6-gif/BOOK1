@@ -411,6 +411,47 @@ single earlier poem, so all 10 are kept:
     jannadu waa halkiis e / G iyo K waa calaamaddii, guudka laga
     sooce / Hadda iyo weliba dambena, waa hodan adduunke!"
 
+**Batch 8 — Heello (added 22 Oct 2026)** — the library's first Heello
+pieces (modernized structural form, per the Forms catalog below). Joe
+sent 10; 4 were heavy repeats (3-4 of 5 lines reused verbatim from one
+specific earlier poem) — "Roobka iyo Barwaaqada" ~ Batch 6's Dhaanto
+"Roobka iyo Barwaaqada"; "Hiddaha iyo Casriga" and "Guugabadii Guusha"
+~ Batch 7's Qaraami "Gabagabada Guusha" (and heavily overlap each
+other too); "Himilada Geesiga" ~ Batch 2's "Himilo iyo Guul" — dropped
+per the same standing rule. The 6 genuinely new ones are saved:
+
+1. *Hiigsiga Muusigga* (The Musical Vision): "Heellooyin aan
+   tiriyaayoo, hadalqaadkii maansada / Hiddaha iyo heesaha casriga ah,
+   halabuurkeedu waa / Kaban yahay hooyadii muunkii, halkan keenayoo /
+   Halyeeygii arlaadii dhashaa, haybad u yeeshayee / GK waa
+   astaantaadu oo, heerkii sare gaaray!"
+2. *Horumarka iyo Asalka* (Progress and Origin): "Halgamayaashii hore
+   iyo hal-abuurkii dhalayey / Heellada maanta la joogo, waa hooyo la
+   helaye / Alindiga xariirta ah, jidhkayagu xirtayoo / Hirarka
+   maansadu waa kuwii, hiddihii dhowrayee / Hadda iyo weliba dambena,
+   waa hodan adduunke!"
+3. *Kaban iyo Kheyraad* (Kaban and Abundance, Heello version — distinct
+   from the earlier Gabay and call-and-response pieces of the same
+   title): "Kaban yahay hannaankii, hoos u dhacaya muunkiis / Heellada
+   la qaadayo, waa hodan arlaadi leedahay / Hankaagu waa kii dhalayoo,
+   hiigsi sare leh / G iyo K calaamaddii bay, guudka saarane / Hadda
+   iyo weliba dambena, waa guul adduunyade!"
+4. *Arooska iyo Heesta* (The Wedding and the Song): "Heesaha
+   arooskiyo, heellada loo luuqaynayo / Haweenkii xidhmada xirtay,
+   haybad bay leeyihiine / Guntiinada la xirtayiyo xariir, waa mid
+   oran jiife / Hadda iyo weliba dambena, waa hodan adduunke / GK waa
+   magacaasoo, guusha haystaye!"
+5. *Qoyska iyo Qaraabada* (Family and Kinship): "Qoyskii dhashay ee
+   sharaftii, soo hooyey maanta e / Heellada ay qaadayaan, waa hiddaha
+   reerkeenna / Qaraabada isu timid ee, qosolku deeqayaye / Hadda iyo
+   weliba dambena, waa hodan adduunke / GK waa astaantaadu oo, guusha
+   haystaye!"
+6. *Aragtidii Hore* (The Ancient Vision, Heello version): "Odayashii
+   horjoogey baa, aayaha u sooce / Heelladii awowyaasheen, halkan lagu
+   keenaye / Inaynu isku duubnawnayoo, ehel la leennahay e / Hadda iyo
+   weliba dambena, waa hodan adduunke / Astaan baannu u nahay adduun,
+   oolli doona e!"
+
 ## Iron rules
 
 1. **Joe writes the Somali. Claude never invents Somali verse.** Keep Joe's
