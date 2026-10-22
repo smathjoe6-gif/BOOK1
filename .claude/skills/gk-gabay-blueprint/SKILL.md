@@ -624,6 +624,27 @@ for a documentary-lane caption, per the "facts get checked" iron rule.
   real-but-unchecked. Joe's framing: night/campfire strategic-counsel form,
   reflective and measured. Studio use: moody late-night ambient Kaban +
   spoken word, framed as GK's own strategic/blueprint track.
+
+**Vocal delivery notes (Joe, 22 Oct 2026, same session)** — how each of
+the 5 should actually be performed/produced; lower factual risk than the
+historical claims above since this is style direction, not a history
+claim, but Biciidley's own unverified status still applies to anything
+that implies it's a confirmed traditional form:
+- **Geeraar** — rapid-fire, galloping, staccato, stiff and aggressive;
+  hard consonants pushed forward like a horse at full sprint; breathless
+  pacing, zero trailing notes.
+- **Biciidley** — deep chest-driven call-and-response, leader drops a
+  heavy phrase, the line roars back in unison; heavy swinging southern
+  drum step (Dhaanto heartbeat rhythm); grounded, booming, communal.
+- **Jiifto** — measured storytelling cadence, smooth rolling vocal wave
+  like an epic recited around a fire, unrushed, every word weighted;
+  warm, clear, narrative-driven, gentle Kaban plucking underneath.
+- **Buraanbur-Dagaaleed** — piercing, sharp, high-pitched tonal
+  modulation, ululation/takbeer accents woven in, cuts through chaos
+  instantly; vibrant, commanding, razor-sharp over heavy percussion.
+- **Guurow** — low, humming, hypnotic, half-spoken half-chanted in a
+  lower register; deep, atmospheric, late-night acoustic resonance.
+
 ❌ Dhaanto is **not** "from Bay and Bakool" — it comes from the Somali Region
 of Ethiopia (Wikipedia "Dhaanto", Sahan Journal).
 
