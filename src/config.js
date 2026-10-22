@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import path from 'node:path';
 
 function required(name) {
   const value = process.env[name];
@@ -28,7 +29,8 @@ export const config = {
   storyCanvaFolderId: process.env.STORY_CANVA_FOLDER_ID || '',
   // Logo / shield stamped in the top-right corner of every person-story video: a PNG (ideally transparent)
   // on this Mac, e.g. ~/gk-automation/gk-logo.png. Blank or a missing file = no logo.
-  storyLogoFile: process.env.STORY_LOGO_FILE || '',
+  // Default = the GK logo shipped in the repo (assets/gk-logo.png); STORY_LOGO_FILE overrides it.
+  storyLogoFile: process.env.STORY_LOGO_FILE || path.join(process.cwd(), 'assets', 'gk-logo.png'),
   // Optional per-gender corner pictures (a man / a woman wearing GK). A story whose Canva design title ends
   // with [M] uses STORY_LOGO_MAN, [F] uses STORY_LOGO_WOMAN; otherwise (or if the file is missing) STORY_LOGO_FILE.
   // Joe's own instrumental-only folder for the person stories (GK_MUSIC_VAULT/GK INSTRUMENTALS MUISC).
