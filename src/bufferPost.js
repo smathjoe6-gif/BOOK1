@@ -17,6 +17,18 @@ import { bufferInCooldown, bufferCooldownUntil, isRateLimitError } from './buffe
 // live API before relying on it.
 
 const RETRY_PATH = path.join(process.cwd(), 'buffer-retry.json');
+// BUFFER_VIDEO_GAP_MINUTES: only one video per gap goes to the Buffer networks;
+// the others wait here (YouTube is not slowed down by this).
+const DEFERRED_PATH = path.join(process.cwd(), 'buffer-deferred.json');
+const LAST_VIDEO_PATH = path.join(process.cwd(), 'buffer-last-video.json');
+
+function readJson(file, fallback) {
+  try {
+    return JSON.parse(fs.readFileSync(file, 'utf8'));
+  } catch {
+    return fallback;
+  }
+}
 const MAX_ATTEMPTS = 3;
 const SERVICE_ALIASES = { x: 'twitter', twitter: 'twitter', instagram: 'instagram', facebook: 'facebook', pinterest: 'pinterest' };
 
@@ -270,7 +282,20 @@ async function publicUrl(auth, fileId) {
 // halfway (3 Oct 2026: three restarts in an hour re-posted one video to
 // Instagram 3x), the networks not yet done simply resume from the queue and
 // the ones already done are never repeated.
-export async function postToBuffer(auth, { fileId, name, title, caption, firstComment = '', coverUrl = '' }) {
+export async function postToBuffer(auth, params, { force = false } = {}) {
+  const { fileId, name, title, caption, firstComment = '', coverUrl = '' } = params;
+  const gapMs = config.bufferVideoGapMinutes * 60 * 1000;
+  if (gapMs > 0 && !force) {
+    const last = readJson(LAST_VIDEO_PATH, { at: 0 }).at || 0;
+    if (Date.now() - last < gapMs) {
+      const waiting = readJson(DEFERRED_PATH, []).filter((d) => d.fileId !== fileId);
+      fs.writeFileSync(DEFERRED_PATH, JSON.stringify([...waiting, { ...params, deferredAt: Date.now() }], null, 2));
+      console.log(`Buffer: "${name}" waits its turn (one video per ${config.bufferVideoGapMinutes} min to the social networks, ${waiting.length + 1} waiting).`);
+      return;
+    }
+  }
+  // Written before posting, so a restart mid-video never lets the next one jump in.
+  if (gapMs > 0) fs.writeFileSync(LAST_VIDEO_PATH, JSON.stringify({ at: Date.now() }));
   const videoUrl = await publicUrl(auth, fileId);
   const services = bufferServices();
   const base = { fileId, name, title, caption, firstComment, coverUrl, attempts: 0, queuedAt: Date.now() };
@@ -362,4 +387,18 @@ export async function retryFailedBufferPosts(auth) {
     }
   }
   saveRetries(retries);
+}
+
+// Sends the oldest waiting video to the Buffer networks once the gap has passed.
+export async function postDeferredBuffer(auth) {
+  if (!(config.bufferVideoGapMinutes > 0)) return;
+  const waiting = readJson(DEFERRED_PATH, []);
+  if (waiting.length === 0) return;
+  if (bufferInCooldown()) return;
+  const last = readJson(LAST_VIDEO_PATH, { at: 0 }).at || 0;
+  if (Date.now() - last < config.bufferVideoGapMinutes * 60 * 1000) return;
+  const [next, ...rest] = waiting;
+  fs.writeFileSync(DEFERRED_PATH, JSON.stringify(rest, null, 2));
+  console.log(`Buffer: sending the next waiting video "${next.name}" (${rest.length} still waiting).`);
+  await postToBuffer(auth, next, { force: true });
 }

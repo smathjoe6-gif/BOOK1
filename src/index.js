@@ -23,7 +23,7 @@ import { postNextHistoryVideo } from './historyChannel.js';
 import { sortDoneFoldersByShape } from './doneSorter.js';
 import { isAlreadyPosted, rememberPosted, seedPostedHashes } from './postedHashes.js';
 import { postDuePicture } from './pictureDrops.js';
-import { bufferPostingEnabled, bufferServices, postToBuffer, retryFailedBufferPosts } from './bufferPost.js';
+import { bufferPostingEnabled, bufferServices, postToBuffer, postDeferredBuffer, retryFailedBufferPosts } from './bufferPost.js';
 
 // Independent test rollout of Pinterest posting for GK_TERMINAL videos,
 // capped at config.pinterestDailyLimit attempts per day while Joe's new
@@ -487,6 +487,11 @@ async function checkOnce() {
   }
 
   if (bufferPostingEnabled()) {
+    try {
+      await postDeferredBuffer(auth);
+    } catch (err) {
+      console.error('Waiting Buffer video could not be sent (will retry next cycle):', err.message);
+    }
     try {
       await retryFailedBufferPosts(auth);
     } catch (err) {
