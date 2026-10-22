@@ -9,6 +9,41 @@ metadata:
 
 # GK Gabay Blueprint
 
+## Full checklist before calling a song "done" (Joe, 22 Oct 2026)
+
+Joe's standing complaint, direct: he has given real material across many
+sessions — the golden-age bands and artist references (CLAUDE.md), the
+Benadiri vs Pan-Somali Qaraami distinction, the precise alliteration/
+letter rules, and now this whole poetry library — and expects all of it
+actually applied together on a real song, not treated as separate facts
+that only sometimes get used. Run this checklist on every real song
+request, not just the parts that feel most relevant:
+
+1. **Pick the real reference mode** (CLAUDE.md "Somali music reference"
+   section): Benadiri/Xamari (Kaban-led, local dialect — Axmed Shariif
+   Killer solo, or + Qosol Wanaag for a back-and-forth duet) vs Pan-Somali
+   Qaraami (standard literary Somali, Tubeec-style). If the brief calls for
+   golden-age "supergroup" energy specifically, pull from the real bands
+   (Waabeeri, Shareero, Iftin, Horseed, Dur-Dur Band — see CLAUDE.md and
+   the "Golden-Age state-sponsored supergroups" note below) rather than
+   generic "Somali music."
+2. **Pick the poetic form** from the Quick trigger reference above (Gabay/
+   Buraanbur/Geeraar/Jiifto/Dhaanto/Balwo/Qaraami/Heello/etc.) and apply
+   its real delivery style, not just its name.
+3. **Check the alliteration rule** (see "How a gabay works" below) if the
+   form requires it — one sound per half-line, real lexical weight, not a
+   cheat particle.
+4. **Draw on the poetry library** below when it fits — it's GK's own
+   material, usable directly, not just a style reference.
+5. **Apply the Style DNA 4 layers + GK stamp** (below) to any paired
+   visual/video prompt.
+6. **Check real facts** (checked-facts list below / ARS) before any
+   historical claim goes in a caption — never the unverified forms
+   (Biciidley, Buraanbur-Dagaaleed mechanics) stated as fact.
+
+Skipping any of these on a real production is the actual failure mode Joe
+is flagging — not missing information, missing *application*.
+
 The repeatable way Joe and Claude build heritage songs and films. Worked
 examples (all in Drive folder GK_Viral_Prompts `1GLeqzy5IpYbpQtN-xll-LcH-AE3_LK8Q`):
 - Gabay Xarafka "G" — "The Sovereign Rally" (letter-locked on G, best example) — `1Xh80XoyY_ZQPPNBw9eQp3LKtSd_2MemcwUyXnnQVBt4`
