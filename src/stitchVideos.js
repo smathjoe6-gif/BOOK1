@@ -323,20 +323,23 @@ async function pickMusic(auth, themeName = '', label = null) {
   }
 }
 
-// Instrumental-only music for the person stories (Joe: "only the music, no song"): songs come
-// ONLY from the vault folder named MIX_CINEMATIC (where listen-music files instrumentals), never
-// from the main folder, so a sung song is never used. No folder / no song = no music.
+// Instrumental-only music for the person stories (Joe: "only the music, no song"): songs come ONLY
+// from Joe's instrumental folder (STORY_MUSIC_FOLDER_ID, default GK_MUSIC_VAULT/GK INSTRUMENTALS MUISC),
+// else from a vault folder named MIX_CINEMATIC, never from the main folder, so a sung song is never
+// used. He picks these tracks himself, so the old-songs rule and the 8 MB minimum do not apply here
+// (1 MB minimum only). No folder / no song = no music.
 export async function pickInstrumental(auth) {
-  const root = config.stitchMusicDriveFolderId;
-  if (!root) return null;
   try {
-    const folder = await findThemeMusicFolder(auth, root, 'MIX_CINEMATIC');
+    let folder = config.storyMusicFolderId ? { id: config.storyMusicFolderId, name: 'instrumentals' } : null;
+    if (!folder && config.stitchMusicDriveFolderId) {
+      folder = await findThemeMusicFolder(auth, config.stitchMusicDriveFolderId, 'MIX_CINEMATIC');
+    }
     if (!folder) {
-      console.log('Story video: no MIX_CINEMATIC (instrumental) music folder found -- no music this time.');
+      console.log('Story video: no instrumental music folder found -- no music this time.');
       return null;
     }
     const songs = (await listSongsDeep(auth, folder.id)).filter(
-      (f) => Number(f.size) >= MIN_MUSIC_BYTES && !/ssstik/i.test(f.name) && songIsOldEnough(f)
+      (f) => Number(f.size) >= 1024 * 1024 && !/ssstik/i.test(f.name)
     );
     if (songs.length === 0) {
       console.log('Story video: the instrumental music folder has no usable songs -- no music this time.');
