@@ -55,34 +55,48 @@ async function download(url, dest) {
 
 // Pure ffmpeg filter for n page pictures: each shown `secs` seconds, cross-faded by `fade`,
 // scaled to fit 1080x1440 and centred on a 1080x1920 dark canvas (9:16).
-export function slideshowFilter(n, secs, fade) {
+export function slideshowFilter(n, secs, fade, logoIndex = -1) {
   const parts = [];
   for (let i = 0; i < n; i++) {
     parts.push(`[${i}:v]scale=1080:1440:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=0x0b0b0b,setsar=1,fps=30,format=yuv420p[v${i}]`);
   }
-  if (n === 1) return { filter: parts.join(';') + ';[v0]null[vout]', total: secs };
+  const total = n === 1 ? secs : n * secs - (n - 1) * fade;
   let last = 'v0';
   for (let i = 1; i < n; i++) {
     const offset = (i * (secs - fade)).toFixed(2);
-    const out = i === n - 1 ? 'vout' : `x${i}`;
-    parts.push(`[${last}][v${i}]xfade=transition=fade:duration=${fade}:offset=${offset}[${out}]`);
-    last = out;
+    parts.push(`[${last}][v${i}]xfade=transition=fade:duration=${fade}:offset=${offset}[x${i}]`);
+    last = `x${i}`;
   }
-  return { filter: parts.join(';'), total: n * secs - (n - 1) * fade };
+  // Logo / shield in the top-right corner (160 px wide, 48 px from the edges), kept over the whole video.
+  if (logoIndex >= 0) {
+    parts.push(`[${logoIndex}:v]scale=160:-1,format=rgba[lg]`);
+    parts.push(`[${last}][lg]overlay=W-w-48:48:format=auto,format=yuv420p[vout]`);
+  } else {
+    parts.push(`[${last}]null[vout]`);
+  }
+  return { filter: parts.join(';'), total };
+}
+
+function logoPath() {
+  const p = expandHome(config.storyLogoFile);
+  return p && fs.existsSync(p) ? p : '';
 }
 
 async function buildSlideshow(pagePaths, outPath, music) {
   const secs = config.storySecondsPerPage;
-  const { filter, total } = slideshowFilter(pagePaths.length, secs, FADE_SECONDS);
+  const logo = logoPath();
+  const logoIndex = logo ? pagePaths.length : -1;
+  const { filter, total } = slideshowFilter(pagePaths.length, secs, FADE_SECONDS, logoIndex);
   const args = ['-y'];
   for (const p of pagePaths) args.push('-loop', '1', '-t', secs.toFixed(2), '-i', p);
+  if (logo) args.push('-loop', '1', '-t', total.toFixed(2), '-i', logo);
   if (music) {
     const start = music.duration > total + 20 ? 8 : 0;
     args.push('-ss', String(start), '-i', music.full);
   }
   args.push('-filter_complex', filter, '-map', '[vout]');
   if (music) {
-    args.push('-map', `${pagePaths.length}:a`, '-af', `afade=t=in:d=1.2,afade=t=out:st=${Math.max(0, total - 2.5).toFixed(2)}:d=2.5`, '-c:a', 'aac', '-b:a', '192k');
+    args.push('-map', `${pagePaths.length + (logo ? 1 : 0)}:a`, '-af', `afade=t=in:d=1.2,afade=t=out:st=${Math.max(0, total - 2.5).toFixed(2)}:d=2.5`, '-c:a', 'aac', '-b:a', '192k');
   }
   args.push('-c:v', 'libx264', '-preset', 'medium', '-crf', '20', '-pix_fmt', 'yuv420p', '-t', total.toFixed(2), '-movflags', '+faststart', outPath);
   await run('ffmpeg', args);

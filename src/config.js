@@ -26,6 +26,9 @@ export const config = {
   // Canva folder where the daily person-story designs (6 pages) are put; the script turns each new
   // design into a slideshow video with instrumental music (src/storyVideos.js). Blank = off.
   storyCanvaFolderId: process.env.STORY_CANVA_FOLDER_ID || '',
+  // Logo / shield stamped in the top-right corner of every person-story video: a PNG (ideally transparent)
+  // on this Mac, e.g. ~/gk-automation/gk-logo.png. Blank or a missing file = no logo.
+  storyLogoFile: process.env.STORY_LOGO_FILE || '',
   storySecondsPerPage: Number(process.env.STORY_SECONDS_PER_PAGE) > 0 ? Number(process.env.STORY_SECONDS_PER_PAGE) : 4.5,
   localDropMinAgeSeconds: Number(process.env.LOCAL_DROP_MIN_AGE_SECONDS) || 120,
   // Video stacker (src/stitchVideos.js): joins short clips from this Mac
