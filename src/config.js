@@ -111,6 +111,8 @@ export const config = {
   // newest (default) or oldest: which queued video goes to TikTok next.
   tiktokOrder: process.env.TIKTOK_ORDER === 'oldest' ? 'oldest' : 'newest',
   // Pause between one network and the next when posting a video via Buffer.
+  // Minutes between whole videos going to the Buffer networks (IG/FB/Pinterest/X). 0 = off (every video as soon as YouTube accepts it).
+  bufferVideoGapMinutes: Number(process.env.BUFFER_VIDEO_GAP_MINUTES) > 0 ? Number(process.env.BUFFER_VIDEO_GAP_MINUTES) : 0,
   bufferGapSeconds: Number.isFinite(Number(process.env.BUFFER_GAP_SECONDS)) && process.env.BUFFER_GAP_SECONDS !== undefined && process.env.BUFFER_GAP_SECONDS !== '' ? Number(process.env.BUFFER_GAP_SECONDS) : 60,
   // Picture posts for Facebook/Pinterest from Drive (src/pictureDrops.js).
   // PICTURE_FOLDER_ID = a Drive folder holding HERITAGE and WILDLIFE
