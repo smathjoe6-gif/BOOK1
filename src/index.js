@@ -4,6 +4,7 @@ import { config } from './config.js';
 import { loadOAuthClient } from './googleAuth.js';
 import { uploadLocalDrops } from './localDrop.js';
 import { stitchOnce } from './stitchVideos.js';
+import { storyVideosOnce } from './storyVideos.js';
 import { listNewVideos, listVideosInFolder, downloadFile, moveToDone, mirrorNewVideos, syncLogToDrive, uploadVerticalCopy } from './drive.js';
 import { findRowForFile, appendGeneratedRow, updateCoverImage } from './sheets.js';
 import { uploadToYouTube, postEngagementComment } from './youtube.js';
@@ -423,6 +424,12 @@ async function checkOnce() {
     await stitchOnce(auth);
   } catch (err) {
     console.error('Video stacker failed (will retry next cycle):', err.message);
+  }
+
+  try {
+    await storyVideosOnce(auth);
+  } catch (err) {
+    console.error('Story video step failed (will retry next cycle):', err.message);
   }
 
   try {

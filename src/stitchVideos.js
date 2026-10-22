@@ -323,6 +323,38 @@ async function pickMusic(auth, themeName = '', label = null) {
   }
 }
 
+// Instrumental-only music for the person stories (Joe: "only the music, no song"): songs come
+// ONLY from the vault folder named MIX_CINEMATIC (where listen-music files instrumentals), never
+// from the main folder, so a sung song is never used. No folder / no song = no music.
+export async function pickInstrumental(auth) {
+  const root = config.stitchMusicDriveFolderId;
+  if (!root) return null;
+  try {
+    const folder = await findThemeMusicFolder(auth, root, 'MIX_CINEMATIC');
+    if (!folder) {
+      console.log('Story video: no MIX_CINEMATIC (instrumental) music folder found -- no music this time.');
+      return null;
+    }
+    const songs = (await listSongsDeep(auth, folder.id)).filter(
+      (f) => Number(f.size) >= MIN_MUSIC_BYTES && !/ssstik/i.test(f.name) && songIsOldEnough(f)
+    );
+    if (songs.length === 0) {
+      console.log('Story video: the instrumental music folder has no usable songs -- no music this time.');
+      return null;
+    }
+    const recent = loadMusicUsed().slice(-5);
+    const fresh = songs.filter((f) => !recent.includes(f.id));
+    const song = shuffled(fresh.length > 0 ? fresh : songs)[0];
+    const full = await downloadFile(auth, song.id, song.name.replace(/[^\w.-]+/g, '_'));
+    const { duration } = await probe(full);
+    fs.writeFileSync(MUSIC_USED_PATH, JSON.stringify({ used: [...loadMusicUsed(), song.id].slice(-50) }, null, 2));
+    return { id: song.id, name: song.name, full, duration };
+  } catch (err) {
+    console.log(`Story video: could not get instrumental music (${err.message.slice(0, 120)}) -- no music this time.`);
+    return null;
+  }
+}
+
 // Puts the song under the video: starts partway into the song (skips long
 // intros), fades in and out, and turns the clips' own sound down. If this
 // fails the video is kept as it was.

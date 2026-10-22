@@ -71,3 +71,26 @@ export async function exportCanvaPng(designId) {
   }
   throw new Error('Canva export timed out after 60 seconds');
 }
+
+// Exports every page of a design as its own PNG and returns the download links in
+// page order (used by src/storyVideos.js for the 6-page person stories).
+export async function exportCanvaPages(designId) {
+  const h = await headers();
+  const res = await fetchWithTimeout(`${API_BASE}/exports`, {
+    method: 'POST',
+    headers: h,
+    body: JSON.stringify({ design_id: designId, format: { type: 'png', as_single_image: false } }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(`Canva export request failed: ${canvaError(data, res)}`);
+  for (let i = 0; i < 45; i++) {
+    const check = await fetchWithTimeout(`${API_BASE}/exports/${data.job.id}`, { headers: h });
+    const body = await check.json();
+    if (!check.ok) throw new Error(`Canva export check failed: ${canvaError(body, check)}`);
+    const status = body.job && body.job.status;
+    if (status === 'success') return body.job.urls || [];
+    if (status === 'failed') throw new Error(`Canva export failed: ${(body.job.error && body.job.error.message) || 'unknown error'}`);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+  }
+  throw new Error('Canva page export timed out after 90 seconds');
+}
