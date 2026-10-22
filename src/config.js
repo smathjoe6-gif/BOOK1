@@ -31,6 +31,8 @@ export const config = {
   storyLogoFile: process.env.STORY_LOGO_FILE || '',
   // Optional per-gender corner pictures (a man / a woman wearing GK). A story whose Canva design title ends
   // with [M] uses STORY_LOGO_MAN, [F] uses STORY_LOGO_WOMAN; otherwise (or if the file is missing) STORY_LOGO_FILE.
+  // Joe's own instrumental-only folder for the person stories (GK_MUSIC_VAULT/GK INSTRUMENTALS MUISC).
+  storyMusicFolderId: process.env.STORY_MUSIC_FOLDER_ID || '1Qn2-znG4d8gFmyISJUqFrTJ4GGKfLi75',
   storyLogoMan: process.env.STORY_LOGO_MAN || '',
   storyLogoWoman: process.env.STORY_LOGO_WOMAN || '',
   storySecondsPerPage: Number(process.env.STORY_SECONDS_PER_PAGE) > 0 ? Number(process.env.STORY_SECONDS_PER_PAGE) : 4.5,
