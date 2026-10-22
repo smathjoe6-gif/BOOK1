@@ -23,6 +23,10 @@ export const config = {
   // Mac folder Grok Bot (or anything local) saves finished videos into; the
   // script uploads them to GK_TERMINAL (see src/localDrop.js). Blank = off.
   localDropFolder: process.env.LOCAL_DROP_FOLDER || '',
+  // Canva folder where the daily person-story designs (6 pages) are put; the script turns each new
+  // design into a slideshow video with instrumental music (src/storyVideos.js). Blank = off.
+  storyCanvaFolderId: process.env.STORY_CANVA_FOLDER_ID || '',
+  storySecondsPerPage: Number(process.env.STORY_SECONDS_PER_PAGE) > 0 ? Number(process.env.STORY_SECONDS_PER_PAGE) : 4.5,
   localDropMinAgeSeconds: Number(process.env.LOCAL_DROP_MIN_AGE_SECONDS) || 120,
   // Video stacker (src/stitchVideos.js): joins short clips from this Mac
   // folder into one ~60 s vertical video per run and saves it into
