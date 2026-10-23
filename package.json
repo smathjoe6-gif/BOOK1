@@ -22,6 +22,7 @@
     "listen-music": "node src/musicListen.js",
     "history-thumbnails": "node src/historyThumbnailBackfill.js",
     "history-metadata": "node src/historyMetadataFix.js",
+    "reply-old-comments": "node src/replyOldComments.js",
     "buffer-queue": "node src/bufferQueue.js",
     "buffer-send": "node src/bufferSend.js"
   },
