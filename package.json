@@ -21,7 +21,9 @@
     "dedupe-drive": "node src/driveDedupe.js",
     "listen-music": "node src/musicListen.js",
     "history-thumbnails": "node src/historyThumbnailBackfill.js",
-    "history-metadata": "node src/historyMetadataFix.js"
+    "history-metadata": "node src/historyMetadataFix.js",
+    "buffer-queue": "node src/bufferQueue.js",
+    "buffer-send": "node src/bufferSend.js"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
