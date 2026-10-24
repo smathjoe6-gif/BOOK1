@@ -251,3 +251,11 @@ Learning loop when Joe shows a real verse or song: (1) break it down (sound
 that carries the alliteration, half-lines, rhythm, vocabulary, tone), (2) Joe
 corrects, (3) save the lesson and the corrected words in this table, (4) only
 then write new material in that form.
+
+### Lesson 24 Oct 2026 (night): gabay vs buraanbur, taught by Joe
+Joe pasted a text on Somali verse (source: Somali cultural-festival text, Wikipedia-style; he did not name it) and a media-source map. What it says, saved as his lesson:
+- **Gabay** = the epic poem, the height of Somali poetic attainment, usually composed by MEN.
+- **Buraanbur** = its female counterpart, lighter measure (miisaan), the highest women's literary genre. Sub-forms: **hoyal, hoobeeyo, sitaat** (sitaat = religious song).
+- Buraanbur is a women's voice for child-rearing, marriage, social and political issues; often with drums, clapping, dancing; passed down by women across generations. Farhio Ilmi leads a Buraanbur performance at Somalisk Kulturfestival 2026.
+- **Rule for prompts:** a woman performer = buraanbur (not gabay); an elder man under an acacia = gabay. Resolves the earlier CHECK on Gabay Prompt 2 (woman on the coastal terrace -> make it buraanbur).
+- Joe's source map (titles only, not verified by Claude): Bulsho News "B-ARIMAHA HAWEENKA & BARWAAQO"; Dheel Dhaqan Studio "Boodo Isaaq", "Buraanbur Gacan Loo Taagay", "Buraanbur Sacad Muse"; Dhaqankeena "Buraanbur Majerten"; Hido iyo Dhaqan Media "Ciyaar Buraanbur Salaan Lootaagaay"; Digital: Instagram, "Wedding Video Blueprint". The titles hint at clan/regional buraanbur styles (Isaaq, Sacad Muse, Majerten); not yet taught, ask Joe before using any clan name in a prompt.
