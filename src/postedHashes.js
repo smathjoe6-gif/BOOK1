@@ -33,6 +33,10 @@ export function isAlreadyPosted(md5) {
   return Boolean(load().hashes[md5]);
 }
 
+export function postedHashSet() {
+  return new Set(Object.keys(load().hashes));
+}
+
 export function rememberPosted(md5, name) {
   if (!md5) return;
   const state = load();
