@@ -202,7 +202,7 @@ function pick(clips, used, count) {
   // Never re-cut a library clip whose exact bytes were already posted as a full video.
   const posted = postedHashSet();
   const fresh = clips.filter(
-    (c) => !usedSet.has(c.id) && Number(c.size || 0) > 300 * 1024 && !(c.md5Checksum && posted.has(c.md5Checksum)) && /\.(mp4|mov|m4v|webm)$/i.test(c.name || '')
+    (c) => !usedSet.has(c.id) && Number(c.size || 0) > 300 * 1024 && !(c.md5Checksum && posted.has(c.md5Checksum)) && !config.loopSkipWords.some((w) => String(c.name || '').toLowerCase().includes(w)) && /\.(mp4|mov|m4v|webm)$/i.test(c.name || '')
   );
   // Newest library clips first: they are the freshest ideas and the most likely to be on-brand.
   fresh.sort((a, b) => String(b.createdTime || '').localeCompare(String(a.createdTime || '')));
