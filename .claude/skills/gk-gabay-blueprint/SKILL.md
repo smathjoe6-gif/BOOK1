@@ -181,3 +181,73 @@ Sources: WardheerNews "Paramountcy of Alliteration in Somali Literature";
 Wikipedia "Somali literature", "Buraanbur", "Hawa Jibril", "Qolobaa Calankeed",
 "Soomaaliyeey toosoo"; Britannica "African literature – Somali"; Sahan Journal
 (buraanbur at weddings).
+
+## Regional palettes — taught by Joe, 24 Oct 2026
+
+Joe's four regional looks for scenes, costumes and colour grades. They are
+JOE'S classification (not independently verified by Claude); use them as his
+creative direction, and ask him before turning any of it into a public FACT
+claim (for example which cloth is worn where).
+
+1. **Banaadiri Coastal (Mogadishu and the coast).** Deep maritime indigo,
+   sea-foam white, ocean blue, gold accents. Light, intricate hand-loomed
+   weaves; refined trade and tailoring. Scenes: sunlit white-stucco courtyard
+   gathering round a master Kaban player; a starlit ocean terrace.
+2. **Digil & Mirifle / Southwest Agrarian (Bay and Bakool).** Rich earth tones,
+   deep crimson, ochre, forest green. Heavy-weave Alindi and multicoloured
+   geometric cloth that tells the story of land and farming. Scenes: river-basin
+   harvest dance to Dhaanto percussion; two elders playing Kaban in a
+   brick studio with amber lattice light.
+3. **Northern & Nomadic (Hargeisa, Burao, the interior).** Bold primary red,
+   stark white, deep black, orange contrasts. Durable wraps and shawls built
+   for movement, with sharp geometric striping. Scenes: a figure in a red,
+   black and white wrap on a rocky overlook; a low-key portrait against red
+   clay with orange Alindi borders.
+4. **Jubbaland & Riverine (Kismayo and the Lower South).** Tropical green,
+   sun-baked terracotta, bright yellow, sky blue. Flowing silhouettes, tie-dye
+   and woven patterns. Scenes: a walk through a sun-dappled coastal forest to
+   Kaban strumming; community gathering on the Jubba river docks at dusk with
+   lanterns.
+
+How to use them: pick ONE palette per prompt, name the colours and the cloth,
+add the Kaban and the GK mark, and keep the rest of the house style.
+
+### House-safe changes to Joe's examples (so they don't trip platforms or AI artifacts)
+- Joe's text says "high-fashion editorial" and "model": write "tailored,
+  premium editorial portrait" and "a woman/man wearing ..." (see Style DNA).
+- GK mark: put it ON an object in the scene (bench corner, drum rim, headstock,
+  lapel, soundhole) like a signature. Never "watermark" and never an overlay.
+- Laas Geel is a real rock-art site near Hargeisa: show the landscape and
+  granite peaks only; no people climbing on or touching the paintings.
+- Keep the realism lines (anatomy, no duplicated fingers, true-to-life skin
+  tones) in every prompt.
+
+## Verified Somali — the learning table (Joe is teaching Claude step by step)
+
+Rule: a line moves to CONFIRMED only when Joe (or a native speaker he names)
+says it is right. Until then it stays CHECK. Record every correction here with
+the wrong form and the reason, so no session repeats a mistake.
+
+CONFIRMED by Joe: (none yet; add rows as Joe confirms)
+
+CLAUDE'S CONFIDENT PHRASES (still to be confirmed by Joe):
+| Somali | Meaning |
+|---|---|
+| Hambalyo! | Congratulations! |
+| Nabad iyo caano! | Peace and milk! (blessing of peace and plenty) |
+| Soo dhawoow! | Welcome! |
+| Soomaaliyeey! | O Somalia / O Somalis! |
+
+CHECK (asked Joe 24 Oct): "Guul iyo midnimo" (victory and unity) and
+"Farxad iyo barwaaqo" (joy and abundance): spelling and wording.
+
+CORRECTIONS FROM JOE: (none yet)
+
+Forms Joe asked about (24 Oct): not only gabay and buraanbur. His list had
+several forms; "shrimp" is probably **Shirib**. Ask Joe which FIVE are the core
+and record them here. Verified forms are in the Forms catalog above.
+
+Learning loop when Joe shows a real verse or song: (1) break it down (sound
+that carries the alliteration, half-lines, rhythm, vocabulary, tone), (2) Joe
+corrects, (3) save the lesson and the corrected words in this table, (4) only
+then write new material in that form.
