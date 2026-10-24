@@ -9,6 +9,7 @@ import { run } from './aspectRatio.js';
 import { loadOAuthClient } from './googleAuth.js';
 import { downloadFile } from './drive.js';
 import { expandHome } from './localDrop.js';
+import { postedHashSet } from './postedHashes.js';
 
 // Loop cutter (Joe, 24 Oct 2026: "I have thousands of videos, my videos are stuck, make it
 // viral, hands free"). His hits are SHORT: an 11 s wedding clip (~76k views) and a 6 s lion
@@ -156,6 +157,17 @@ export async function cutLoop(inputPath, outPath, hook) {
   return { start, length, hasAudio };
 }
 
+// LOOP_SOURCE_FOLDER_ID may hold several folder ids separated by commas.
+export function sourceFolderIds() {
+  return String(config.loopSourceFolderId || '').split(',').map((x) => x.trim()).filter(Boolean);
+}
+
+async function listSources(auth) {
+  const all = [];
+  for (const id of sourceFolderIds()) all.push(...(await listFolderTree(auth, id)));
+  return all;
+}
+
 async function listFolderTree(auth, rootId, depth = 3) {
   const drive = google.drive({ version: 'v3', auth });
   const clips = [];
@@ -165,7 +177,7 @@ async function listFolderTree(auth, rootId, depth = 3) {
       const res = await drive.files.list(
         {
           q: `'${folderId}' in parents and trashed = false and (mimeType contains 'video/' or mimeType = '${FOLDER}')`,
-          fields: 'nextPageToken, files(id, name, mimeType, createdTime, size)',
+          fields: 'nextPageToken, files(id, name, mimeType, createdTime, size, md5Checksum)',
           pageSize: 1000,
           pageToken,
         },
@@ -187,7 +199,11 @@ async function listFolderTree(auth, rootId, depth = 3) {
 
 function pick(clips, used, count) {
   const usedSet = new Set(used);
-  const fresh = clips.filter((c) => !usedSet.has(c.id) && Number(c.size || 0) > 300 * 1024);
+  // Never re-cut a library clip whose exact bytes were already posted as a full video.
+  const posted = postedHashSet();
+  const fresh = clips.filter(
+    (c) => !usedSet.has(c.id) && Number(c.size || 0) > 300 * 1024 && !(c.md5Checksum && posted.has(c.md5Checksum)) && /\.(mp4|mov|m4v|webm)$/i.test(c.name || '')
+  );
   // Newest library clips first: they are the freshest ideas and the most likely to be on-brand.
   fresh.sort((a, b) => String(b.createdTime || '').localeCompare(String(a.createdTime || '')));
   return fresh.slice(0, count);
@@ -212,7 +228,7 @@ export async function loopCutOnce(auth) {
   const state = loadState();
   if (state.made >= config.loopPerDay) return;
   if (state.failedAt && Date.now() - state.failedAt < 60 * 60 * 1000) return;
-  const clips = await listFolderTree(auth, config.loopSourceFolderId);
+  const clips = await listSources(auth);
   const [clip] = pick(clips, loadUsed(), 1);
   if (!clip) {
     console.log('Loop cutter: no unused clip left in the library folder.');
@@ -255,7 +271,7 @@ async function main() {
   }
   const auth = await loadOAuthClient();
   fs.mkdirSync(TEST_DIR, { recursive: true });
-  const clips = await listFolderTree(auth, config.loopSourceFolderId);
+  const clips = await listSources(auth);
   console.log(`Library folder: ${clips.length} clip(s) found.`);
   const chosen = pick(clips, loadUsed(), count);
   let i = 0;
