@@ -19,6 +19,7 @@
     "tidy-drive": "node src/driveTidy.js",
     "reorg-drive": "node src/driveReorg.js",
     "dedupe-drive": "node src/driveDedupe.js",
+    "loop-cut": "node src/loopCutter.js",
     "listen-music": "node src/musicListen.js",
     "history-thumbnails": "node src/historyThumbnailBackfill.js",
     "history-metadata": "node src/historyMetadataFix.js",
