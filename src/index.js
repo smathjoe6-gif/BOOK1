@@ -20,6 +20,7 @@ import { uploadToTwitter } from './twitter.js';
 import { maybeAutoGenerateVideo } from './autoGenerate.js';
 import { ensureVerticalVideo } from './aspectRatio.js';
 import { engagementQuestion } from './engagementQuestion.js';
+import { withAffiliateLine } from './affiliate.js';
 import { postNextHistoryVideo } from './historyChannel.js';
 import { sortDoneFoldersByShape } from './doneSorter.js';
 import { isAlreadyPosted, rememberPosted, seedPostedHashes } from './postedHashes.js';
@@ -162,7 +163,7 @@ async function processVideoOnce(file) {
     }
   }
 
-  const caption = `${row.capture} ${row.hashtag}`.trim();
+  const caption = withAffiliateLine(`${row.capture} ${row.hashtag}`.trim(), file.name, row.title, row.capture);
 
   console.log('Uploading to YouTube...');
   let youtubePosted = false;
