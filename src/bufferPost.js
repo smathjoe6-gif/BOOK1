@@ -397,7 +397,11 @@ export async function postDeferredBuffer(auth) {
   if (bufferInCooldown()) return;
   const last = readJson(LAST_VIDEO_PATH, { at: 0 }).at || 0;
   if (Date.now() - last < config.bufferVideoGapMinutes * 60 * 1000) return;
-  const [next, ...rest] = waiting;
+  // Person-story videos (<Name>_story_<id>.mp4) jump the waiting list; otherwise oldest first.
+  const storyAt = waiting.findIndex((d) => /_story_/i.test(d.name || ''));
+  const pick = storyAt > 0 ? storyAt : 0;
+  const next = waiting[pick];
+  const rest = waiting.filter((_, i) => i !== pick);
   fs.writeFileSync(DEFERRED_PATH, JSON.stringify(rest, null, 2));
   console.log(`Buffer: sending the next waiting video "${next.name}" (${rest.length} still waiting).`);
   await postToBuffer(auth, next, { force: true });
