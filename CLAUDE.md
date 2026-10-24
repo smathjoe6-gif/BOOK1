@@ -25,6 +25,14 @@ one built and started over with a different approach. Rules:
    Make executions, and the sheet before claiming something works/broke.
 4. **Update the board** (date + what changed) at the end of every session.
 
+### 🧠 MEMORY — what Joe has already told us (never ask him again; look here or in Drive)
+- **The machine is hands-free.** A finished video lands in `GK_TERMINAL` (or `GK_JING`, or `LOCAL_DROP_FOLDER`/`GK_DROP` on the Mac) and the Mac script posts it everywhere. NEVER tell Joe to 'download this, put it here' as the plan; build automatic steps. Joe: 'You should remind yourself, I should not have to repeat.'
+- **Library for the loop cutter:** `GROK_LIBRARY_SORTED` `15BCZdPZ9084ZmZxkVyaE3A1fwU4zmcDe` (My Drive top level); its `9x16 ` subfolder is `1urZQyvzL085W9MXjX24mdRlYCbeaUwIB` (note trailing space in the name); `16x9.` `1TVCN8wI2SUxc4svA6xq8OcwmedPuEXxY`; `other` `1_tBk7T4gT-lWR_3MzZSenC3VYd012CTM`. Joe's `.env` line for the loop cutter: `LOOP_SOURCE_FOLDER_ID=1urZQyvzL085W9MXjX24mdRlYCbeaUwIB`.
+- **Other ids:** GK_Viral_Prompts `1GLeqzy5IpYbpQtN-xll-LcH-AE3_LK8Q`; NOTEBOOKLM_SOURCES `1YIcfycSNpjFuK0_MkERQhNXwJ00gixh1`; GK_STOCK_VIDEOS `1WkRGbfFWwaxSdtLYjhDHRyRrW9VAF12Z`; GK_MUSIC_VAULT `1jgxpsHcBPqBEED132Z8NyaXdxI7uvL0n`; live log `1SrzWDMGMH8X0hTeXs7GO_-c9TApOx3Mp`; GK_Person_Stories (Canva) `FAHYvwhgP84`.
+- **Plan facts:** Google AI Pro 5 TB £18.99/month (Flow credits refresh daily + a backup pool of 'AI credits'); NEVER press add-on / buy credits; Veo through Google's developer API is paid per second and is NOT used. Flow has no verified API, so the hands-free generator is Grok Automations; Veo clips by hand only for the best Somali-speaking ones (or a computer-use agent, only after Google's rules for Flow are checked).
+- **What goes viral for Joe:** SHORT loud clips (11 s wedding Short ~76k views, 6 s lion roar 46k); long or stitched videos got 11-500. Somali words: only the confident lines in the skill table; never invent verse; gabay = men, buraanbur = women.
+- **Rules that stay:** copyright footer on every public item; GK crest on an object, never a watermark; 'tailored, premium' not 'high-fashion'; billing rule (Joe confirms every billing mail); no real people in AI videos.
+
 ### ✅ Working (verified 22-23 Sep 2026)
 | What | How | Proof |
 |---|---|---|
