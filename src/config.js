@@ -42,6 +42,15 @@ export const config = {
   // Video stacker (src/stitchVideos.js): joins short clips from this Mac
   // folder into one ~60 s vertical video per run and saves it into
   // LOCAL_DROP_FOLDER. Blank = off.
+  // Loop cutter (src/loopCutter.js): one short loud clip from the library folder, hook line, 9:16.
+  // Blank LOOP_SOURCE_FOLDER_ID = off. Needs LOCAL_DROP_FOLDER too.
+  loopSourceFolderId: process.env.LOOP_SOURCE_FOLDER_ID || '',
+  // Library clips whose file name contains one of these words are never cut (real-person rule:
+  // no politician / president clips; also skips test files and plain title cards).
+  loopSkipWords: (process.env.LOOP_SKIP_WORDS === undefined ? 'politician,president,minister,test_video,drama' : process.env.LOOP_SKIP_WORDS)
+    .split(',').map((w) => w.trim().toLowerCase()).filter(Boolean),
+  loopSeconds: Number(process.env.LOOP_SECONDS) || 10,
+  loopPerDay: process.env.LOOP_PER_DAY === undefined || process.env.LOOP_PER_DAY === '' ? 4 : Number(process.env.LOOP_PER_DAY),
   stitchFolder: process.env.STITCH_FOLDER || '',
   // Or take the clips straight from a Google Drive folder (stays in Drive,
   // clips are reused round after round). Wins over STITCH_FOLDER if both set.
