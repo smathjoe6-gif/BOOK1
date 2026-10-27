@@ -392,14 +392,32 @@ export async function retryFailedBufferPosts(auth) {
 // Sends the oldest waiting video to the Buffer networks once the gap has passed.
 export async function postDeferredBuffer(auth) {
   if (!(config.bufferVideoGapMinutes > 0)) return;
-  const waiting = readJson(DEFERRED_PATH, []);
+  let waiting = readJson(DEFERRED_PATH, []);
   if (waiting.length === 0) return;
   if (bufferInCooldown()) return;
   const last = readJson(LAST_VIDEO_PATH, { at: 0 }).at || 0;
   if (Date.now() - last < config.bufferVideoGapMinutes * 60 * 1000) return;
-  // Person-story videos (<Name>_story_<id>.mp4) jump the waiting list; otherwise oldest first.
-  const storyAt = waiting.findIndex((d) => /_story_/i.test(d.name || ''));
-  const pick = storyAt > 0 ? storyAt : 0;
+  // Old news is not posted: drop videos that waited longer than BUFFER_DEFERRED_MAX_HOURS (they already went to YouTube).
+  const maxMs = config.bufferDeferredMaxHours * 3600 * 1000;
+  if (maxMs > 0) {
+    const fresh = waiting.filter((d) => !d.deferredAt || Date.now() - d.deferredAt <= maxMs);
+    if (fresh.length < waiting.length) {
+      console.log(`Buffer: dropped ${waiting.length - fresh.length} waiting video(s) older than ${config.bufferDeferredMaxHours} h (not posted late).`);
+      waiting = fresh;
+      fs.writeFileSync(DEFERRED_PATH, JSON.stringify(waiting, null, 2));
+      if (waiting.length === 0) return;
+    }
+  }
+  // Person-story videos (<Name>_story_<id>.mp4) jump the waiting list; otherwise NEWEST first (BUFFER_DEFERRED_ORDER=oldest restores the old order).
+  const newestFirst = config.bufferDeferredOrder !== 'oldest';
+  const lastIdx = (match) => {
+    let found = -1;
+    waiting.forEach((d, i) => { if (match(d)) found = i; });
+    return found;
+  };
+  const isStory = (d) => /_story_/i.test(d.name || '');
+  const storyAt = newestFirst ? lastIdx(isStory) : waiting.findIndex(isStory);
+  const pick = storyAt >= 0 && (storyAt > 0 || newestFirst) ? storyAt : (newestFirst ? waiting.length - 1 : 0);
   const next = waiting[pick];
   const rest = waiting.filter((_, i) => i !== pick);
   fs.writeFileSync(DEFERRED_PATH, JSON.stringify(rest, null, 2));
