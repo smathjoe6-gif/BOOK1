@@ -133,20 +133,11 @@ export const config = {
   // Pause between one network and the next when posting a video via Buffer.
   // Minutes between whole videos going to the Buffer networks (IG/FB/Pinterest/X). 0 = off (every video as soon as YouTube accepts it).
   bufferVideoGapMinutes: Number(process.env.BUFFER_VIDEO_GAP_MINUTES) > 0 ? Number(process.env.BUFFER_VIDEO_GAP_MINUTES) : 0,
-  // Machine-made clips from old stock (stitches, loop cuts) go AFTER real videos in the TikTok queue and the Buffer waiting list.
-  // Regex on the file name; blank = no low-priority group.
-  lowPriorityPattern: (() => {
-    const raw = process.env.TIKTOK_LOW_PRIORITY_PATTERN === undefined ? 'GK_Stitch_|GK_Loop_' : process.env.TIKTOK_LOW_PRIORITY_PATTERN.trim();
-    try {
-      return raw ? new RegExp(raw, 'i') : null;
-    } catch {
-      return null;
-    }
-  })(),
   // Which waiting video goes to the Buffer networks first: 'newest' (default) or 'oldest'.
   bufferDeferredOrder: process.env.BUFFER_DEFERRED_ORDER === 'oldest' ? 'oldest' : 'newest',
   // A video that has waited longer than this many hours is dropped from the waiting list instead of being posted late. 0 = never drop.
   bufferDeferredMaxHours: process.env.BUFFER_DEFERRED_MAX_HOURS === undefined || process.env.BUFFER_DEFERRED_MAX_HOURS === '' ? 36 : Math.max(0, Number(process.env.BUFFER_DEFERRED_MAX_HOURS) || 0),
+  lowPriorityPattern: (() => { const raw = process.env.TIKTOK_LOW_PRIORITY_PATTERN === undefined ? 'GK_Stitch_|GK_Loop_' : process.env.TIKTOK_LOW_PRIORITY_PATTERN.trim(); try { return raw ? new RegExp(raw, 'i') : null; } catch { return null; } })(),
   // "GK picks" affiliate page (src/affiliate.js). Blank = no affiliate line in any caption.
   affiliatePicksUrl: (process.env.AFFILIATE_PICKS_URL || '').trim(),
   affiliateAll: process.env.AFFILIATE_ALL === 'true',
