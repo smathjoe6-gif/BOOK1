@@ -4,6 +4,7 @@ import { google } from 'googleapis';
 import { config } from './config.js';
 import { bufferGraphQL } from './bufferTikTok.js';
 import { bufferInCooldown, bufferCooldownUntil, isRateLimitError } from './bufferCooldown.js';
+import { pickWaitingIndex } from './waitingOrder.js';
 
 // Posts one Drive video to Instagram, Facebook, Pinterest and X through
 // Buffer's GraphQL API -- the replacement for Make scenario 9696465 (Oct 2026,
@@ -410,14 +411,8 @@ export async function postDeferredBuffer(auth) {
   }
   // Person-story videos (<Name>_story_<id>.mp4) jump the waiting list; otherwise NEWEST first (BUFFER_DEFERRED_ORDER=oldest restores the old order).
   const newestFirst = config.bufferDeferredOrder !== 'oldest';
-  const lastIdx = (match) => {
-    let found = -1;
-    waiting.forEach((d, i) => { if (match(d)) found = i; });
-    return found;
-  };
-  const isStory = (d) => /_story_/i.test(d.name || '');
-  const storyAt = newestFirst ? lastIdx(isStory) : waiting.findIndex(isStory);
-  const pick = storyAt >= 0 && (storyAt > 0 || newestFirst) ? storyAt : (newestFirst ? waiting.length - 1 : 0);
+  // Stories first, real videos next, stitched/loop clips from old stock last.
+  const pick = pickWaitingIndex(waiting, newestFirst);
   const next = waiting[pick];
   const rest = waiting.filter((_, i) => i !== pick);
   fs.writeFileSync(DEFERRED_PATH, JSON.stringify(rest, null, 2));

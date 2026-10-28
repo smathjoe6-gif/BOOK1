@@ -3,6 +3,7 @@ import path from 'node:path';
 import { config } from './config.js';
 import { uploadToTikTokViaBuffer } from './bufferTikTok.js';
 import { bufferInCooldown, isRateLimitError } from './bufferCooldown.js';
+import { pickWaitingIndex } from './waitingOrder.js';
 
 // TikTok caps how many videos one account may publish through the API in a
 // day. On 23 Sep 2026 ~30 videos went to Buffer within 24 hours; Buffer
@@ -128,8 +129,9 @@ async function drainOne(auth) {
   }
 
   const newestFirst = config.tiktokOrder !== 'oldest';
-  const item = newestFirst ? state.queue[state.queue.length - 1] : state.queue[0];
-  const removeItem = () => (newestFirst ? state.queue.pop() : state.queue.shift());
+  // Story videos first, then real videos, stitched/loop clips from old stock last (src/waitingOrder.js).
+  const item = state.queue[pickWaitingIndex(state.queue, newestFirst)];
+  const removeItem = () => state.queue.splice(state.queue.indexOf(item), 1);
   console.log(`Posting to TikTok via Buffer: "${item.name}"...`);
   // Written to disk BEFORE calling Buffer (see "interrupted" above).
   item.sending = true;

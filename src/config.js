@@ -137,6 +137,7 @@ export const config = {
   bufferDeferredOrder: process.env.BUFFER_DEFERRED_ORDER === 'oldest' ? 'oldest' : 'newest',
   // A video that has waited longer than this many hours is dropped from the waiting list instead of being posted late. 0 = never drop.
   bufferDeferredMaxHours: process.env.BUFFER_DEFERRED_MAX_HOURS === undefined || process.env.BUFFER_DEFERRED_MAX_HOURS === '' ? 36 : Math.max(0, Number(process.env.BUFFER_DEFERRED_MAX_HOURS) || 0),
+  lowPriorityPattern: (() => { const raw = process.env.TIKTOK_LOW_PRIORITY_PATTERN === undefined ? 'GK_Stitch_|GK_Loop_' : process.env.TIKTOK_LOW_PRIORITY_PATTERN.trim(); try { return raw ? new RegExp(raw, 'i') : null; } catch { return null; } })(),
   // "GK picks" affiliate page (src/affiliate.js). Blank = no affiliate line in any caption.
   affiliatePicksUrl: (process.env.AFFILIATE_PICKS_URL || '').trim(),
   affiliateAll: process.env.AFFILIATE_ALL === 'true',
