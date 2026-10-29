@@ -142,6 +142,11 @@ export const config = {
   affiliatePicksUrl: (process.env.AFFILIATE_PICKS_URL || '').trim(),
   affiliateAll: process.env.AFFILIATE_ALL === 'true',
   affiliateKeywords: (process.env.AFFILIATE_KEYWORDS || 'piano,keys,keyboard,music,song,melody,instrument,wood,carpent,diy,craft').toLowerCase().split(',').map((w) => w.trim()),
+  // One link per product, matched on the file name: PRODUCT_LINKS="goat=https://vm.tiktok.com/...;oukitel=https://...".
+  productLinks: (process.env.PRODUCT_LINKS || '').split(';').map((pair) => {
+    const i = pair.indexOf('=');
+    return i > 0 ? { word: pair.slice(0, i).trim().toLowerCase(), url: pair.slice(i + 1).trim() } : null;
+  }).filter((x) => x && x.word && x.url),
   bufferGapSeconds: Number.isFinite(Number(process.env.BUFFER_GAP_SECONDS)) && process.env.BUFFER_GAP_SECONDS !== undefined && process.env.BUFFER_GAP_SECONDS !== '' ? Number(process.env.BUFFER_GAP_SECONDS) : 60,
   // Picture posts for Facebook/Pinterest from Drive (src/pictureDrops.js).
   // PICTURE_FOLDER_ID = a Drive folder holding HERITAGE and WILDLIFE
