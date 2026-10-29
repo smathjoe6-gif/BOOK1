@@ -86,6 +86,29 @@ STEP 1/STEP 4 already apply to vibe and form. A love song can still be
 triumphant; a patriotic song can still be reflective — category and
 vibe are independent axes, rotate both.
 
+**Concrete theme words Joe gave directly (29 Oct 2026) to pull from
+inside the categories above — don't let these sit unused, actually
+write toward them in rotation, and give each its own "push" per the
+hook/bridge rule above:**
+- Liberty, freedom, sovereignty, dignity, respect — patriotic/pride
+  category, dignity-forward rather than only flag/victory imagery.
+- Unsatisfied love, an unbroken/unbreakable heart — love/romance
+  category, the ache/longing register, not only the happy-courtship
+  register Qaraami Duet defaults to.
+- Forever life, fantasy — a mythic/aspirational register (legacy that
+  outlives the singer, a larger-than-life imagined future) — fits the
+  personal-legacy/GK-identity angle or Visionary Empire mode.
+- Irritation, irritable — real frustration/conflict as its own honest
+  emotional note, not softened into generic "struggle" — a song can
+  be ABOUT being fed up, not just about enduring.
+- On the hood, on the block, surviving the street, serving life — the
+  Street Reality/Wake-Up Call mode (section 16) already built for
+  exactly this; use it, don't let it sit unused while defaulting to
+  the gentler everyday-trade lane.
+- Helping — service/community care as its own theme (someone who
+  shows up for others), distinct from the everyday-trade-hardship
+  lane even when the subject also has a trade.
+
 ## Core theme is appreciation/blessing + "Jannah beneath her feet" — not a life-event timeline (Joe, 21 Oct 2026)
 
 Joe rejected a stanza listing "when I grew up, when I fell, when I got
