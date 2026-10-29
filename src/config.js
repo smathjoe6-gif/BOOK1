@@ -143,6 +143,10 @@ export const config = {
   affiliateAll: process.env.AFFILIATE_ALL === 'true',
   affiliateKeywords: (process.env.AFFILIATE_KEYWORDS || 'piano,keys,keyboard,music,song,melody,instrument,wood,carpent,diy,craft').toLowerCase().split(',').map((w) => w.trim()),
   // One link per product, matched on the file name: PRODUCT_LINKS="goat=https://vm.tiktok.com/...;oukitel=https://...".
+  // Writes the daily GK_Viral_Prompts doc by itself (src/dailyPrompts.js). Needs GEMINI_API_KEY. DAILY_PROMPTS_AUTO=false turns it off.
+  dailyPromptsAuto: process.env.DAILY_PROMPTS_AUTO !== 'false',
+  dailyPromptsHour: process.env.DAILY_PROMPTS_HOUR === undefined || process.env.DAILY_PROMPTS_HOUR === '' ? 7 : Number(process.env.DAILY_PROMPTS_HOUR),
+  dailyPromptsFolderId: (process.env.DAILY_PROMPTS_FOLDER_ID || '1GLeqzy5IpYbpQtN-xll-LcH-AE3_LK8Q').trim(),
   productLinks: (process.env.PRODUCT_LINKS || '').split(';').map((pair) => {
     const i = pair.indexOf('=');
     return i > 0 ? { word: pair.slice(0, i).trim().toLowerCase(), url: pair.slice(i + 1).trim() } : null;

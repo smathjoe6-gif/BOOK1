@@ -6,6 +6,7 @@ import { uploadLocalDrops } from './localDrop.js';
 import { stitchOnce } from './stitchVideos.js';
 import { storyVideosOnce } from './storyVideos.js';
 import { loopCutOnce } from './loopCutter.js';
+import { dailyPromptsOnce } from './dailyPrompts.js';
 import { listNewVideos, listVideosInFolder, downloadFile, moveToDone, mirrorNewVideos, syncLogToDrive, uploadVerticalCopy } from './drive.js';
 import { findRowForFile, appendGeneratedRow, updateCoverImage } from './sheets.js';
 import { uploadToYouTube, postEngagementComment } from './youtube.js';
@@ -420,6 +421,12 @@ async function checkOnce() {
     await uploadLocalDrops(auth);
   } catch (err) {
     console.error('Local drop folder upload failed (will retry next cycle):', err.message);
+  }
+
+  try {
+    await dailyPromptsOnce(auth);
+  } catch (err) {
+    console.error('Daily prompts step failed (will retry later):', err.message);
   }
 
   try {
