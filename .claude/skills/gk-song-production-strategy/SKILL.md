@@ -108,6 +108,68 @@ hook/bridge rule above:**
 - Helping — service/community care as its own theme (someone who
   shows up for others), distinct from the everyday-trade-hardship
   lane even when the subject also has a trade.
+- Jealousy, selfish, greedy, unhelper — the shadow/vice side, usable
+  as a warning or a contrast figure in a Street Reality-style song
+  (what NOT to become), not something GK glorifies as the narrator's
+  own voice.
+- Self-official, self-independent, hard survivor, hustler, money
+  maker, intelligent, individual, success, individual success — an
+  ambition/self-made-success register: a narrator who built himself
+  up alone, smart and self-reliant, measuring his own win — distinct
+  from the Visionary Empire mode's stadium-scale ambition; this one
+  is personal and individual-scale, one person's hustle and come-up.
+
+## English-language sections must follow standard grammar (Joe, 29 Oct 2026)
+
+Apply these as a hard checklist to every English lyric line (and every
+English line in a bilingual chorus/hook) before finalizing a song doc:
+subject-verb-object order; consistent tense within a sentence; correct
+articles (a/an for new/general, "the" for something already
+established); subject-verb agreement (she works, they work); never
+drop the subject ("it is raining," not "is raining"); every line a
+complete thought with a main clause; keep lines short and punchy
+rather than one long run-on; correct prepositions (interested in,
+good at, afraid of); prefer active voice; correct question word order
+when a line is phrased as a question; keep a modifier next to the
+thing it describes; use plain linking words (and, but, because, so)
+to connect ideas; capitalize sentence starts and proper names; normal
+end punctuation. This doesn't flatten the song's style — short,
+declarative, grammatically clean lines are also exactly what the
+hook/bridge punch rule above is asking for.
+
+## Real Somali trap/drill opener vocabulary + UK drill texture option (Joe, 29 Oct 2026)
+
+Joe gave a categorized list of real Somali words with their real
+meanings, specifically for trap/drill-leaning songs — use these
+(never invented substitutes) when a hook, intro, or verse opener needs
+this kind of weight. Same "real words only" iron rule as
+`gk-gabay-blueprint`'s vocabulary table; this list extends that table
+for the harder/street-leaning registers:
+
+- **Aggressive drill/trap openers:** Kici (wake up/rise/ignite — instant
+  hype before the beat drops), Walaalo (brothers — shouting out the
+  crew/day-ones), Ordan (running/chasing — fast-paced drill motion),
+  Gariir (tremble/shake — tells the listener the bass is about to hit).
+- **Hard street storytelling:** Xabsi (prison/cage — a heavy, real word
+  common in UK-Somali drill), Iska jir (watch out/beware — street
+  awareness, fake friends), Kalinimada (loneliness/isolation — a deep
+  introspective intro), Madow (dark/black — a moody late-night vibe).
+- **Deep cultural metaphors:** Gabay (poem — links modern bars to
+  centuries of Somali poetic history, same form already in this
+  skill's rotation), Ciidda (the soil/the land — roots meeting where
+  you stand now), Dhiig (blood — loyalty, passion, or pain), Masiibo
+  (disaster/tragedy — signals the lyrics are about to get dangerous).
+- **Short cinematic starters:** Halkan (right here — establishes
+  ground/presence immediately), Erayada (the words — puts full focus
+  on the lyricism), Bari (east — a proud nod to East Africa and
+  nomadic heritage).
+
+**UK drum/British drill texture:** on a Street Reality/drill-leaning
+song, it's fine to lean into UK drill-style drum programming (per
+section 13's 142-143 BPM UK drill reference) as a deliberate,
+occasional production choice — not every song, but a real option in
+the rotation when the content category calls for that harder street
+register.
 
 ## Core theme is appreciation/blessing + "Jannah beneath her feet" — not a life-event timeline (Joe, 21 Oct 2026)
 
