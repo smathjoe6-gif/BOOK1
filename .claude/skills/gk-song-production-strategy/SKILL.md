@@ -12,6 +12,48 @@ metadata:
 
 # GK Song Production Strategy
 
+## CONTENT-CATEGORY ROTATION is mandatory — vibe/form rotation alone is not enough (Joe, 29 Oct 2026)
+
+Joe's direct correction, after several days straight of Kaban Rap Drop
+songs (Kaban-maker, camel-herder, goldsmith, letter-to-mother,
+athlete-in-training): "same strategy... somebody talking life
+difficult, okay, or the survivor... you should be something love,
+something romantic, something patriotic, something like enjoying
+song... no matter how many times I teach you, you will not change."
+Rotating the VIBE (cinematic/triumphant/reflective/club-pulse) and the
+POETIC FORM while the underlying CONTENT CATEGORY stays "hardship /
+perseverance / everyday-struggle" every single day is the exact
+failure this flags — different packaging, same emotional note. Vibe
+and form rotation were never a substitute for this; they sit on top
+of it.
+
+**Fix, binding on the daily routine from now on, STEP 1 of every song
+(before vibe/form/language):** first pick the CONTENT CATEGORY itself,
+and rotate it so the same category never runs 2 days straight and
+"everyday-trade/hardship/legacy" (the lane this skill leaned on almost
+exclusively) is just ONE option among several, never the default.
+Categories to rotate across:
+- **Love/romance** — Qaraami Love Duet mode (section 8) is the
+  reference; courtship, longing, devotion, a parting vow. Not a
+  hardship story with a love line added.
+- **Celebration/fun/joy** — a wedding, a dance, a community
+  celebration, pure good news; Dhaanto/Buraanbur energy; nothing heavy
+  at all, no struggle framing.
+- **Patriotic/pride** — flag, homeland, unity, GK-identity; the
+  catalog-proven patriotic-anthem lane (section 11) — pride and
+  legacy, not a survival story wearing a flag.
+- **Playful/lighthearted** — humor, banter, a cheeky/fun narrator
+  voice; genuinely light, not profound.
+- **Everyday-trade/legacy/hardship** — what this skill defaulted to;
+  keep it, but only as one rotating option, never picked two days in a
+  row and never the fallback when nothing else comes to mind.
+
+Check the last 3-4 days' actual CONTENT CATEGORY (not just their vibe
+label) before picking today's, the same anti-repetition discipline
+STEP 1/STEP 4 already apply to vibe and form. A love song can still be
+triumphant; a patriotic song can still be reflective — category and
+vibe are independent axes, rotate both.
+
 ## Core theme is appreciation/blessing + "Jannah beneath her feet" — not a life-event timeline (Joe, 21 Oct 2026)
 
 Joe rejected a stanza listing "when I grew up, when I fell, when I got
