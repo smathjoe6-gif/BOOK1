@@ -95,6 +95,15 @@ hook/bridge rule above:**
 - Unsatisfied love, an unbroken/unbreakable heart — love/romance
   category, the ache/longing register, not only the happy-courtship
   register Qaraami Duet defaults to.
+  **Reference title bank Joe gave directly (29 Oct 2026) for this
+  category — real titles, usable as-is or as the direct pattern for a
+  new title, not just inspiration to half-copy:** Naftayda Ku Kuursay
+  (The One Wrapped Around My Soul), Boqorada Jaceylka (The Queen of
+  Love), Dhiigga Wadnahayga (The Blood of My Heart), Xiddigtii
+  Noloshayda (The Star of My Life), Caashaq Aan Dhamaanayn (An
+  Endless Love). Draw a love/romance day's title from this bank (or
+  a title in the same direct, devotional-declaration pattern) before
+  inventing a new one from scratch.
 - Forever life, fantasy — a mythic/aspirational register (legacy that
   outlives the singer, a larger-than-life imagined future) — fits the
   personal-legacy/GK-identity angle or Visionary Empire mode.
