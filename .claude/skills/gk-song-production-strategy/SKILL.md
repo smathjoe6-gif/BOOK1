@@ -92,6 +92,14 @@ write toward them in rotation, and give each its own "push" per the
 hook/bridge rule above:**
 - Liberty, freedom, sovereignty, dignity, respect — patriotic/pride
   category, dignity-forward rather than only flag/victory imagery.
+  **Reference title bank Joe gave directly (29 Oct 2026) for this
+  category — real titles, usable as-is or as the direct pattern for a
+  new title:** Ciidda Hooyo (The Motherland Soil), Dhiigga Geeska
+  (Blood of the Horn), Xorriyad iyo Sharaf (Freedom and Honor),
+  Nikaaxii Calanka (Married to the Flag), Astaanta Dhulka (The Emblem
+  of the Land). Draw a patriotic/pride day's title from this bank (or
+  the same direct, devotional/land-and-flag declaration pattern)
+  before inventing a new one from scratch.
 - Unsatisfied love, an unbroken/unbreakable heart — love/romance
   category, the ache/longing register, not only the happy-courtship
   register Qaraami Duet defaults to.
