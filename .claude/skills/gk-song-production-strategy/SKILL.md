@@ -12,6 +12,38 @@ metadata:
 
 # GK Song Production Strategy
 
+## HOOKS AND BRIDGES NEED REAL PUNCH — a rallying-cry moment, not a flat recitation (Joe, 29 Oct 2026)
+
+Joe's direct correction: the hook isn't landing with a strong enough
+punch, and the bridge isn't hitting hard enough either — he wants
+something people would actually shout back, a "my kingdom"-level
+declaration, a line built for a crowd to sing/chant along to live,
+not a competently-written line that just sits there. This applies on
+top of (not instead of) the existing structural rules — every hook
+and every bridge, regardless of today's content category or vibe,
+needs this specific quality of impact:
+- **The hook's signature line must be a declaration, not a
+  description.** Not "this is about courage" — a line that CLAIMS
+  something ("this is MY kingdom," "this ground is MINE," "WE are the
+  guul") in the first person or direct address, short enough and
+  rhythmically simple enough that a crowd could shout it back after
+  one listen. Favor a short declarative claim over a longer poetic
+  image at the hook's peak moment.
+- **The bridge is a pushing moment, not just a quiet one.** The
+  existing rule (beat drops to just the Kaban, spoken-word, reflective)
+  is still right for TONE, but the words themselves still need to push
+  — a rallying address to the listener/crowd, a call-and-answer beat,
+  or a line that sets up the final hook's bigger swell rather than
+  just musing quietly. "Reflective in sound" and "flat in impact" are
+  not the same thing — keep the hushed production, raise the lyrical
+  stakes.
+- **Test every hook/bridge draft against this question before
+  finalizing:** would a crowd actually shout this back, or is it just
+  a nice line to read? If it only reads well, rewrite the peak line as
+  a direct, short, first-person or direct-address claim before moving
+  on — this check applies on every song, every day, regardless of
+  content category (see rotation rule below) or vibe.
+
 ## CONTENT-CATEGORY ROTATION is mandatory — vibe/form rotation alone is not enough (Joe, 29 Oct 2026)
 
 Joe's direct correction, after several days straight of Kaban Rap Drop
