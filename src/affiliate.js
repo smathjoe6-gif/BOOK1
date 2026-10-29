@@ -14,7 +14,15 @@ export function affiliateLine(...texts) {
   return `Tools and lessons I recommend (affiliate link): ${url}`;
 }
 
+// One link per product (TikTok Shop test, 29 Oct 2026): PRODUCT_LINKS="goat=https://...;oukitel=https://...".
+// A link is added when the video's FILE NAME contains the word (case ignored). Blank = off.
+export function productLinkLine(fileName = '') {
+  const name = String(fileName).toLowerCase();
+  const hit = (config.productLinks || []).find(({ word }) => word && name.includes(word));
+  return hit ? `Product link (affiliate): ${hit.url}` : '';
+}
+
 export function withAffiliateLine(caption, ...texts) {
-  const line = affiliateLine(...texts);
-  return line ? `${caption}\n\n${line}` : caption;
+  const lines = [affiliateLine(...texts), productLinkLine(texts[0])].filter(Boolean);
+  return lines.length ? `${caption}\n\n${lines.join('\n')}` : caption;
 }
