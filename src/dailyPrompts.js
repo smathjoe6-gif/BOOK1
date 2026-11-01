@@ -79,9 +79,9 @@ NOTE ON TODAY'S SET: <which short-form (TikTok) trends from this week's search y
 
 Then 10 prompts. Each prompt is: a heading line exactly like === N. LANE - "Title" ===, then the next line exactly FILE NAME: NN_Title_With_Underscores (NN = 01 to 10, title words joined by underscores, letters and digits only, no punctuation, no extension), then a blank line, then the prompt paragraph. Documentary prompts also have, before the paragraph, a line starting "(Real detail:" with the checked fact and what the video must NOT state where sources disagree, and, after the paragraph, a line "Source: <page 1> and <page 2>" (real page names/URLs you found by search).
 
-LANES (in order): 1 GABAY, 2 BURAANBUR, 3 and 4 Broad viral (use this week's trends you found), 5 6 7 GK Legend heritage (hands crafts: close-ups of a craft with an apprentice or relative beside them), 8 9 10 Documentary (a real place or fact verified by search with two agreeing sources; drop any detail the sources disagree on; no portraits of real people; no atrocity or conflict topics; not Somali-political).
+LANES (in order, changed 1 Nov 2026 after Joe's Pinterest numbers: wild animals and fashion win there): 1 GABAY, 2 BURAANBUR, 3 4 5 WILD ANIMAL (a different wild animal with its own clear character each time, e.g. proud lion, curious meerkat, grumpy hippo, playful otter; loud natural sound hook, calm awe, shown at a natural safe distance; NO kills, blood, cruelty, fighting to injury or people hurting animals; do not repeat an animal from the recent docs), 6 7 FASHION (tailored, premium outfits for Pinterest: close-ups of fabric, stitching and a finished outfit, men's and women's, Alindi / Guntiino / Dirac textures with real specificity, a model shown from the shoulders down or from behind so no real person's likeness is needed), 8 GK Legend heritage (a hands craft: close-up of a craft with an apprentice or relative beside them), 9 Broad viral (use this week's trends you found), 10 Documentary (a real place or fact verified by search with two agreeing sources; drop any detail the sources disagree on; no portraits of real people; no atrocity or conflict topics; not Somali-political).
 
-EVERY PROMPT must contain: a first-second hook with a loud described SOUND in capitals; a GK Legend crest or emblem worked ONTO an object in the scene (drum rim, stone, cloth, plaque), never a watermark; photorealism and anatomy words: "Accurate anatomy and correct proportions, no duplicated fingers or distorted features, natural true-to-life colour grading, correct <materials> physics with no warping, real <named> light."; a short bold white subtitle: A short bold white subtitle reads "..." across the bottom third for the full 10 seconds.; and end with "10 seconds." People always appear together in one frame (e.g. "elder and child together in one frame"). Never use the words high-fashion or stylized. No animals. No violence, drugs, addiction or distress. NEVER invent Somali verse; the Gabay (elder man reciting, long weighty poem) and Buraanbur (women, frame drum, call-and-answer, one dancer with a shawl over one shoulder stepping on one leg) subtitles are English, e.g. "Gabay: the poem that moves a nation. Turn your volume up." Real instruments and cloth only (Kaban, dhaanto drum, Alindi, Guntiino, Dirac). Use a NEW setting for the gabay and buraanbur scenes every day.
+EVERY PROMPT must contain: a first-second hook with a loud described SOUND in capitals; a GK Legend crest or emblem worked ONTO an object in the scene (drum rim, stone, cloth, plaque), never a watermark; photorealism and anatomy words: "Accurate anatomy and correct proportions, no duplicated fingers or distorted features, natural true-to-life colour grading, correct <materials> physics with no warping, real <named> light."; a short bold white subtitle: A short bold white subtitle reads "..." across the bottom third for the full 10 seconds.; and end with "10 seconds." People always appear together in one frame (e.g. "elder and child together in one frame"). Never use the words high-fashion or stylized. Animals only in the WILD ANIMAL lane. No violence, drugs, addiction or distress. NEVER invent Somali verse; the Gabay (elder man reciting, long weighty poem) and Buraanbur (women, frame drum, call-and-answer, one dancer with a shawl over one shoulder stepping on one leg) subtitles are English, e.g. "Gabay: the poem that moves a nation. Turn your volume up." Real instruments and cloth only (Kaban, dhaanto drum, Alindi, Guntiino, Dirac). Use a NEW setting for the gabay and buraanbur scenes every day.
 
 Never reuse a Broad-viral idea, gabay or buraanbur setting, heritage craft, or documentary topic from the recent docs below.`;
 
@@ -98,6 +98,32 @@ async function recentDocsText(drive, folderId) {
     } catch { /* skip a doc that cannot be read */ }
   }
   return out;
+}
+
+// Winners loop (1 Nov 2026): the channel's best recent videos, read from the YouTube Data API
+// (no extra login scope), so the daily prompts make variants of what really works.
+async function winnersText(auth) {
+  try {
+    const yt = google.youtube({ version: 'v3', auth });
+    const ch = await yt.channels.list({ part: 'contentDetails', mine: true });
+    const uploads = ch.data.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
+    if (!uploads) return '';
+    const items = await yt.playlistItems.list({ part: 'contentDetails', playlistId: uploads, maxResults: 50 });
+    const ids = (items.data.items || []).map((i) => i.contentDetails.videoId).filter(Boolean);
+    if (!ids.length) return '';
+    const vids = await yt.videos.list({ part: 'snippet,statistics,contentDetails', id: ids.join(',') });
+    const rows = (vids.data.items || [])
+      .map((v) => ({ title: v.snippet.title, views: Number(v.statistics?.viewCount || 0), dur: v.contentDetails?.duration || '' }))
+      .filter((v) => /^PT(\d+S|\d+M\d+S)$/.test(v.dur) && !/PT([2-9]M|\d{2,}M)/.test(v.dur)) // shorts-length only
+      .sort((a, b) => b.views - a.views)
+      .slice(0, 3);
+    if (!rows.length || rows[0].views < 2000) return '';
+    const list = rows.map((r) => `- "${r.title}" (${r.views} views, ${r.dur})`).join('\n');
+    return `\n\n--- WINNERS OF THE LAST 50 UPLOADS (read from YouTube) ---\n${list}\nRULE: at least 3 of today's 10 prompts must be NEW variants of what these winners have in common (short, loud, one clear feeling, replayable). Never copy the same scene: change place, people, sound and subtitle. Say in the NOTE ON TODAY'S SET which winner each variant follows.`;
+  } catch (err) {
+    console.log(`Daily prompts: could not read the winners (${err.message}) -- writing without them.`);
+    return '';
+  }
 }
 
 export async function dailyPromptsOnce(auth) {
@@ -117,7 +143,7 @@ export async function dailyPromptsOnce(auth) {
 
   saveState({ ...state, lastTry: Date.now() });
   console.log(`Daily prompts: writing ${name} with Gemini + Google Search...`);
-  const recent = await recentDocsText(drive, folderId);
+  const recent = (await recentDocsText(drive, folderId)) + (await winnersText(auth));
   const user = `Today's date (London): ${today}. Search the web for this week's short-form (TikTok) trends and for the documentary facts, then write the document.${recent}`;
   const system = RULES.replace('<DATE>', today);
   let result;
