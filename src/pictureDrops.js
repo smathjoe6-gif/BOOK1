@@ -4,7 +4,7 @@ import { google } from 'googleapis';
 import { config } from './config.js';
 import { bufferGraphQL } from './bufferTikTok.js';
 import { bufferInCooldown, isRateLimitError } from './bufferCooldown.js';
-import { listBufferChannels } from './bufferPost.js';
+import { listBufferChannels, stripLinksForFacebook } from './bufferPost.js';
 import { generateCaption } from './autoCaption.js';
 import { listCanvaPictures, exportCanvaPng } from './canvaPictures.js';
 
@@ -112,7 +112,7 @@ async function postToChannel(service, { imageUrl, title, text, kind }) {
   if (!channel) throw new Error(`No ${service} channel connected in Buffer.`);
   const input = {
     channelId: channel.id,
-    text,
+    text: service === 'facebook' ? stripLinksForFacebook(text) : text,
     schedulingType: 'automatic',
     mode: 'shareNow',
     assets: [{ image: { url: imageUrl, metadata: { altText: title.slice(0, 200) } } }],

@@ -167,6 +167,7 @@ export const config = {
   // let Buffer spread posts over each channel's own posting times.
   bufferPostMode: ['addToQueue', 'shareNext'].includes(process.env.BUFFER_POST_MODE) ? process.env.BUFFER_POST_MODE : 'shareNow',
   bufferInstagramType: process.env.BUFFER_INSTAGRAM_TYPE || 'reel',
+  facebookStripLinks: process.env.FACEBOOK_STRIP_LINKS !== 'false',
   bufferFacebookType: process.env.BUFFER_FACEBOOK_TYPE || 'reel',
   bufferPinterestBoardId: process.env.BUFFER_PINTEREST_BOARD_ID || '',
   xaiApiKey: process.env.XAI_API_KEY || '',
