@@ -87,10 +87,33 @@ function metadataFor(service, title, firstComment) {
   return undefined;
 }
 
+// Facebook (1 Nov 2026): Meta limits how many posts WITH LINKS a page may publish per
+// month unless it pays for Meta One ("You used 2 of your posts with links this month"),
+// and every caption here ended with the YouTube footer URL, so a page ran out and could
+// not post anything. For Facebook the links are taken out: a line that carries any other
+// link (affiliate / product lines) is dropped, the YouTube footer URL becomes plain text.
+// FACEBOOK_STRIP_LINKS=false switches this off.
+export function stripLinksForFacebook(text) {
+  if (!config.facebookStripLinks) return text;
+  return String(text || '')
+    .split('\n')
+    .map((line) => {
+      if (!/https?:\/\/|www\./i.test(line)) return line;
+      if (/youtube\.com\/@PathFoundGK/i.test(line)) return 'YouTube: @PathFoundGK';
+      const rest = line.replace(/https?:\/\/\S+|www\.\S+/gi, '').trim();
+      return /affiliate|link/i.test(rest) || rest.length < 4 ? null : rest;
+    })
+    .filter((line) => line !== null)
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 // Pinterest and X have no "first comment" in Buffer's API, so for them the
 // engagement question goes into the post text itself (first on X, where the
 // text is cut at ~270 characters; last in the Pinterest description).
 function textFor(service, caption, firstComment) {
+  if (service === 'facebook') return stripLinksForFacebook(caption);
   if (service === 'twitter') {
     const text = firstComment ? `${firstComment}\n\n${caption}` : caption;
     return text.length > 270 ? `${text.slice(0, 267)}...` : text;
