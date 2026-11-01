@@ -100,6 +100,32 @@ async function recentDocsText(drive, folderId) {
   return out;
 }
 
+// Winners loop (1 Nov 2026): the channel's best recent videos, read from the YouTube Data API
+// (no extra login scope), so the daily prompts make variants of what really works.
+async function winnersText(auth) {
+  try {
+    const yt = google.youtube({ version: 'v3', auth });
+    const ch = await yt.channels.list({ part: 'contentDetails', mine: true });
+    const uploads = ch.data.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
+    if (!uploads) return '';
+    const items = await yt.playlistItems.list({ part: 'contentDetails', playlistId: uploads, maxResults: 50 });
+    const ids = (items.data.items || []).map((i) => i.contentDetails.videoId).filter(Boolean);
+    if (!ids.length) return '';
+    const vids = await yt.videos.list({ part: 'snippet,statistics,contentDetails', id: ids.join(',') });
+    const rows = (vids.data.items || [])
+      .map((v) => ({ title: v.snippet.title, views: Number(v.statistics?.viewCount || 0), dur: v.contentDetails?.duration || '' }))
+      .filter((v) => /^PT(\d+S|\d+M\d+S)$/.test(v.dur) && !/PT([2-9]M|\d{2,}M)/.test(v.dur)) // shorts-length only
+      .sort((a, b) => b.views - a.views)
+      .slice(0, 3);
+    if (!rows.length || rows[0].views < 2000) return '';
+    const list = rows.map((r) => `- "${r.title}" (${r.views} views, ${r.dur})`).join('\n');
+    return `\n\n--- WINNERS OF THE LAST 50 UPLOADS (read from YouTube) ---\n${list}\nRULE: at least 3 of today's 10 prompts must be NEW variants of what these winners have in common (short, loud, one clear feeling, replayable). Never copy the same scene: change place, people, sound and subtitle. Say in the NOTE ON TODAY'S SET which winner each variant follows.`;
+  } catch (err) {
+    console.log(`Daily prompts: could not read the winners (${err.message}) -- writing without them.`);
+    return '';
+  }
+}
+
 export async function dailyPromptsOnce(auth) {
   if (!config.dailyPromptsAuto || !config.geminiApiKey) return;
   const today = londonDate();
@@ -117,7 +143,7 @@ export async function dailyPromptsOnce(auth) {
 
   saveState({ ...state, lastTry: Date.now() });
   console.log(`Daily prompts: writing ${name} with Gemini + Google Search...`);
-  const recent = await recentDocsText(drive, folderId);
+  const recent = (await recentDocsText(drive, folderId)) + (await winnersText(auth));
   const user = `Today's date (London): ${today}. Search the web for this week's short-form (TikTok) trends and for the documentary facts, then write the document.${recent}`;
   const system = RULES.replace('<DATE>', today);
   let result;
