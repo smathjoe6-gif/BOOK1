@@ -136,7 +136,13 @@ export const config = {
   // Which waiting video goes to the Buffer networks first: 'newest' (default) or 'oldest'.
   bufferDeferredOrder: process.env.BUFFER_DEFERRED_ORDER === 'oldest' ? 'oldest' : 'newest',
   // A video that has waited longer than this many hours is dropped from the waiting list instead of being posted late. 0 = never drop.
-  bufferDeferredMaxHours: process.env.BUFFER_DEFERRED_MAX_HOURS === undefined || process.env.BUFFER_DEFERRED_MAX_HOURS === '' ? 36 : Math.max(0, Number(process.env.BUFFER_DEFERRED_MAX_HOURS) || 0),
+  // Nothing old is ever posted late (Joe, 4 Nov 2026: "anything old, not be repeating, I need a clean system").
+  // WAITING_MAX_HOURS (default 24, 0 = never drop) is how long a video may wait in ANY social queue
+  // (TikTok queue, Buffer waiting list, Buffer retry list) before it is dropped instead of posted.
+  waitingMaxHours: process.env.WAITING_MAX_HOURS === undefined || process.env.WAITING_MAX_HOURS === '' ? 24 : Math.max(0, Number(process.env.WAITING_MAX_HOURS) || 0),
+  bufferDeferredMaxHours: process.env.BUFFER_DEFERRED_MAX_HOURS === undefined || process.env.BUFFER_DEFERRED_MAX_HOURS === ''
+    ? (process.env.WAITING_MAX_HOURS === undefined || process.env.WAITING_MAX_HOURS === '' ? 24 : Math.max(0, Number(process.env.WAITING_MAX_HOURS) || 0))
+    : Math.max(0, Number(process.env.BUFFER_DEFERRED_MAX_HOURS) || 0),
   lowPriorityPattern: (() => { const raw = process.env.TIKTOK_LOW_PRIORITY_PATTERN === undefined ? 'GK_Stitch_|GK_Loop_' : process.env.TIKTOK_LOW_PRIORITY_PATTERN.trim(); try { return raw ? new RegExp(raw, 'i') : null; } catch { return null; } })(),
   // "GK picks" affiliate page (src/affiliate.js). Blank = no affiliate line in any caption.
   affiliatePicksUrl: (process.env.AFFILIATE_PICKS_URL || '').trim(),
