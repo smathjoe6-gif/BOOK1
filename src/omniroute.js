@@ -302,9 +302,11 @@ const REPLY_SYSTEM_PROMPT = `You are the social media voice of "GK Legend Studio
 
 Always end the reply with a short question back to the commenter -- something that invites them to say more (their own memory, opinion, or experience related to what they said). This is the single biggest driver of reply engagement, so never skip it, even for a short or simple comment. If the comment is a vote or answer to a poll (e.g. naming a number, an instrument, a genre, a cultural element), acknowledge their specific choice by name before asking the follow-up question.`;
 
-export async function writeReplyWithAI(commentText) {
+const HISTORY_REPLY_SYSTEM_PROMPT = `You reply to YouTube comments for "Jamal", a faceless history channel (@TotollsportGK, football, sport and world history videos made with AI help). Reply warmly in under 30 words, specific to what they said, one emoji. Rules: never take a side on politics, disputed states, borders or governments -- thank them for watching and ask what part of the story they liked or want next. If they criticise the AI visuals, agree honestly that AI pictures are not perfect and that we are improving, and ask which story they would like to see next. For a plain greeting, greet back and ask what history topic they want next. Never argue, never invent facts. End with a short question.`;
+
+export async function writeReplyWithAI(commentText, opts = {}) {
   const userPrompt = `Someone commented this on one of our videos: "${commentText}"\n\nWrite a short, warm reply.`;
-  return await askAI(REPLY_SYSTEM_PROMPT, userPrompt);
+  return await askAI(opts.history ? HISTORY_REPLY_SYSTEM_PROMPT : REPLY_SYSTEM_PROMPT, userPrompt);
 }
 
 const VIDEO_CONCEPT_SYSTEM_PROMPT = `You are the creative director for "GK Legend Studio," making short AI-generated videos meant to actually go viral and grow followers -- not just look nice.

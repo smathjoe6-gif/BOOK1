@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { config } from './config.js';
 import { loadOAuthClient, hasSavedLogin } from './googleAuth.js';
+import { replyToNewComments } from './comments.js';
 import { listVideosInFolder, downloadFile, moveToDone } from './drive.js';
 import { google } from 'googleapis';
 import { uploadToYouTube, findOrCreatePlaylist, addVideoToPlaylist, postEngagementComment } from './youtube.js';
@@ -209,6 +210,12 @@ function engagementFor(topic, videoId) {
 }
 
 let isPosting = false;
+
+// Answers new unanswered comments on the history channel (own login).
+export async function replyToHistoryComments() {
+  if (!hasSavedLogin(config.historyTokenFile)) return;
+  await replyToNewComments(loadOAuthClient(config.historyTokenFile), { history: true });
+}
 
 export async function postNextHistoryVideo(driveAuth) {
   if (!config.historyChannelEnabled || !config.historyFolderId) return;
