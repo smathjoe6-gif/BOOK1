@@ -62,7 +62,7 @@ export function queueTikTok({ fileId, name, caption, md5 }) {
     console.log(`TikTok: "${name}" was already sent to TikTok -- not queuing it again.`);
     return;
   }
-  state.queue.push({ fileId, name, caption, key, attempts: 0 });
+  state.queue.push({ fileId, name, caption, key, attempts: 0, queuedAt: Date.now() });
   saveState(state);
   console.log(`TikTok: queued "${name}" (${state.queue.length} waiting, ${state.postedToday}/${config.tiktokDailyLimit} posted today).`);
 }
@@ -89,6 +89,23 @@ export async function postNextQueuedTikTok(auth) {
 async function drainOne(auth) {
   const state = loadState();
   if (state.queue.length === 0) return;
+
+  // Old news is not posted: a video that waited longer than WAITING_MAX_HOURS is dropped (it already went to
+  // YouTube and the other networks). Items from before this rule have no timestamp: they start counting now.
+  const maxMs = config.waitingMaxHours * 3600 * 1000;
+  if (maxMs > 0) {
+    let stamped = false;
+    for (const q of state.queue) if (!q.queuedAt) { q.queuedAt = Date.now(); stamped = true; }
+    const fresh = state.queue.filter((q) => Date.now() - q.queuedAt <= maxMs);
+    if (fresh.length < state.queue.length) {
+      console.log(`TikTok: dropped ${state.queue.length - fresh.length} waiting video(s) older than ${config.waitingMaxHours} h (not posted late).`);
+      state.queue = fresh;
+      saveState(state);
+      if (state.queue.length === 0) return;
+    } else if (stamped) {
+      saveState(state);
+    }
+  }
 
   // TikTok's "Wait 24 hours" block: Buffer still accepts posts during it,
   // but TikTok rejects every one (and may extend the block), so hold the

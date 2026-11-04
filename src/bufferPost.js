@@ -380,7 +380,17 @@ export async function retryFailedBufferPosts(auth) {
   } catch (err) {
     console.error('Buffer post check failed (will retry next cycle):', err.message);
   }
-  const retries = loadRetries();
+  let retries = loadRetries();
+  // Old news is not posted late: drop retries that have waited longer than WAITING_MAX_HOURS.
+  const maxRetryMs = config.waitingMaxHours * 3600 * 1000;
+  if (maxRetryMs > 0 && retries.length) {
+    const fresh = retries.filter((r) => !r.queuedAt || Date.now() - r.queuedAt <= maxRetryMs);
+    if (fresh.length < retries.length) {
+      console.log(`Buffer: dropped ${retries.length - fresh.length} waiting network post(s) older than ${config.waitingMaxHours} h (not posted late).`);
+      retries = fresh;
+      saveRetries(retries);
+    }
+  }
   if (retries.length === 0) return;
   const item = retries.shift();
   try {
