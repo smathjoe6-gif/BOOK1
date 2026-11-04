@@ -23,7 +23,7 @@ import { maybeAutoGenerateVideo } from './autoGenerate.js';
 import { ensureVerticalVideo } from './aspectRatio.js';
 import { engagementQuestion } from './engagementQuestion.js';
 import { withAffiliateLine } from './affiliate.js';
-import { postNextHistoryVideo } from './historyChannel.js';
+import { postNextHistoryVideo, replyToHistoryComments } from './historyChannel.js';
 import { sortDoneFoldersByShape } from './doneSorter.js';
 import { isAlreadyPosted, rememberPosted, seedPostedHashes } from './postedHashes.js';
 import { postDuePicture } from './pictureDrops.js';
@@ -588,6 +588,11 @@ async function historyCycle() {
     await postNextHistoryVideo(auth);
   } catch (err) {
     console.error('History channel post failed (will retry next cycle):', err.message);
+  }
+  try {
+    await replyToHistoryComments();
+  } catch (err) {
+    console.error('History comment reply check failed:', err.message);
   }
 }
 

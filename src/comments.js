@@ -8,17 +8,19 @@ const REPLY_BANK = [
   "🙌 Appreciate you stopping by -- stay tuned for more from GK Legend Studio.",
 ];
 
-let cachedChannelId = null;
-async function getOwnChannelId(youtube) {
-  if (cachedChannelId) return cachedChannelId;
+const cachedChannelIds = new Map();
+async function getOwnChannelId(youtube, key) {
+  if (cachedChannelIds.get(key)) return cachedChannelIds.get(key);
   const res = await youtube.channels.list({ part: ['id'], mine: true });
-  cachedChannelId = res.data.items?.[0]?.id;
-  return cachedChannelId;
+  const id = res.data.items?.[0]?.id;
+  if (id) cachedChannelIds.set(key, id);
+  return id;
 }
 
-export async function replyToNewComments(auth) {
+// opts.history = true: the history channel (@TotollsportGK, its own login).
+export async function replyToNewComments(auth, opts = {}) {
   const youtube = google.youtube({ version: 'v3', auth });
-  const channelId = await getOwnChannelId(youtube);
+  const channelId = await getOwnChannelId(youtube, opts.history ? 'history' : 'main');
   if (!channelId) return;
 
   const res = await youtube.commentThreads.list({
@@ -41,7 +43,7 @@ export async function replyToNewComments(auth) {
 
     let replyText;
     try {
-      replyText = await writeReplyWithAI(topComment.textOriginal || topComment.textDisplay || '');
+      replyText = await writeReplyWithAI(topComment.textOriginal || topComment.textDisplay || '', opts);
     } catch (err) {
       replyText = REPLY_BANK[Math.floor(Math.random() * REPLY_BANK.length)];
     }
@@ -57,13 +59,13 @@ export async function replyToNewComments(auth) {
         },
       });
       repliedCount++;
-      console.log(`Replied to ${topComment.authorDisplayName}: "${replyText}"`);
+      console.log(`${opts.history ? 'History channel: replied' : 'Replied'} to ${topComment.authorDisplayName}: "${replyText}"`);
     } catch (err) {
       console.error(`Could not reply to a comment from ${topComment.authorDisplayName}:`, err.message);
     }
   }
 
   if (repliedCount === 0) {
-    console.log('No new unanswered comments.');
+    console.log(`No new unanswered comments${opts.history ? ' (history channel)' : ''}.`);
   }
 }
