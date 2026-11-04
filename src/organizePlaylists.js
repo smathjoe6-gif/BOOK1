@@ -45,8 +45,15 @@ async function main() {
     token = res.data.nextPageToken;
   } while (token);
   if (playlists.length === 0) throw new Error('no playlists found on this channel');
-  console.log(`Playlists (${playlists.length}):`);
-  playlists.forEach((p, i) => console.log(`  ${i + 1}. ${p.title}`));
+  // Only Joe's six real playlists are targets (4 Nov 2026: his channel also holds 'Quran', 'India song1',
+  // 'd', 'WKJ' ... which must never receive videos). ORGANIZE_PLAYLISTS_ONLY="word,word" overrides the list;
+  // a playlist is a target when its title contains one of the words (case-insensitive).
+  const words = (process.env.ORGANIZE_PLAYLISTS_ONLY || 'modern legend,heritage archive,rap revolution,global grooves,filmmaker,golden sounds')
+    .split(',').map((w) => w.trim().toLowerCase()).filter(Boolean);
+  const targets = playlists.filter((p) => words.some((w) => p.title.toLowerCase().includes(w)));
+  if (targets.length === 0) throw new Error('none of the target playlists was found (check ORGANIZE_PLAYLISTS_ONLY)');
+  console.log(`Playlists on the channel: ${playlists.length}. Target playlists (${targets.length}):`);
+  targets.forEach((p, i) => console.log(`  ${i + 1}. ${p.title}`));
 
   // Videos already in any playlist stay where they are
   const placed = new Set();
@@ -86,7 +93,7 @@ async function main() {
           title: v.snippet.title,
           description: v.snippet.description,
           minutes: minutesOf(v.contentDetails.duration),
-          playlists: playlists.map((p) => p.title),
+          playlists: targets.map((p) => p.title),
         });
       } catch (err) {
         console.log(`  AI unavailable (${String(err.message).slice(0, 80)}) -- stopping; run again later.`);
@@ -94,7 +101,7 @@ async function main() {
         return;
       }
       planned += 1;
-      const target = pick ? playlists[pick - 1] : null;
+      const target = pick ? targets[pick - 1] : null;
       console.log(`- "${v.snippet.title}" -> ${target ? `"${target.title}"` : 'no playlist fits (left alone)'}`);
       if (!DO) continue; // dry run: decisions are NOT remembered, so the real run judges again
       state.judged[v.id] = pick;
