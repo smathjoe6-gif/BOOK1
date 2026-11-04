@@ -354,6 +354,27 @@ TOPIC: <sports|somali|world>`;
   };
 }
 
+// Which of Joe's EXISTING @PathFoundGK playlists a video belongs in (npm run organize-playlists).
+// Returns the playlist number (1-based) or 0 for "none fits". The hints below are Joe's own words
+// (4 Nov 2026): the Filmmaker / Visual Artist playlist holds the short clips, one playlist is for
+// the heritage / classic music, one for the fashion (GK / Modern Legend collection).
+export async function choosePlaylistWithAI({ title, description, minutes, playlists }) {
+  const list = playlists.map((p, i) => `${i + 1}. ${p}`).join('\n');
+  const userPrompt = `A YouTube video on a Somali heritage / music / fashion channel.
+Title: "${title}"
+Description (start): "${String(description || '').slice(0, 300)}"
+Length: ${minutes.toFixed(1)} minutes
+
+The channel's playlists:
+${list}
+
+Hints from the channel owner: short clips and visual art go in the "Filmmaker / Visual Artist" playlist; heritage and history in the "Heritage Archive"; Somali classic songs in "Golden Sounds"; rap in "Rap Revolution"; hip-hop/R&B/feel-good music in "Global Grooves"; fashion and the GK collection in "The Modern Legend Collection".
+Pick the single best playlist number, or 0 if none fits. Respond with only the number.`;
+  const text = await askAI('You sort YouTube videos into playlists. Answer with one number only.', userPrompt);
+  const n = parseInt(String(text).match(/\d+/)?.[0] || '0', 10);
+  return n >= 0 && n <= playlists.length ? n : 0;
+}
+
 // One short, specific question to pin under a new YouTube video, so viewers
 // have something concrete to answer (comments fell 9% on PathFoundGK in the
 // 28 days to 27 Sep 2026 while the comment was a generic "What did you
