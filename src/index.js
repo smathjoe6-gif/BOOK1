@@ -443,12 +443,6 @@ async function checkOnce() {
   }
 
   try {
-    await songFixOnce(auth);
-  } catch (err) {
-    console.error('Song fix failed (will retry next cycle):', err.message);
-  }
-
-  try {
     await loopCutOnce(auth);
   } catch (err) {
     console.error('Loop cutter failed (will retry next cycle):', err.message);
@@ -603,10 +597,22 @@ async function historyCycle() {
   }
 }
 
+// Song fix runs on its own timer too: a full-length song (Joe's first one is a 394 MB video) can take
+// longer than the 10-minute check cycle, and songFixOnce() has its own "already running" guard.
+async function songFixCycle() {
+  try {
+    await songFixOnce(auth);
+  } catch (err) {
+    console.error('Song fix failed (will retry next cycle):', err.message);
+  }
+}
+
 async function main() {
   await safeCheckOnce();
   const intervalMs = config.pollIntervalMinutes * 60 * 1000;
   historyCycle();
+  songFixCycle();
+  setInterval(songFixCycle, intervalMs);
   setInterval(historyCycle, intervalMs);
   console.log(`\nWatching your configured Drive folder${config.mirrorFolderId ? ' (and mirroring with its pair folder)' : ''} — checking every ${config.pollIntervalMinutes} minutes, posting at most one video per check so they never all land at once. Leave this running (Ctrl+C to stop).`);
   setInterval(safeCheckOnce, intervalMs);
