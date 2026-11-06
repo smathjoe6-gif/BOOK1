@@ -30,7 +30,9 @@ const saveState = (s) => fs.writeFileSync(STATE_PATH, JSON.stringify(s, null, 2)
 
 function run(cmd, args) {
   return new Promise((resolve, reject) => {
-    const p = spawn(cmd, args);
+    // The launchd background job has a short PATH: ffmpeg/ffprobe live in /opt/homebrew/bin on Joe's Mac.
+    const env = { ...process.env, PATH: `/opt/homebrew/bin:/usr/local/bin:${process.env.PATH || ''}` };
+    const p = spawn(cmd, args, { env });
     let out = '';
     p.stdout.on('data', (d) => (out += d));
     p.stderr.on('data', (d) => (out += d));
@@ -127,7 +129,7 @@ async function songFixInner(auth, folderId) {
   });
   const next = (res.data.files || []).find((f) => {
     const ext = path.extname(f.name || '').toLowerCase();
-    return MEDIA_EXT.has(ext) && !/_FIXED/i.test(f.name) && !state.done.includes(f.id) && (state.failed[f.id] || 0) < 3;
+    return MEDIA_EXT.has(ext) && !/_FIXED/i.test(f.name) && !state.done.includes(f.id) && (state.failed[f.id] || 0) < 5;
   });
   if (!next) return;
 
