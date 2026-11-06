@@ -6,6 +6,7 @@ import { uploadLocalDrops } from './localDrop.js';
 import { stitchOnce } from './stitchVideos.js';
 import { storyVideosOnce } from './storyVideos.js';
 import { loopCutOnce } from './loopCutter.js';
+import { songFixOnce } from './songFix.js';
 import { dailyPromptsOnce } from './dailyPrompts.js';
 import { listNewVideos, listVideosInFolder, downloadFile, moveToDone, mirrorNewVideos, syncLogToDrive, uploadVerticalCopy } from './drive.js';
 import { findRowForFile, appendGeneratedRow, updateCoverImage } from './sheets.js';
@@ -439,6 +440,12 @@ async function checkOnce() {
     await storyVideosOnce(auth);
   } catch (err) {
     console.error('Story video step failed (will retry next cycle):', err.message);
+  }
+
+  try {
+    await songFixOnce(auth);
+  } catch (err) {
+    console.error('Song fix failed (will retry next cycle):', err.message);
   }
 
   try {
