@@ -1,3 +1,4 @@
+import { quotaBlocked, markQuotaBlocked, isQuotaError } from './youtubeQuota.js';
 import { google } from 'googleapis';
 import fs from 'node:fs';
 
@@ -36,8 +37,10 @@ export async function uploadToYouTube(auth, { filePath, title, description, tags
 // Facebook route's "Drop a comment below" comment. Failing to post this
 // should never block anything else -- callers should wrap it in try/catch.
 export async function postEngagementComment(auth, videoId, text) {
+  if (quotaBlocked()) return; // quota used up: keep what is left for uploads
   const youtube = google.youtube({ version: 'v3', auth });
-  await youtube.commentThreads.insert(
+  try {
+    await youtube.commentThreads.insert(
     {
       part: ['snippet'],
       requestBody: {
@@ -51,6 +54,10 @@ export async function postEngagementComment(auth, videoId, text) {
     },
     { timeout: 30000 }
   );
+  } catch (err) {
+    if (isQuotaError(err)) markQuotaBlocked();
+    throw err;
+  }
 }
 
 // Finds a playlist on the signed-in channel whose title matches `matcher`

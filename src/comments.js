@@ -1,5 +1,6 @@
 import { google } from 'googleapis';
 import { writeReplyWithAI } from './omniroute.js';
+import { quotaBlocked, markQuotaBlocked, isQuotaError } from './youtubeQuota.js';
 
 const REPLY_BANK = [
   "🙏 Thank you for watching -- GK Legend Studio appreciates you!",
@@ -19,17 +20,27 @@ async function getOwnChannelId(youtube, key) {
 
 // opts.history = true: the history channel (@TotollsportGK, its own login).
 export async function replyToNewComments(auth, opts = {}) {
+  if (quotaBlocked()) {
+    console.log('Comment replies skipped: YouTube quota is used up until the next reset.');
+    return;
+  }
   const youtube = google.youtube({ version: 'v3', auth });
   const channelId = await getOwnChannelId(youtube, opts.history ? 'history' : 'main');
   if (!channelId) return;
 
-  const res = await youtube.commentThreads.list({
+  let res;
+  try {
+    res = await youtube.commentThreads.list({
     part: ['snippet'],
     allThreadsRelatedToChannelId: channelId,
     order: 'time',
     maxResults: 25,
     textFormat: 'plainText',
-  });
+    });
+  } catch (err) {
+    if (isQuotaError(err)) markQuotaBlocked();
+    throw err;
+  }
 
   const threads = res.data.items || [];
   let repliedCount = 0;
@@ -62,6 +73,10 @@ export async function replyToNewComments(auth, opts = {}) {
       console.log(`${opts.history ? 'History channel: replied' : 'Replied'} to ${topComment.authorDisplayName}: "${replyText}"`);
     } catch (err) {
       console.error(`Could not reply to a comment from ${topComment.authorDisplayName}:`, err.message);
+      if (isQuotaError(err)) {
+        markQuotaBlocked();
+        break;
+      }
     }
   }
 
