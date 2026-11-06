@@ -91,7 +91,7 @@ async function findOrCreateOutFolder(drive, parentId) {
     fields: 'files(id,name)',
     pageSize: 100,
   });
-  const hit = (res.data.files || []).find((f) => f.name.trim().toLowerCase() === OUT_FOLDER_NAME);
+  const hit = (res.data.files || []).find((f) => /^complete finish/i.test(f.name.trim()));
   if (hit) return hit.id;
   const made = await drive.files.create({
     requestBody: { name: OUT_FOLDER_NAME, mimeType: 'application/vnd.google-apps.folder', parents: [parentId] },
@@ -102,9 +102,20 @@ async function findOrCreateOutFolder(drive, parentId) {
 
 const MIME = { '.wav': 'audio/wav', '.mp3': 'audio/mpeg', '.mp4': 'video/mp4' };
 
+let running = false;
+
 export async function songFixOnce(auth) {
   const folderId = config.songFixFolderId;
-  if (!folderId) return;
+  if (!folderId || running) return;
+  running = true;
+  try {
+    await songFixInner(auth, folderId);
+  } finally {
+    running = false;
+  }
+}
+
+async function songFixInner(auth, folderId) {
   const drive = google.drive({ version: 'v3', auth });
   const state = loadState();
 
