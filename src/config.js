@@ -45,7 +45,7 @@ export const config = {
   // Loop cutter (src/loopCutter.js): one short loud clip from the library folder, hook line, 9:16.
   // Blank LOOP_SOURCE_FOLDER_ID = off. Needs LOCAL_DROP_FOLDER too.
   // Song fix (src/songFix.js): Drive folder Joe drops full songs into; fixed copies go to its 'complete finish deploy' subfolder. Nothing posts.
-  songFixFolderId: process.env.SONG_FIX_FOLDER_ID === undefined ? '1iJhCHE1AxojZVKudSlorFaemGpYp3F5q' : process.env.SONG_FIX_FOLDER_ID,
+  songFixFolderId: process.env.SONG_FIX_FOLDER_ID === undefined ? '1iJhCHE1AxojZVKudSIorFaemGpYp3F5q' : process.env.SONG_FIX_FOLDER_ID,
   loopSourceFolderId: process.env.LOOP_SOURCE_FOLDER_ID || '',
   // Library clips whose file name contains one of these words are never cut (real-person rule:
   // no politician / president clips; also skips test files and plain title cards).
