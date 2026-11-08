@@ -7,6 +7,7 @@ import { stitchOnce } from './stitchVideos.js';
 import { storyVideosOnce } from './storyVideos.js';
 import { loopCutOnce } from './loopCutter.js';
 import { songFixOnce } from './songFix.js';
+import { pinterestFeedOnce } from './pinterestFeed.js';
 import { dailyPromptsOnce } from './dailyPrompts.js';
 import { listNewVideos, listVideosInFolder, downloadFile, moveToDone, mirrorNewVideos, syncLogToDrive, uploadVerticalCopy } from './drive.js';
 import { findRowForFile, appendGeneratedRow, updateCoverImage } from './sheets.js';
@@ -607,12 +608,24 @@ async function songFixCycle() {
   }
 }
 
+// Pinterest product feed: its own small timer; pinterestFeedOnce() itself only runs once per
+// PINTEREST_FEED_EVERY_MINUTES and never blocks posting (any failure is just logged).
+async function pinterestFeedCycle() {
+  try {
+    await pinterestFeedOnce(auth);
+  } catch (err) {
+    console.error('Pinterest feed update failed (will retry next cycle):', err.message);
+  }
+}
+
 async function main() {
   await safeCheckOnce();
   const intervalMs = config.pollIntervalMinutes * 60 * 1000;
   historyCycle();
   songFixCycle();
   setInterval(songFixCycle, intervalMs);
+  pinterestFeedCycle();
+  setInterval(pinterestFeedCycle, intervalMs);
   setInterval(historyCycle, intervalMs);
   console.log(`\nWatching your configured Drive folder${config.mirrorFolderId ? ' (and mirroring with its pair folder)' : ''} — checking every ${config.pollIntervalMinutes} minutes, posting at most one video per check so they never all land at once. Leave this running (Ctrl+C to stop).`);
   setInterval(safeCheckOnce, intervalMs);

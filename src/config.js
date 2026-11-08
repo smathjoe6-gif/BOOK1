@@ -46,6 +46,10 @@ export const config = {
   // Blank LOOP_SOURCE_FOLDER_ID = off. Needs LOCAL_DROP_FOLDER too.
   // Song fix (src/songFix.js): Drive folder Joe drops full songs into; fixed copies go to its 'complete finish deploy' subfolder. Nothing posts.
   songFixFolderId: process.env.SONG_FIX_FOLDER_ID === undefined ? '1iJhCHE1AxojZVKudSIorFaemGpYp3F5q' : process.env.SONG_FIX_FOLDER_ID,
+  // Pinterest product feed (src/pinterestFeed.js): Joe's sheet 'GK Pinterest Product Feed' is turned into a public CSV
+  // in Drive that Pinterest (Catalogs > Data sources) reads by itself. PINTEREST_FEED_SHEET_ID= (blank) turns it off.
+  pinterestFeedSheetId: process.env.PINTEREST_FEED_SHEET_ID === undefined ? '1GXTPkbShCzDZg9FrNMisnobuVrDdYQNs72OoSd1nvAU' : process.env.PINTEREST_FEED_SHEET_ID,
+  pinterestFeedEveryMinutes: Number(process.env.PINTEREST_FEED_EVERY_MINUTES) > 0 ? Number(process.env.PINTEREST_FEED_EVERY_MINUTES) : 60,
   loopSourceFolderId: process.env.LOOP_SOURCE_FOLDER_ID || '',
   // Library clips whose file name contains one of these words are never cut (real-person rule:
   // no politician / president clips; also skips test files and plain title cards).
