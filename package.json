@@ -21,6 +21,7 @@
     "dedupe-drive": "node src/driveDedupe.js",
     "loop-cut": "node src/loopCutter.js",
     "song-fix": "node src/songFix.js",
+    "pinterest-feed": "node src/pinterestFeed.js",
     "listen-music": "node src/musicListen.js",
     "history-thumbnails": "node src/historyThumbnailBackfill.js",
     "history-metadata": "node src/historyMetadataFix.js",
