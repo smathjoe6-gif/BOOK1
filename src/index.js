@@ -12,6 +12,7 @@ import { dailyPromptsOnce } from './dailyPrompts.js';
 import { listNewVideos, listVideosInFolder, downloadFile, moveToDone, mirrorNewVideos, syncLogToDrive, uploadVerticalCopy } from './drive.js';
 import { findRowForFile, appendGeneratedRow, updateCoverImage } from './sheets.js';
 import { uploadToYouTube, postEngagementComment } from './youtube.js';
+import { autoAddToPlaylist } from './autoPlaylist.js';
 import { generateCaption, isLikelyDuplicateVariant, stripCollisionSuffix } from './autoCaption.js';
 import { getCoverImage } from './coverImage.js';
 import { replyToNewComments } from './comments.js';
@@ -183,6 +184,7 @@ async function processVideoOnce(file) {
     // Remember the moment YouTube accepts it: a restart after this point can
     // never upload the same video again (the md5 guard catches it).
     rememberPosted(file.md5Checksum, file.name);
+    await autoAddToPlaylist(auth, { videoId: yt.id, title: row.title, description: caption });
     try {
       const question = await engagementQuestion(row.title, row.capture);
       engagementText = `${question} — GK Legend Studio`;
