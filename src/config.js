@@ -197,6 +197,11 @@ export const config = {
   // quota (429). Comma-separated; set GEMINI_FALLBACK_MODEL= (empty) to switch off.
   geminiFallbackModels: (process.env.GEMINI_FALLBACK_MODEL === undefined ? 'gemini-2.5-flash-lite,gemini-3.5-flash-lite' : process.env.GEMINI_FALLBACK_MODEL)
     .split(',').map((m) => m.trim()).filter(Boolean),
+  // Groq (groq.com) free text models, OpenAI-compatible, tried after the Gemini models and before Hive.
+  // Blank key = off. Free key, no card: console.groq.com. Model/URL can be changed in .env.
+  groqApiKey: process.env.GROQ_API_KEY || '',
+  groqModel: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+  groqUrl: process.env.GROQ_URL || 'https://api.groq.com/openai/v1/chat/completions',
   // Hive (thehive.ai) text model, OpenAI-compatible, tried after the Gemini models
   // and before OmniRoute. Blank key = off. URL/model can be changed in .env if
   // Hive's docs differ (the URL here was not checked against live Hive).

@@ -40,6 +40,38 @@ async function requestOnce(systemPrompt, userPrompt, model = config.omnirouteMod
   }
 }
 
+// Groq (groq.com, NOT Grok) free text models, OpenAI-compatible: a free-tier backup that is tried
+// right after the Gemini models and before Hive / OmniRoute. Only used if GROQ_API_KEY is set (free key,
+// no card: console.groq.com). Joe, 9 Nov 2026: 'when Gemini finishes, another AI steps up'.
+async function askGroq(systemPrompt, userPrompt) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  try {
+    const res = await fetch(config.groqUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${config.groqApiKey}` },
+      body: JSON.stringify({
+        model: config.groqModel,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+      }),
+      signal: controller.signal,
+    });
+    if (!res.ok) {
+      const body = (await res.text().catch(() => '')).replace(/\s+/g, ' ').slice(0, 160);
+      throw new Error(`Groq returned ${res.status}: ${body}`);
+    }
+    const data = await res.json();
+    const text = data.choices?.[0]?.message?.content?.trim();
+    if (!text) throw new Error('Groq gave an empty response');
+    return text;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 // Hive's OpenAI-compatible chat endpoint (cheap DeepSeek text model), used when
 // Gemini's free quota is gone. Only used if HIVE_API_KEY is set.
 async function askHive(systemPrompt, userPrompt) {
@@ -209,6 +241,15 @@ async function askAI(systemPrompt, userPrompt) {
         }
       }
       console.log(`Gemini ${model} failed (${(lastErr.message.replace(/\s+/g, ' ')).slice(0, 220)})${model === models[models.length - 1] ? ', trying OmniRoute...' : ', trying the backup model...'}`);
+    }
+  }
+
+  if (config.groqApiKey) {
+    try {
+      return await askGroq(systemPrompt, userPrompt);
+    } catch (err) {
+      lastErr = err;
+      console.log(`Groq failed (${err.message}), trying the next backup...`);
     }
   }
 
