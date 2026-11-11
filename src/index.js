@@ -28,7 +28,7 @@ import { engagementQuestion } from './engagementQuestion.js';
 import { withAffiliateLine } from './affiliate.js';
 import { postNextHistoryVideo, replyToHistoryComments } from './historyChannel.js';
 import { sortDoneFoldersByShape } from './doneSorter.js';
-import { isAlreadyPosted, rememberPosted, seedPostedHashes } from './postedHashes.js';
+import { isAlreadyPosted, isCopyOfRecentlyPosted, rememberPosted, seedPostedHashes } from './postedHashes.js';
 import { postDuePicture } from './pictureDrops.js';
 import { cleanBufferPosts } from './bufferClean.js';
 import { updateSocialQueueStatus } from './socialQueueStatus.js';
@@ -99,6 +99,12 @@ async function processVideoOnce(file) {
   // Park it in DONE instead of posting it again.
   if (isAlreadyPosted(file.md5Checksum)) {
     console.log(`"${file.name}" has identical content to a video already posted -- moving to DONE without posting again.`);
+    await moveToDone(auth, file.id);
+    return 'skipped';
+  }
+
+  if (isCopyOfRecentlyPosted(file.name)) {
+    console.log(`"${file.name}" is a re-downloaded copy ("(1)" style) of a video already posted in the last 7 days -- moving to DONE without posting again.`);
     await moveToDone(auth, file.id);
     return 'skipped';
   }
