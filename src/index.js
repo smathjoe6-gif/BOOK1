@@ -30,6 +30,7 @@ import { postNextHistoryVideo, replyToHistoryComments } from './historyChannel.j
 import { sortDoneFoldersByShape } from './doneSorter.js';
 import { isAlreadyPosted, rememberPosted, seedPostedHashes } from './postedHashes.js';
 import { postDuePicture } from './pictureDrops.js';
+import { cleanBufferPosts } from './bufferClean.js';
 import { updateSocialQueueStatus } from './socialQueueStatus.js';
 import { bufferPostingEnabled, bufferServices, postToBuffer, postDeferredBuffer, retryFailedBufferPosts } from './bufferPost.js';
 
@@ -643,6 +644,7 @@ async function main() {
     socialBusy = true;
     try {
       await postDeferredBuffer(auth);
+      await cleanBufferPosts();
       await updateSocialQueueStatus(auth);
     } catch (err) {
       console.error('Social queue timer failed (will retry):', err.message);

@@ -1,5 +1,6 @@
 import { google } from 'googleapis';
 import { config } from './config.js';
+import { recordBufferPost } from './bufferClean.js';
 import { fetchWithTimeout } from './fetchWithTimeout.js';
 import { BufferRateLimitError, bufferInCooldown, bufferCooldownUntil, isRateLimitError, startBufferCooldown } from './bufferCooldown.js';
 
@@ -140,5 +141,6 @@ export async function uploadToTikTokViaBuffer(auth, { fileId, caption }) {
   if (!createPost || !createPost.post) {
     throw new Error(`Buffer TikTok post failed: ${(createPost && createPost.message) || JSON.stringify(createPost)}`);
   }
+  recordBufferPost({ postId: createPost.post.id, service: 'tiktok', name: String(caption || '').slice(0, 40) });
   return { updateId: createPost.post.id };
 }

@@ -4,6 +4,7 @@ import { google } from 'googleapis';
 import { config } from './config.js';
 import { bufferGraphQL } from './bufferTikTok.js';
 import { bufferInCooldown, bufferCooldownUntil, isRateLimitError } from './bufferCooldown.js';
+import { recordBufferPost } from './bufferClean.js';
 import { pickWaitingIndex } from './waitingOrder.js';
 
 // Posts one Drive video to Instagram, Facebook, Pinterest and X through
@@ -370,6 +371,7 @@ export async function postToBuffer(auth, params, { force = false } = {}) {
       const id = await postToService(service, { videoUrl, title, caption, firstComment, coverUrl });
       update(service, null);
       addVerify(id, { service, fileId, name, title, caption, firstComment, coverUrl });
+      recordBufferPost({ postId: id, service, name });
       console.log(`Buffer ${service}: posted (${id}).`);
       results[service] = 'posted';
     } catch (err) {
@@ -429,6 +431,7 @@ export async function retryFailedBufferPosts(auth) {
     const videoUrl = await publicUrl(auth, item.fileId);
     const id = await postToService(item.service, { videoUrl, title: item.title, caption: item.caption, firstComment: item.firstComment, coverUrl: item.coverUrl });
     addVerify(id, item, (item.redo || 0) + (item.postId ? 1 : 0));
+    recordBufferPost({ postId: id, service: item.service, name: item.name });
     console.log(`Buffer ${item.service}: retry posted "${item.name}" (${id}).`);
   } catch (err) {
     if (err instanceof DailyLimitError) {
