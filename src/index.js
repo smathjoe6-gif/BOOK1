@@ -644,7 +644,7 @@ async function main() {
     socialBusy = true;
     try {
       await postDeferredBuffer(auth);
-      await cleanBufferPosts();
+      await cleanBufferPosts(auth);
       await updateSocialQueueStatus(auth);
     } catch (err) {
       console.error('Social queue timer failed (will retry):', err.message);

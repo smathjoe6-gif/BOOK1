@@ -115,7 +115,7 @@ const CREATE_POST_MUTATION = `
   }
 `;
 
-export async function uploadToTikTokViaBuffer(auth, { fileId, caption }) {
+export async function uploadToTikTokViaBuffer(auth, { fileId, caption, name }) {
   if (!config.bufferAccessToken) {
     throw new Error('Buffer is not configured -- set BUFFER_ACCESS_TOKEN in .env.');
   }
@@ -141,6 +141,6 @@ export async function uploadToTikTokViaBuffer(auth, { fileId, caption }) {
   if (!createPost || !createPost.post) {
     throw new Error(`Buffer TikTok post failed: ${(createPost && createPost.message) || JSON.stringify(createPost)}`);
   }
-  recordBufferPost({ postId: createPost.post.id, service: 'tiktok', name: String(caption || '').slice(0, 40) });
+  recordBufferPost({ postId: createPost.post.id, service: 'tiktok', name: String(name || caption || '').slice(0, 60), item: { fileId, caption } });
   return { updateId: createPost.post.id };
 }
