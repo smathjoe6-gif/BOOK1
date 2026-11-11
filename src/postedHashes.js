@@ -18,9 +18,9 @@ const STATE_PATH = path.join(process.cwd(), 'posted-hashes.json');
 function load() {
   try {
     const state = JSON.parse(fs.readFileSync(STATE_PATH, 'utf8'));
-    return { seeded: !!state.seeded, hashes: state.hashes || {} };
+    return { seeded: !!state.seeded, hashes: state.hashes || {}, names: state.names || {} };
   } catch {
-    return { seeded: false, hashes: {} };
+    return { seeded: false, hashes: {}, names: {} };
   }
 }
 
@@ -37,11 +37,28 @@ export function postedHashSet() {
   return new Set(Object.keys(load().hashes));
 }
 
+// Name of a video without its extension and without " (1)" / " (2)" collision suffixes.
+export function baseNameKey(name) {
+  return String(name || '').replace(/\.[A-Za-z0-9]{2,4}$/, '').replace(/(\s*\(\d+\))+\s*$/, '').trim().toLowerCase();
+}
+
 export function rememberPosted(md5, name) {
-  if (!md5) return;
   const state = load();
-  state.hashes[md5] = { name, at: new Date().toISOString() };
+  if (md5) state.hashes[md5] = { name, at: new Date().toISOString() };
+  const key = baseNameKey(name);
+  if (key) state.names[key] = Date.now();
+  for (const k of Object.keys(state.names)) if (Date.now() - state.names[k] > NAME_MEMORY_MS) delete state.names[k];
   save(state);
+}
+
+// A file named "clip (1).mp4" is a re-download of "clip.mp4" when "clip" went out in the last 7 days
+// (Joe, 11 Nov 2026: such copies were posted to YouTube again and again). Only used for names that
+// carry a collision suffix, so a normal new video is never blocked by this.
+const NAME_MEMORY_MS = 7 * 24 * 3600 * 1000;
+export function isCopyOfRecentlyPosted(name) {
+  if (baseNameKey(name) === String(name || '').replace(/\.[A-Za-z0-9]{2,4}$/, '').trim().toLowerCase()) return false;
+  const at = load().names[baseNameKey(name)];
+  return Boolean(at && Date.now() - at <= NAME_MEMORY_MS);
 }
 
 // Run once (the first cycle after this feature ships): learns the
