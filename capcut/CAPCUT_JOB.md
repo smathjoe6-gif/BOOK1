@@ -68,6 +68,18 @@ about 2 minutes or fails, skip that clip and take the next one.
   `curl -L -o ~/GK_CAPCUT_WORK/<name>.mp4 "<url>"` (the link expires fast).
 - Name it `CAPCUT_<theme>_<NN>.mp4` (the AI caption uses the file name as its hint, so make it meaningful).
 
+## Branding (EVERY video, before the quality gate)
+Joe's order (11 Nov): every video carries the GK Legend logo and the copyright line. Do it with ffmpeg
+(the overlay filter works on Joe's Mac; drawtext does not, so the text is a ready-made picture):
+```
+ffmpeg -y -i CAPCUT_<theme>_<NN>.mp4 -i ~/gk-automation/assets/gk-logo.png -i ~/gk-automation/assets/gk-copyright-strip.png \
+  -filter_complex "[1:v]scale=200:-1[l];[0:v][l]overlay=W-w-30:40[a];[a][2:v]overlay=0:H-h-120" \
+  -c:v libx264 -crf 20 -pix_fmt yuv420p -c:a copy CAPCUT_<theme>_<NN>_GK.mp4
+```
+Logo = small badge top-right, copyright strip = near the bottom (above the app buttons). Check one frame after
+branding: both visible, not covering faces. Only the `_GK.mp4` file goes to `~/GK_DROP`. The pipe adds the
+copyright footer to the caption by itself, so do not write captions.
+
 ## Quality gate (you do this; nobody else will look)
 Only move a video to `~/GK_DROP` if ALL are true, checked with ffprobe and extracted frames:
 - 9:16 (1080x1920 or similar), 8 to 12.5 seconds, file size above 300 KB.
