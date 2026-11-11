@@ -30,6 +30,7 @@ import { postNextHistoryVideo, replyToHistoryComments } from './historyChannel.j
 import { sortDoneFoldersByShape } from './doneSorter.js';
 import { isAlreadyPosted, rememberPosted, seedPostedHashes } from './postedHashes.js';
 import { postDuePicture } from './pictureDrops.js';
+import { updateSocialQueueStatus } from './socialQueueStatus.js';
 import { bufferPostingEnabled, bufferServices, postToBuffer, postDeferredBuffer, retryFailedBufferPosts } from './bufferPost.js';
 
 // Independent test rollout of Pinterest posting for GK_TERMINAL videos,
@@ -634,6 +635,21 @@ async function main() {
   // TikTok has its own timer (Joe, 18 Oct 2026: 15 minutes between TikTok posts is too slow while the
   // other networks go out a minute apart). It checks every minute; postNextQueuedTikTok() itself keeps
   // TIKTOK_MIN_GAP_MINUTES between posts, the daily cap, the Buffer cooldown and the pause.
+  // The Buffer networks get the same: postDeferredBuffer() checks every minute and sends ONE waiting video once
+  // BUFFER_VIDEO_GAP_MINUTES have passed since the last one (Joe, 11 Nov 2026: exact gap, not the 15-min cycle).
+  let socialBusy = false;
+  if (bufferPostingEnabled() && config.bufferVideoGapMinutes > 0) setInterval(async () => {
+    if (socialBusy) return;
+    socialBusy = true;
+    try {
+      await postDeferredBuffer(auth);
+      await updateSocialQueueStatus(auth);
+    } catch (err) {
+      console.error('Social queue timer failed (will retry):', err.message);
+    } finally {
+      socialBusy = false;
+    }
+  }, 60 * 1000);
   if (config.bufferAccessToken) setInterval(() => {
     postNextQueuedTikTok(auth).catch((err) => console.error('TikTok queue timer failed (will retry):', err.message));
   }, 60 * 1000);

@@ -22,6 +22,24 @@ const RETRY_PATH = path.join(process.cwd(), 'buffer-retry.json');
 // the others wait here (YouTube is not slowed down by this).
 const DEFERRED_PATH = path.join(process.cwd(), 'buffer-deferred.json');
 const LAST_VIDEO_PATH = path.join(process.cwd(), 'buffer-last-video.json');
+// Same video saved twice under names like "clip.mp4" / "clip (1).mp4" (11 Nov 2026: copies went out twice).
+// A video whose name (minus extension and " (n)") was already queued or sent within 48 h is not queued again.
+const SEEN_PATH = path.join(process.cwd(), 'buffer-seen.json');
+const SEEN_MS = 48 * 3600 * 1000;
+export function nameKey(name) {
+  return String(name || '').replace(/\.[A-Za-z0-9]{2,4}$/, '').replace(/(\s*\(\d+\))+\s*$/, '').trim().toLowerCase();
+}
+function seenBefore(name) {
+  const key = nameKey(name);
+  if (!key) return false;
+  const seen = readJson(SEEN_PATH, {});
+  const now = Date.now();
+  for (const k of Object.keys(seen)) if (now - seen[k] > SEEN_MS) delete seen[k];
+  const dup = Boolean(seen[key]);
+  if (!dup) seen[key] = now;
+  fs.writeFileSync(SEEN_PATH, JSON.stringify(seen));
+  return dup;
+}
 
 function readJson(file, fallback) {
   try {
@@ -309,6 +327,10 @@ async function publicUrl(auth, fileId) {
 export async function postToBuffer(auth, params, { force = false } = {}) {
   const { fileId, name, title, caption, firstComment = '', coverUrl = '' } = params;
   const gapMs = config.bufferVideoGapMinutes * 60 * 1000;
+  if (!force && seenBefore(name)) {
+    console.log(`Buffer: "${name}" is a copy of a video already queued or sent in the last 48 h -- not posting it again.`);
+    return;
+  }
   if (gapMs > 0 && !force) {
     const last = readJson(LAST_VIDEO_PATH, { at: 0 }).at || 0;
     if (Date.now() - last < gapMs) {
