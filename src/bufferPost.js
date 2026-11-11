@@ -4,6 +4,7 @@ import { google } from 'googleapis';
 import { config } from './config.js';
 import { bufferGraphQL } from './bufferTikTok.js';
 import { bufferInCooldown, bufferCooldownUntil, isRateLimitError } from './bufferCooldown.js';
+import { recordBufferPost } from './bufferClean.js';
 import { pickWaitingIndex } from './waitingOrder.js';
 
 // Posts one Drive video to Instagram, Facebook, Pinterest and X through
@@ -22,6 +23,25 @@ const RETRY_PATH = path.join(process.cwd(), 'buffer-retry.json');
 // the others wait here (YouTube is not slowed down by this).
 const DEFERRED_PATH = path.join(process.cwd(), 'buffer-deferred.json');
 const LAST_VIDEO_PATH = path.join(process.cwd(), 'buffer-last-video.json');
+// Same video saved twice under names like "clip.mp4" / "clip (1).mp4" (11 Nov 2026: copies went out twice).
+// A video whose name (minus extension and " (n)") was already queued or sent within 48 h is not queued again.
+const HISTORY_PATH = path.join(process.cwd(), 'social-queue-history.json');
+const SEEN_PATH = path.join(process.cwd(), 'buffer-seen.json');
+const SEEN_MS = 48 * 3600 * 1000;
+export function nameKey(name) {
+  return String(name || '').replace(/\.[A-Za-z0-9]{2,4}$/, '').replace(/(\s*\(\d+\))+\s*$/, '').trim().toLowerCase();
+}
+function seenBefore(name) {
+  const key = nameKey(name);
+  if (!key) return false;
+  const seen = readJson(SEEN_PATH, {});
+  const now = Date.now();
+  for (const k of Object.keys(seen)) if (now - seen[k] > SEEN_MS) delete seen[k];
+  const dup = Boolean(seen[key]);
+  if (!dup) seen[key] = now;
+  fs.writeFileSync(SEEN_PATH, JSON.stringify(seen));
+  return dup;
+}
 
 function readJson(file, fallback) {
   try {
@@ -309,6 +329,10 @@ async function publicUrl(auth, fileId) {
 export async function postToBuffer(auth, params, { force = false } = {}) {
   const { fileId, name, title, caption, firstComment = '', coverUrl = '' } = params;
   const gapMs = config.bufferVideoGapMinutes * 60 * 1000;
+  if (!force && seenBefore(name)) {
+    console.log(`Buffer: "${name}" is a copy of a video already queued or sent in the last 48 h -- not posting it again.`);
+    return;
+  }
   if (gapMs > 0 && !force) {
     const last = readJson(LAST_VIDEO_PATH, { at: 0 }).at || 0;
     if (Date.now() - last < gapMs) {
@@ -335,6 +359,7 @@ export async function postToBuffer(auth, params, { force = false } = {}) {
     saveRetries(list);
   };
 
+  const results = {};
   for (let i = 0; i < services.length; i++) {
     const service = services[i];
     // One network at a time, with a pause between them (BUFFER_GAP_SECONDS,
@@ -346,15 +371,24 @@ export async function postToBuffer(auth, params, { force = false } = {}) {
       const id = await postToService(service, { videoUrl, title, caption, firstComment, coverUrl });
       update(service, null);
       addVerify(id, { service, fileId, name, title, caption, firstComment, coverUrl });
+      recordBufferPost({ postId: id, service, name, item: base });
       console.log(`Buffer ${service}: posted (${id}).`);
+      results[service] = 'posted';
     } catch (err) {
       const waiting = err instanceof DailyLimitError || isRateLimitError(err);
+      results[service] = waiting ? 'waiting (limit)' : `failed: ${String(err.message).slice(0, 80)}`;
       console.error(`Buffer ${service} ${waiting ? 'waiting' : `failed (will retry up to ${MAX_ATTEMPTS} times)`}:`, err.message);
       update(service, { attempts: waiting ? 0 : 1 });
       // Rate limited: the other networks would fail too -- leave them queued.
       if (isRateLimitError(err)) break;
     }
   }
+  // Video finished: the gap now counts from the FINISH (Joe, 11 Nov 2026) and the result is kept
+  // for GK_Social_Queue.txt ("what came back"), so the next video is only taken after the full gap.
+  if (gapMs > 0) fs.writeFileSync(LAST_VIDEO_PATH, JSON.stringify({ at: Date.now() }));
+  const history = readJson(HISTORY_PATH, []);
+  history.unshift({ name, at: Date.now(), results });
+  fs.writeFileSync(HISTORY_PATH, JSON.stringify(history.slice(0, 15), null, 2));
 }
 
 // One network only, right now, no retry queue -- used by `npm run facebook-redo`
@@ -397,6 +431,7 @@ export async function retryFailedBufferPosts(auth) {
     const videoUrl = await publicUrl(auth, item.fileId);
     const id = await postToService(item.service, { videoUrl, title: item.title, caption: item.caption, firstComment: item.firstComment, coverUrl: item.coverUrl });
     addVerify(id, item, (item.redo || 0) + (item.postId ? 1 : 0));
+    recordBufferPost({ postId: id, service: item.service, name: item.name, item });
     console.log(`Buffer ${item.service}: retry posted "${item.name}" (${id}).`);
   } catch (err) {
     if (err instanceof DailyLimitError) {

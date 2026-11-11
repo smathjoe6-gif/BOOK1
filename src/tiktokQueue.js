@@ -154,7 +154,7 @@ async function drainOne(auth) {
   item.sending = true;
   saveState(state);
   try {
-    const tk = await uploadToTikTokViaBuffer(auth, { fileId: item.fileId, caption: item.caption });
+    const tk = await uploadToTikTokViaBuffer(auth, { fileId: item.fileId, caption: item.caption, name: item.name });
     removeItem();
     state.sent = [...(state.sent || []), item.key || videoKey({ name: item.name })].slice(-SENT_MEMORY);
     state.postedToday += 1;
