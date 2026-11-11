@@ -40,6 +40,13 @@ and make another: a missing video costs nothing, a bad public video does.
    `~/GK_CAPCUT_WORK`, never touch the originals.
 Pick clips that MATCH each other (same mood and look) and the template's idea.
 
+
+### Drive clips are ONLINE-ONLY (cloud icon in Finder)
+Google Drive for desktop streams the files, so they are not on the Mac until opened. Find the folders by pattern,
+not exact name (`9x16*` has a trailing space in Drive, `16x9*` has a trailing dot). Copy the clips you need
+(`cp`, which forces the download) into `~/GK_CAPCUT_CLIPS` first, a few at a time. If a copy takes more than
+about 2 minutes or fails, skip that clip and take the next one.
+
 ## Music (Joe's own, already sorted by Gemini)
 - Vault: Drive `GK_MUSIC_VAULT` (1,000 to 2,000 songs), on the Mac under
   `~/Library/CloudStorage/GoogleDrive-*/My Drive/02_Brand_Assets/GK_MUSIC_VAULT`.
