@@ -31,6 +31,10 @@ export function buildStatusText() {
     `Waiting: ${waiting.length}`,
     ...waiting.map((d, i) => `  ${i + 1}. ${d.name}  (waiting since ${fmt(d.deferredAt)})`),
     '',
+    'Recently finished (what came back from Buffer):',
+    ...(readJson(path.join(process.cwd(), 'social-queue-history.json'), []).slice(0, 10).map((h) =>
+      `  ${fmt(h.at)}  ${h.name}  ->  ${Object.entries(h.results || {}).map(([k, v]) => `${k}: ${v}`).join(', ') || 'nothing sent'}`)),
+    '',
     `TikTok queue: ${(tt.queue || []).length} waiting, daily limit ${config.tiktokDailyLimit || 'n/a'}`,
     '',
     config.copyrightFooter || '© 2026 GK Legend Studio. All rights reserved.\nhttps://www.youtube.com/@PathFoundGK',

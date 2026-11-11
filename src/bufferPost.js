@@ -24,6 +24,7 @@ const DEFERRED_PATH = path.join(process.cwd(), 'buffer-deferred.json');
 const LAST_VIDEO_PATH = path.join(process.cwd(), 'buffer-last-video.json');
 // Same video saved twice under names like "clip.mp4" / "clip (1).mp4" (11 Nov 2026: copies went out twice).
 // A video whose name (minus extension and " (n)") was already queued or sent within 48 h is not queued again.
+const HISTORY_PATH = path.join(process.cwd(), 'social-queue-history.json');
 const SEEN_PATH = path.join(process.cwd(), 'buffer-seen.json');
 const SEEN_MS = 48 * 3600 * 1000;
 export function nameKey(name) {
@@ -357,6 +358,7 @@ export async function postToBuffer(auth, params, { force = false } = {}) {
     saveRetries(list);
   };
 
+  const results = {};
   for (let i = 0; i < services.length; i++) {
     const service = services[i];
     // One network at a time, with a pause between them (BUFFER_GAP_SECONDS,
@@ -369,14 +371,22 @@ export async function postToBuffer(auth, params, { force = false } = {}) {
       update(service, null);
       addVerify(id, { service, fileId, name, title, caption, firstComment, coverUrl });
       console.log(`Buffer ${service}: posted (${id}).`);
+      results[service] = 'posted';
     } catch (err) {
       const waiting = err instanceof DailyLimitError || isRateLimitError(err);
+      results[service] = waiting ? 'waiting (limit)' : `failed: ${String(err.message).slice(0, 80)}`;
       console.error(`Buffer ${service} ${waiting ? 'waiting' : `failed (will retry up to ${MAX_ATTEMPTS} times)`}:`, err.message);
       update(service, { attempts: waiting ? 0 : 1 });
       // Rate limited: the other networks would fail too -- leave them queued.
       if (isRateLimitError(err)) break;
     }
   }
+  // Video finished: the gap now counts from the FINISH (Joe, 11 Nov 2026) and the result is kept
+  // for GK_Social_Queue.txt ("what came back"), so the next video is only taken after the full gap.
+  if (gapMs > 0) fs.writeFileSync(LAST_VIDEO_PATH, JSON.stringify({ at: Date.now() }));
+  const history = readJson(HISTORY_PATH, []);
+  history.unshift({ name, at: Date.now(), results });
+  fs.writeFileSync(HISTORY_PATH, JSON.stringify(history.slice(0, 15), null, 2));
 }
 
 // One network only, right now, no retry queue -- used by `npm run facebook-redo`
