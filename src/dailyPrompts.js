@@ -42,7 +42,7 @@ export function looksLikeValidDoc(text) {
   return heads.length === 10 && files.length === 10 && !badSubtitle;
 }
 
-async function askGeminiWithSearch(model, systemPrompt, userPrompt) {
+export async function askGeminiWithSearch(model, systemPrompt, userPrompt) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 240000);
   try {
