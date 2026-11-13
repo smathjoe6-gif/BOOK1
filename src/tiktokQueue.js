@@ -36,6 +36,16 @@ function loadState() {
     state.date = todayKey();
     state.postedToday = 0;
   }
+  // Joe 13 Nov 2026: TikTok only gets TODAY's videos. Anything that waited over from an earlier day (or has no
+  // timestamp, i.e. is old) is dropped, never posted the next day. TIKTOK_SAME_DAY_ONLY=false turns this off.
+  if (process.env.TIKTOK_SAME_DAY_ONLY !== 'false') {
+    const before = state.queue.length;
+    state.queue = state.queue.filter((q) => q.queuedAt && new Date(q.queuedAt).toLocaleDateString('en-CA') === todayKey());
+    if (state.queue.length < before) {
+      console.log(`TikTok: dropped ${before - state.queue.length} waiting video(s) from earlier days (only today's videos go to TikTok).`);
+      fs.writeFileSync(QUEUE_PATH, JSON.stringify(state, null, 2));
+    }
+  }
   return state;
 }
 
