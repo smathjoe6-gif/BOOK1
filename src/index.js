@@ -9,6 +9,7 @@ import { loopCutOnce } from './loopCutter.js';
 import { songFixOnce } from './songFix.js';
 import { pinterestFeedOnce } from './pinterestFeed.js';
 import { dailyPromptsOnce } from './dailyPrompts.js';
+import { dailyHistoryDocsOnce } from './dailyHistoryDocs.js';
 import { listNewVideos, listVideosInFolder, downloadFile, moveToDone, mirrorNewVideos, syncLogToDrive, uploadVerticalCopy } from './drive.js';
 import { findRowForFile, appendGeneratedRow, updateCoverImage } from './sheets.js';
 import { uploadToYouTube, postEngagementComment } from './youtube.js';
@@ -439,6 +440,12 @@ async function checkOnce() {
     await dailyPromptsOnce(auth);
   } catch (err) {
     console.error('Daily prompts step failed (will retry later):', err.message);
+  }
+
+  try {
+    await dailyHistoryDocsOnce(auth);
+  } catch (err) {
+    console.error('Daily history docs step failed (will retry later):', err.message);
   }
 
   try {
