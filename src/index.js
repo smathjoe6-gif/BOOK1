@@ -30,6 +30,7 @@ import { withAffiliateLine } from './affiliate.js';
 import { postNextHistoryVideo, replyToHistoryComments } from './historyChannel.js';
 import { sortDoneFoldersByShape } from './doneSorter.js';
 import { isAlreadyPosted, isCopyOfRecentlyPosted, rememberPosted, seedPostedHashes } from './postedHashes.js';
+import { visualHashes, findVisualDuplicate, rememberVisual } from './visualDupes.js';
 import { postDuePicture } from './pictureDrops.js';
 import { cleanBufferPosts } from './bufferClean.js';
 import { updateSocialQueueStatus } from './socialQueueStatus.js';
@@ -158,6 +159,15 @@ async function processVideoOnce(file) {
   console.log(`Downloading...`);
   let localPath = await downloadFile(auth, file.id, file.name);
 
+  // Same-LOOKING video as one posted in the last days (different file/bytes, so the md5 guard misses it)?
+  const vHashes = await visualHashes(localPath);
+  const lookalike = findVisualDuplicate(vHashes);
+  if (lookalike) {
+    console.log(`"${file.name}" looks the same as "${lookalike}" (posted in the last days) -- moving to DONE without posting again.`);
+    await moveToDone(auth, file.id);
+    return 'skipped';
+  }
+
   // Which Drive file Buffer (IG/FB/Pinterest/X/TikTok) fetches: the original,
   // unless the video had to be converted to 9:16, in which case a copy of the
   // converted file (a wide original is rejected by Facebook Reels).
@@ -193,6 +203,7 @@ async function processVideoOnce(file) {
     // Remember the moment YouTube accepts it: a restart after this point can
     // never upload the same video again (the md5 guard catches it).
     rememberPosted(file.md5Checksum, file.name);
+    rememberVisual(vHashes, file.name);
     await autoAddToPlaylist(auth, { videoId: yt.id, title: row.title, description: caption });
     try {
       const question = await engagementQuestion(row.title, row.capture);
