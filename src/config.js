@@ -202,6 +202,9 @@ export const config = {
   groqApiKey: process.env.GROQ_API_KEY || '',
   groqModel: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
   groqUrl: process.env.GROQ_URL || 'https://api.groq.com/openai/v1/chat/completions',
+  // Groq model that can LOOK at pictures: the backup for frame captions when every Gemini model is out of quota.
+  // Name NOT verified against Groq's live list (13 Nov 2026): if Groq answers 404/400, change it in .env.
+  groqVisionModel: process.env.GROQ_VISION_MODEL || 'meta-llama/llama-4-scout-17b-16e-instruct',
   // Hive (thehive.ai) text model, OpenAI-compatible, tried after the Gemini models
   // and before OmniRoute. Blank key = off. URL/model can be changed in .env if
   // Hive's docs differ (the URL here was not checked against live Hive).
