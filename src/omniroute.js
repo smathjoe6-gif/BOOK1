@@ -72,6 +72,43 @@ async function askGroq(systemPrompt, userPrompt) {
   }
 }
 
+// Groq vision call (OpenAI-style image_url with base64 JPEG), the free backup for frame captions.
+async function askGroqVision(systemPrompt, userPrompt, frames) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  try {
+    const res = await fetch(config.groqUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${config.groqApiKey}` },
+      body: JSON.stringify({
+        model: config.groqVisionModel,
+        max_tokens: 600,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          {
+            role: 'user',
+            content: [
+              ...frames.slice(0, 3).map((b) => ({ type: 'image_url', image_url: { url: `data:image/jpeg;base64,${b.toString('base64')}` } })),
+              { type: 'text', text: userPrompt },
+            ],
+          },
+        ],
+      }),
+      signal: controller.signal,
+    });
+    if (!res.ok) {
+      const body = (await res.text().catch(() => '')).replace(/\s+/g, ' ').slice(0, 160);
+      throw new Error(`Groq vision returned ${res.status}: ${body}`);
+    }
+    const data = await res.json();
+    const text = data.choices?.[0]?.message?.content?.trim();
+    if (!text) throw new Error('Groq vision gave an empty response');
+    return text;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 // Hive's OpenAI-compatible chat endpoint (cheap DeepSeek text model), used when
 // Gemini's free quota is gone. Only used if HIVE_API_KEY is set.
 async function askHive(systemPrompt, userPrompt) {
@@ -347,7 +384,7 @@ HASHTAGS: <6 hashtags separated by spaces>`;
 const FRAME_NOTE = `You ARE shown three frames from the video (start, middle, end). Look at them and write the title, caption and hashtags about what is really visible: the subject, the place, the action, the mood. Be specific to this clip (a different clip must not get the same title). Only describe what you can see or what the hint says; never invent facts, names, news or events, and never name a real person. If a frame shows readable text, you may use it.`;
 
 export async function writeCaptionFromFrames(filenameHint, frames) {
-  if (!config.geminiApiKey) throw new Error('no Gemini key for frame captions');
+  if (!config.geminiApiKey && !config.groqApiKey) throw new Error('no Gemini or Groq key for frame captions');
   if (!frames || !frames.length) throw new Error('no frames');
   const system = CAPTION_SYSTEM_PROMPT.replace(/You cannot see the video, and you only get a filename hint\./, FRAME_NOTE);
   const userPrompt = `Write a short YouTube title (under 60 characters, include 1 emoji), a 1-2 sentence caption, and 6 matching hashtags for this short video from GK Legend Studio, based on the three frames shown. File name hint (ignore it if it looks like a random ID): "${filenameHint}".
@@ -358,7 +395,7 @@ CAPTION: <caption here>
 HASHTAGS: <6 hashtags separated by spaces>`;
   const models = [config.geminiModel, ...config.geminiFallbackModels.filter((m) => m !== config.geminiModel)];
   let lastErr;
-  for (const model of models) {
+  for (const model of config.geminiApiKey ? models : []) {
     try {
       const text = await askGemini(system, userPrompt, model, frames);
       const titleMatch = text.match(/TITLE:\s*(.+)/i);
@@ -368,6 +405,20 @@ HASHTAGS: <6 hashtags separated by spaces>`;
       return { title: titleMatch[1].trim(), capture: captionMatch[1].trim(), hashtag: hashtagMatch ? hashtagMatch[1].trim() : undefined };
     } catch (err) {
       lastErr = err;
+    }
+  }
+  // Every Gemini model is out: the free Groq vision model looks at the same frames (needs GROQ_API_KEY).
+  if (config.groqApiKey) {
+    try {
+      const text = await askGroqVision(system, userPrompt, frames);
+      const titleMatch = text.match(/TITLE:\s*(.+)/i);
+      const captionMatch = text.match(/CAPTION:\s*([\s\S]+?)(?:\nHASHTAGS:|$)/i);
+      const hashtagMatch = text.match(/HASHTAGS:\s*(.+)/i);
+      if (!titleMatch || !captionMatch) throw new Error('could not parse the answer');
+      console.log('Gemini is out of quota -- the Groq vision model looked at the frames instead.');
+      return { title: titleMatch[1].trim(), capture: captionMatch[1].trim(), hashtag: hashtagMatch ? hashtagMatch[1].trim() : undefined };
+    } catch (err) {
+      console.log(`Groq vision failed (${err.message}).`);
     }
   }
   throw lastErr || new Error('frame caption failed');
