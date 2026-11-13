@@ -153,7 +153,7 @@ const GEMINI_TIMEOUT_MS = 25000;
 // Studio key (aistudio.google.com/apikey) in GEMINI_API_KEY; the key goes in
 // the x-goog-api-key header, which works for both the older AIza... keys and
 // the newer AQ.... ones. Only used if GEMINI_API_KEY is set.
-async function askGemini(systemPrompt, userPrompt, model = config.geminiModel) {
+async function askGemini(systemPrompt, userPrompt, model = config.geminiModel, images = []) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
 
@@ -173,7 +173,7 @@ async function askGemini(systemPrompt, userPrompt, model = config.geminiModel) {
         },
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: systemPrompt }] },
-          contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+          contents: [{ role: 'user', parts: [...images.map((b) => ({ inlineData: { mimeType: 'image/jpeg', data: b.toString('base64') } })), { text: userPrompt }] }],
           generationConfig,
         }),
         signal: controller.signal,
@@ -337,6 +337,40 @@ HASHTAGS: <6 hashtags separated by spaces>`;
     capture: captionMatch[1].trim(),
     hashtag: hashtagMatch ? hashtagMatch[1].trim() : undefined,
   };
+}
+
+// Joe 13 Nov 2026: the AI only saw a file name, so a clip called "2026-10-29_dd21f654....mp4" got the same
+// feeling-title ("Pure Joy in Every Moment") as every other. Now Gemini is shown three frames of the real video
+// and writes the title, caption and hashtags from what is on screen. Only Gemini can look at pictures (Groq,
+// Hive and OmniRoute are text-only); every Gemini model in the fallback chain is tried; any failure throws and
+// the caller falls back to the old file-name route.
+const FRAME_NOTE = `You ARE shown three frames from the video (start, middle, end). Look at them and write the title, caption and hashtags about what is really visible: the subject, the place, the action, the mood. Be specific to this clip (a different clip must not get the same title). Only describe what you can see or what the hint says; never invent facts, names, news or events, and never name a real person. If a frame shows readable text, you may use it.`;
+
+export async function writeCaptionFromFrames(filenameHint, frames) {
+  if (!config.geminiApiKey) throw new Error('no Gemini key for frame captions');
+  if (!frames || !frames.length) throw new Error('no frames');
+  const system = CAPTION_SYSTEM_PROMPT.replace(/You cannot see the video, and you only get a filename hint\./, FRAME_NOTE);
+  const userPrompt = `Write a short YouTube title (under 60 characters, include 1 emoji), a 1-2 sentence caption, and 6 matching hashtags for this short video from GK Legend Studio, based on the three frames shown. File name hint (ignore it if it looks like a random ID): "${filenameHint}".
+
+Respond in exactly this format, nothing else:
+TITLE: <title here>
+CAPTION: <caption here>
+HASHTAGS: <6 hashtags separated by spaces>`;
+  const models = [config.geminiModel, ...config.geminiFallbackModels.filter((m) => m !== config.geminiModel)];
+  let lastErr;
+  for (const model of models) {
+    try {
+      const text = await askGemini(system, userPrompt, model, frames);
+      const titleMatch = text.match(/TITLE:\s*(.+)/i);
+      const captionMatch = text.match(/CAPTION:\s*([\s\S]+?)(?:\nHASHTAGS:|$)/i);
+      const hashtagMatch = text.match(/HASHTAGS:\s*(.+)/i);
+      if (!titleMatch || !captionMatch) throw new Error('could not parse the answer');
+      return { title: titleMatch[1].trim(), capture: captionMatch[1].trim(), hashtag: hashtagMatch ? hashtagMatch[1].trim() : undefined };
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+  throw lastErr || new Error('frame caption failed');
 }
 
 const REPLY_SYSTEM_PROMPT = `You are the social media voice of "GK Legend Studio." Reply warmly and briefly (under 30 words) to a YouTube comment, genuine and specific to what they said where possible, with one emoji. Never sound like a canned template.

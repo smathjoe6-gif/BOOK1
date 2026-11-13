@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { writeCaptionWithAI } from './omniroute.js';
+import { writeCaptionWithAI, writeCaptionFromFrames } from './omniroute.js';
+import { grabFrames } from './videoFrames.js';
 
 const THEME_STATE_PATH = path.join(process.cwd(), 'theme-caption-state.json');
 
@@ -204,7 +205,18 @@ export function randomThemedCaption() {
   return { title: pick.title, capture: pick.capture, hashtag: pickRandomHashtags(6, NEUTRAL_HASHTAG_BANK) };
 }
 
-export async function generateCaption(filename) {
+export async function generateCaption(filename, opts = {}) {
+  // Frames first: the AI looks at the real video, not just the file name (Joe, 13 Nov 2026).
+  if (opts.videoPath && process.env.FRAME_CAPTIONS !== 'false') {
+    try {
+      const frames = await grabFrames(opts.videoPath);
+      const ai = await writeCaptionFromFrames(filename, frames);
+      console.log(`Frame-based caption used for "${filename}"`);
+      return { title: ai.title, capture: ai.capture, hashtag: ai.hashtag || pickRandomHashtags(6) };
+    } catch (err) {
+      console.log(`Frame-based caption not available (${err.message}) -- using the file-name route.`);
+    }
+  }
   try {
     const ai = await writeCaptionWithAI(filename);
     console.log(`AI-written caption used for "${filename}"`);

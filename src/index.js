@@ -111,6 +111,18 @@ async function processVideoOnce(file) {
     return 'skipped';
   }
 
+  // Download first: the caption writer now looks at real frames of the video, and the same-LOOKING video
+  // check (different file/bytes, so the md5 guard misses it) needs the file too.
+  console.log(`Downloading...`);
+  let localPath = await downloadFile(auth, file.id, file.name);
+  const vHashes = await visualHashes(localPath);
+  const lookalike = findVisualDuplicate(vHashes);
+  if (lookalike) {
+    console.log(`"${file.name}" looks the same as "${lookalike}" (posted in the last days) -- moving to DONE without posting again.`);
+    await moveToDone(auth, file.id);
+    return 'skipped';
+  }
+
   let row = await findRowForFile(auth, file.name);
   let newRowCover = '';
   const collisionBaseName = stripCollisionSuffix(file.name);
@@ -131,7 +143,7 @@ async function processVideoOnce(file) {
       console.log(`"${file.name}" looks like an extra copy of another video (ends in _2/_3/etc) — skipping so it doesn't post twice. Add a spreadsheet row for it if it's actually different content.`);
       return 'skipped';
     }
-    const generated = await generateCaption(collisionBaseName);
+    const generated = await generateCaption(collisionBaseName, { videoPath: localPath });
     console.log(`No spreadsheet entry for "${file.name}" — auto-writing one: "${generated.title}"`);
     row = { title: generated.title, capture: generated.capture, hashtag: generated.hashtag };
 
@@ -156,17 +168,6 @@ async function processVideoOnce(file) {
     }
   }
 
-  console.log(`Downloading...`);
-  let localPath = await downloadFile(auth, file.id, file.name);
-
-  // Same-LOOKING video as one posted in the last days (different file/bytes, so the md5 guard misses it)?
-  const vHashes = await visualHashes(localPath);
-  const lookalike = findVisualDuplicate(vHashes);
-  if (lookalike) {
-    console.log(`"${file.name}" looks the same as "${lookalike}" (posted in the last days) -- moving to DONE without posting again.`);
-    await moveToDone(auth, file.id);
-    return 'skipped';
-  }
 
   // Which Drive file Buffer (IG/FB/Pinterest/X/TikTok) fetches: the original,
   // unless the video had to be converted to 9:16, in which case a copy of the
