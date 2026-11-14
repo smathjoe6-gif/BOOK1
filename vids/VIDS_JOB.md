@@ -12,8 +12,8 @@ Pull the newest copy: `cd ~/gk-automation && git pull`.
 
 ## Goal
 1 video a day, 15 to 30 seconds, 9:16, made of 4 to 6 of Joe's own Somali-themed clips that belong together
-(same mood and look: heritage, buraanbur / gabay scenes, Somali wedding energy, markets, coast). Quiet music
-or Vids' own stock music, no voices. Finished file goes to `~/GK_DROP`; the pipe posts it everywhere.
+(same mood and look: heritage, buraanbur / gabay scenes, Somali wedding energy, markets, coast). Joe's own music
+(or Vids' stock music), no voices. Finished file goes to `~/GK_DROP`; the pipe posts it everywhere.
 
 ## Hard rules (never break)
 - NEVER press Upgrade, Buy, Get AI credits or any payment button; stop and tell Joe if asked to pay or sign in.
@@ -33,7 +33,11 @@ clips of one mood; 6 s clips are fine (cut each to 3 to 5 s).
 1. docs.google.com/videos in Joe's signed-in Chrome, new blank video, vertical 9:16 if offered (else 16:9 and
    crop in the next step).
 2. Add the clips in order (strongest first, strongest last), trim each to 3 to 5 s, cuts on the beat.
-3. Music: Vids' own library, calm cinematic or Somali-feeling instrumental; no voice-over, no AI voice.
+3. Music: Joe's OWN music is allowed here (his decision, 14 Nov). Vault: Drive `GK_MUSIC_VAULT`
+   (`02_Brand_Assets/GK_MUSIC_VAULT`, on the Mac under `~/Library/CloudStorage/GoogleDrive-*/My Drive/02_Brand_Assets/`).
+   Prefer `01_SOMALI_HERITAGE`, `Somali`, `03_MIX_CINEMATIC` for Somali clips; skip names with "ssstik" and
+   `Needs Review`; never the same song twice in a row. Cut a loud 15 to 30 s stretch with ffmpeg (0.3 s fade in,
+   1 s fade out), upload it to Vids as the audio. Fallback: Vids' own music. No voice-over, no AI voice.
 4. Export / download as MP4 (File > Download > MP4). If Chrome cannot save, fetch the file URL with curl as in
    the CapCut card.
 
