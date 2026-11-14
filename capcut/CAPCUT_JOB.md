@@ -117,6 +117,18 @@ So for CapCut videos, INSTEAD of the ~/GK_DROP route:
   least 60 minutes after any other TikTok post (the pipe also posts to the same account, TikTok blocks bursts).
 - **Do NOT also put a posted video into ~/GK_DROP** (it would post twice). Videos that fail the gate are deleted.
 - Keep a line in `~/GK_CAPCUT_WORK/log.txt`: file/design name, networks posted, time, caption.
+- **What CapCut's Share screen offers (Joe's photos, 14 Nov):** TikTok, TikTok Ads Manager (NEVER press: paid ads),
+  YouTube, YouTube Shorts, Facebook Page, Instagram Reels, Schedule. No Pinterest and no X there. Joe tested Facebook Page
+  ("Music Production Studio"), YouTube, TikTok and Instagram: all connected and posted.
+- **Every Share box has a Title, a Description and a Video cover (thumbnail).** CapCut pre-fills the Description with
+  "Created with CapCut: <capcut link> #CapCut": DELETE that and write our own (title, caption, hashtags, footer, see
+  above). The Title must be real words (not "gk leg"), 3 to 6 words.
+- **Video cover (thumbnail):** always pick one. Choose the most striking frame from the first 2 seconds (clear subject, no
+  black or white frame, no text cut off); if the box offers an upload, use a frame you exported yourself. Never leave
+  the spinner or an empty cover.
+- **Export settings:** 1080p, Recommended quality, 30 fps, MP4; Name = a meaningful name (`CAPCUT_<theme>_<NN>`).
+- **Pinterest and X** are not in CapCut's list: leave them out (Joe schedules those from Canva when he wants).
+
 - Never press Renew, Upgrade or any payment button.
 
 ## Branding (EVERY video, before the quality gate)
