@@ -63,6 +63,12 @@ export const config = {
   // Or take the clips straight from a Google Drive folder (stays in Drive,
   // clips are reused round after round). Wins over STITCH_FOLDER if both set.
   stitchDriveFolderId: process.env.STITCH_DRIVE_FOLDER_ID || '',
+  // Extra READ-ONLY clip folders for the stacker (comma list), e.g. Joe's GROK_LIBRARY_SORTED 9x16 folder with
+  // thousands of clips. Nothing in them is tidied, moved or deleted; clips are only listed and downloaded.
+  stitchExtraFolderIds: (process.env.STITCH_EXTRA_FOLDER_IDS || '').split(',').map((x) => x.trim()).filter(Boolean),
+  // 'oldest' (default, Joe 14 Nov): start with the OLDEST clips (2025) and work up to the newest, never the same
+  // clip twice. 'random' = the old behaviour.
+  stitchOrder: String(process.env.STITCH_ORDER || 'oldest').toLowerCase() === 'random' ? 'random' : 'oldest',
   // Beat cuts (src/stitchBeats.js): with a song, cut on its beats; STITCH_BEAT_CUTS=false = old cuts.
   stitchBeatCuts: process.env.STITCH_BEAT_CUTS !== 'false',
   stitchBeatSeconds: Number(process.env.STITCH_BEAT_SECONDS) || 30,

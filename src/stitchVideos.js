@@ -154,6 +154,15 @@ function shuffled(list) {
   return copy;
 }
 
+// Date of a clip: a date in the file name (2026-02-11_...) wins, else Drive's created date.
+export function clipDate(c) {
+  const m = String(c.name || '').match(/(20\d\d)-(\d\d)-(\d\d)/);
+  return m ? `${m[1]}-${m[2]}-${m[3]}` : String(c.createdTime || '').slice(0, 10);
+}
+export function byOldest(a, b) {
+  return clipDate(a).localeCompare(clipDate(b)) || String(a.createdTime || '').localeCompare(String(b.createdTime || ''));
+}
+
 // Every video directly inside the Drive stock folder (all pages).
 async function listDriveStock(auth, folderId) {
   const drive = google.drive({ version: 'v3', auth });
@@ -584,7 +593,14 @@ async function stitchFromFolder(auth, dir, outDir, state) {
 // been used the cycle starts again.
 async function stitchFromDrive(auth, folderId, outDir, state) {
   const needed = Math.min(MAX_CLIPS, Math.ceil(config.stitchTargetSeconds / config.stitchMaxClipSeconds) + 2);
-  const rootClips = await listLooseStock(auth, folderId);
+  let rootClips = await listLooseStock(auth, folderId);
+  for (const extraId of config.stitchExtraFolderIds) {
+    try {
+      rootClips = rootClips.concat(await listLooseStock(auth, extraId));
+    } catch (err) {
+      console.log(`Stitch: could not list the extra clip folder ${extraId} (${err.message.slice(0, 100)}).`);
+    }
+  }
   const themes = [];
   for (const sub of await listSubfolders(auth, folderId)) {
     if (isShapeFolder(sub.name)) continue;
@@ -618,9 +634,17 @@ async function stitchFromDrive(auth, folderId, outDir, state) {
     (g) => g.clips.filter((f) => !used.includes(f.id)).length >= themeNeeded
   );
   let picked;
+  const oldest = config.stitchOrder === 'oldest';
   if (ready.length > 0) {
-    theme = shuffled(ready)[0];
-    pool = theme.clips.filter((f) => !used.includes(f.id));
+    if (oldest) {
+      // The group whose oldest unused clip is the oldest comes first.
+      const firstOf = (g) => g.clips.filter((f) => !used.includes(f.id)).sort(byOldest)[0];
+      theme = [...ready].sort((a, b) => byOldest(firstOf(a), firstOf(b)))[0];
+      pool = theme.clips.filter((f) => !used.includes(f.id)).sort(byOldest);
+    } else {
+      theme = shuffled(ready)[0];
+      pool = theme.clips.filter((f) => !used.includes(f.id));
+    }
     picked = pool.slice(0, themeCount);
   } else {
     pool = stock.filter((f) => !used.includes(f.id));
@@ -629,7 +653,8 @@ async function stitchFromDrive(auth, folderId, outDir, state) {
       used = [];
       pool = stock;
     }
-    picked = shuffled(pool).slice(0, needed);
+    picked = oldest ? [...pool].sort(byOldest).slice(0, needed) : shuffled(pool).slice(0, needed);
+    if (oldest && picked.length) console.log(`Stitch: oldest clips first -- starting at ${clipDate(picked[0])} (up to ${clipDate(picked[picked.length - 1])}).`);
   }
   if (theme) console.log(`Stitch: using the "${theme.name}" ${LABELS.includes(theme.name) ? 'clips Gemini matched together' : 'folder'} (${picked.length} clips).`);
 
