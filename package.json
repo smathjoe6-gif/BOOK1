@@ -19,6 +19,7 @@
     "tidy-drive": "node src/driveTidy.js",
     "reorg-drive": "node src/driveReorg.js",
     "dedupe-drive": "node src/driveDedupe.js",
+    "organize-folder": "node src/organizeFolder.js",
     "loop-cut": "node src/loopCutter.js",
     "song-fix": "node src/songFix.js",
     "pinterest-feed": "node src/pinterestFeed.js",
