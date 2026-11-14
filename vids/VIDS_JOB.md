@@ -41,6 +41,20 @@ clips of one mood; 6 s clips are fine (cut each to 3 to 5 s).
 4. Export / download as MP4 (File > Download > MP4). If Chrome cannot save, fetch the file URL with curl as in
    the CapCut card.
 
+## NO VOICES, MUSIC THAT MATCHES, USE THE TEMPLATE (Joe, 14 Nov 2026, after the first test)
+The first test had voices from the clips and music that did not fit. Fix, every time:
+- **Mute the clips' own sound completely** (set every clip volume to 0 / use "Detach audio" and delete it). The
+  only sound in the video is ONE music track. If any speech is audible in the exported video, reject it.
+- **The music must match the picture**: fast, loud, punchy clips get an energetic beat; slow, calm clips get a
+  slow track. Pick the music AFTER you have looked at the clips, never the reverse.
+- **Cut on the beat**: use the template's own beat-sync (CapCut: "Auto beat sync" / "Beats" on the audio; Vids:
+  cuts on the beat by hand) so every cut lands on a drum hit. Clips of 1.5 to 3 s each, strongest clip first, a
+  strong last second. No slow fades.
+- **Use a template** (CapCut: Templates tab; Vids: a template or scene layout) and keep ITS cuts, transitions and
+  text style, but put Joe's own clips in every slot. Do not leave the template's sample footage.
+- Viral shape: a hook in the first second (the most striking moment), fast cuts, one clear feeling, ends on a
+  loop-friendly or strong final shot.
+
 ## Branding (every video) and quality gate
 Same ffmpeg overlay as the CapCut card (logo top-right 200 px, copyright strip near the bottom), name
 `VIDS_Somali_<theme>_<NN>_GK.mp4`. Gate: 9:16 (1080x1920 or similar), 12 to 35 s, over 300 KB, frames at 1 s,
