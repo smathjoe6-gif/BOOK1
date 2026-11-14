@@ -75,6 +75,20 @@ template's own sample footage: every clip slot must hold one of Joe's clips.
   `curl -L -o ~/GK_CAPCUT_WORK/<name>.mp4 "<url>"` (the link expires fast).
 - Name it `CAPCUT_<theme>_<NN>.mp4` (the AI caption uses the file name as its hint, so make it meaningful).
 
+## NO VOICES, MUSIC THAT MATCHES, USE THE TEMPLATE (Joe, 14 Nov 2026, after the first test)
+The first test had voices from the clips and music that did not fit. Fix, every time:
+- **Mute the clips' own sound completely** (set every clip volume to 0 / use "Detach audio" and delete it). The
+  only sound in the video is ONE music track. If any speech is audible in the exported video, reject it.
+- **The music must match the picture**: fast, loud, punchy clips get an energetic beat; slow, calm clips get a
+  slow track. Pick the music AFTER you have looked at the clips, never the reverse.
+- **Cut on the beat**: use the template's own beat-sync (CapCut: "Auto beat sync" / "Beats" on the audio; Vids:
+  cuts on the beat by hand) so every cut lands on a drum hit. Clips of 1.5 to 3 s each, strongest clip first, a
+  strong last second. No slow fades.
+- **Use a template** (CapCut: Templates tab; Vids: a template or scene layout) and keep ITS cuts, transitions and
+  text style, but put Joe's own clips in every slot. Do not leave the template's sample footage.
+- Viral shape: a hook in the first second (the most striking moment), fast cuts, one clear feeling, ends on a
+  loop-friendly or strong final shot.
+
 ## Branding (EVERY video, before the quality gate)
 Joe's order (11 Nov): every video carries the GK Legend logo and the copyright line. Do it with ffmpeg
 (the overlay filter works on Joe's Mac; drawtext does not, so the text is a ready-made picture):
