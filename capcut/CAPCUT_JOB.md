@@ -75,6 +75,17 @@ template's own sample footage: every clip slot must hold one of Joe's clips.
   `curl -L -o ~/GK_CAPCUT_WORK/<name>.mp4 "<url>"` (the link expires fast).
 - Name it `CAPCUT_<theme>_<NN>.mp4` (the AI caption uses the file name as its hint, so make it meaningful).
 
+## Clip order: OLDEST FIRST, never the same clip twice (Joe, 14 Nov 2026)
+Joe keeps seeing the same videos. Fix: do NOT pick the newest or the same favourites.
+- Sources (all of Joe's own, thousands of clips): `GROK_LIBRARY_SORTED/9x16 ` and `16x9.`, `KA`, `EVERY-DESKTOP-DOWNLOADS`,
+  `GK_STOCK_VIDEOS`, CapCut's Media library, and `GK_VERTICAL_COPIES`.
+- Start with the OLDEST clips (2025, then early 2026: use the date in the file name, else Drive's created date) and
+  work UP step by step toward the newest. Old clips are the ones people have not seen.
+- Keep a pointer in `~/GK_CAPCUT_WORK/clip-pointer.txt` (the date of the last clip used) and a list of every used
+  file name in `log.txt`. Next run starts just after the pointer. Never reuse a clip, ever; when a source runs out,
+  move to the next source.
+- Skip clips already posted as full videos (same name in `~/GK_DROP/done` or the sheet).
+
 ## NO VOICES, MUSIC THAT MATCHES, USE THE TEMPLATE (Joe, 14 Nov 2026, after the first test)
 The first test had voices from the clips and music that did not fit. Fix, every time:
 - **Mute the clips' own sound completely** (set every clip volume to 0 / use "Detach audio" and delete it). The

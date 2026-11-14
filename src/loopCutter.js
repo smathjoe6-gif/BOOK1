@@ -204,8 +204,14 @@ function pick(clips, used, count) {
   const fresh = clips.filter(
     (c) => !usedSet.has(c.id) && Number(c.size || 0) > 300 * 1024 && !(c.md5Checksum && posted.has(c.md5Checksum)) && !config.loopSkipWords.some((w) => String(c.name || '').toLowerCase().includes(w)) && /\.(mp4|mov|m4v|webm)$/i.test(c.name || '')
   );
-  // Newest library clips first: they are the freshest ideas and the most likely to be on-brand.
-  fresh.sort((a, b) => String(b.createdTime || '').localeCompare(String(a.createdTime || '')));
+  // Order (LOOP_ORDER): 'oldest' (default, Joe 14 Nov: start from the old clips people have not seen and work up
+  // to the new ones) or 'newest'. A date in the file name (2026-02-11_...) wins over Drive's created time.
+  const dateOf = (c) => {
+    const m = String(c.name || '').match(/(20\d\d)-(\d\d)-(\d\d)/);
+    return m ? `${m[1]}-${m[2]}-${m[3]}` : String(c.createdTime || '').slice(0, 10);
+  };
+  const dir = config.loopOrder === 'newest' ? -1 : 1;
+  fresh.sort((a, b) => dir * (dateOf(a).localeCompare(dateOf(b)) || String(a.createdTime || '').localeCompare(String(b.createdTime || ''))));
   return fresh.slice(0, count);
 }
 
