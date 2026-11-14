@@ -55,6 +55,8 @@ export const config = {
   // no politician / president clips; also skips test files and plain title cards).
   loopSkipWords: (process.env.LOOP_SKIP_WORDS === undefined ? 'politician,president,minister,test_video,drama' : process.env.LOOP_SKIP_WORDS)
     .split(',').map((w) => w.trim().toLowerCase()).filter(Boolean),
+  // 'oldest' (default) = start with the oldest library clips and work up to the newest; 'newest' = the reverse.
+  loopOrder: String(process.env.LOOP_ORDER || 'oldest').toLowerCase() === 'newest' ? 'newest' : 'oldest',
   loopSeconds: Number(process.env.LOOP_SECONDS) || 10,
   loopPerDay: process.env.LOOP_PER_DAY === undefined || process.env.LOOP_PER_DAY === '' ? 4 : Number(process.env.LOOP_PER_DAY),
   stitchFolder: process.env.STITCH_FOLDER || '',
