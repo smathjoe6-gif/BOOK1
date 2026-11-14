@@ -100,6 +100,25 @@ The first test had voices from the clips and music that did not fit. Fix, every 
 - Viral shape: a hook in the first second (the most striking moment), fast cuts, one clear feeling, ends on a
   loop-friendly or strong final shot.
 
+## CAPCUT POSTS IT ITSELF (Joe, 14 Nov 2026: his test posted to YouTube and TikTok straight from CapCut)
+Joe wants everything made in CapCut to go out from CapCut's own Share / Publish, to every network he has connected
+there (YouTube and TikTok work; he connects Instagram, Facebook, Pinterest, X himself in CapCut if it offers them).
+So for CapCut videos, INSTEAD of the ~/GK_DROP route:
+- **Branding inside CapCut** (there is no ffmpeg step before posting): add `assets/gk-logo.png` (small, top-right) and
+  `assets/gk-copyright-strip.png` (near the bottom, above the app buttons) as overlay stickers in the editor.
+  Upload both once into CapCut's Media, keep them as a saved template layer if CapCut allows it.
+- **Quality gate** (same checks, done on the preview before posting): 9:16, 8 to 12.5 s, no black frames, no CapCut
+  watermark or end card, no voices, music matches. If anything fails, do not post.
+- **Write the post text yourself, every time** (title + caption + hashtags): a title of 3 to 6 words that says what the
+  video shows (no invented facts, no real people's names); a caption of one or two lines; 5 or 6 hashtags (#GKLegend,
+  #GKLegendStudio, two content tags, one broad tag); end the caption with: "(c) 2026 GK Legend Studio. All rights
+  reserved. https://www.youtube.com/@PathFoundGK" (the (c) sign is fine). Turn ON the "AI-generated content" label on TikTok.
+- **Post** with Share > YouTube, TikTok (and any other connected network): one video at a time, max 2 a day, TikTok at
+  least 60 minutes after any other TikTok post (the pipe also posts to the same account, TikTok blocks bursts).
+- **Do NOT also put a posted video into ~/GK_DROP** (it would post twice). Videos that fail the gate are deleted.
+- Keep a line in `~/GK_CAPCUT_WORK/log.txt`: file/design name, networks posted, time, caption.
+- Never press Renew, Upgrade or any payment button.
+
 ## Branding (EVERY video, before the quality gate)
 Joe's order (11 Nov): every video carries the GK Legend logo and the copyright line. Do it with ffmpeg
 (the overlay filter works on Joe's Mac; drawtext does not, so the text is a ready-made picture):
