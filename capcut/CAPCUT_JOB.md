@@ -6,7 +6,7 @@ Pull the newest copy: `cd ~/gk-automation && git pull`.
 ## Goal
 Make **2 viral-style videos per day** (10 to 11 seconds, 9:16) in **CapCut on the web**, in Joe's own Chrome
 (already signed in, year plan, free templates, about 838 credits). Use a **different template each time**,
-add Joe's own music, and let the pipe post them. Short, loud, one clear feeling. Joe's hits were 6 to 11 s clips;
+add CapCut's own viral music, and let the pipe post them. Short, loud, one clear feeling. Joe's hits were 6 to 11 s clips;
 long or stitched videos got 11 to 500 views.
 
 ## Joe's decision (11 Nov 2026, late night): AUTOMATIC, 2-DAY TRIAL
@@ -47,14 +47,21 @@ not exact name (`9x16*` has a trailing space in Drive, `16x9*` has a trailing do
 (`cp`, which forces the download) into `~/GK_CAPCUT_CLIPS` first, a few at a time. If a copy takes more than
 about 2 minutes or fails, skip that clip and take the next one.
 
-## Music (Joe's own, already sorted by Gemini)
-- Vault: Drive `GK_MUSIC_VAULT` (1,000 to 2,000 songs), on the Mac under
-  `~/Library/CloudStorage/GoogleDrive-*/My Drive/02_Brand_Assets/GK_MUSIC_VAULT`.
-- Pick ENERGY songs that match the video: `02_HIP_HOP`, `01_SOMALI_HERITAGE/SOMALI_HIGH_ENERGY`,
-  `03_MIX_CINEMATIC`, or the `Somali` / `English` / `Mixed` folders. Skip names with "ssstik". Skip `Needs Review`
-  unless nothing else fits. Never the same song twice in a row.
-- Cut a loud 10 to 12 s stretch (ffmpeg: start where it is loudest, 0.3 s fade in, 1 s fade out) into
-  `~/GK_CAPCUT_WORK/music_NN.mp3`, upload that to CapCut's Audio tab and put it under the video.
+## Music (CHANGED 14 Nov 2026: CapCut's OWN viral music, not Joe's songs)
+Joe's decision: do NOT use his music vault. In the editor's Audio tab use CapCut's own trending / viral sounds
+(the "Trending", "Viral" or "Popular" lists, shown with the template when a template carries its own sound).
+- Pick a sound that fits the mood of the clips, with NO voice or speech (music or beat only). Skip sounds that
+  are mostly talking, and anything marked as needing payment or a licence you do not have.
+- Never the same sound twice in a row. Write the sound name in the log.
+- Keep the music 10 to 12 s. If the template already has its own sound, keep it (the first lion video, which Joe
+  liked, was made this way).
+- No `ffmpeg` music step, no vault, no upload of songs.
+
+## Restart (14 Nov 2026)
+The pause from 11 Nov is lifted by Joe's word on 14 Nov: remove `~/GK_CAPCUT_WORK/STOP` (if it exists) and run
+again, 2 videos a day, same quality gate. The 11 Nov verdict stays: the first lion video (own clips, music only,
+no voices) was good; the second (template sample footage, a stranger on a treadmill) was bad. Never keep a
+template's own sample footage: every clip slot must hold one of Joe's clips.
 
 ## Templates
 - A DIFFERENT CapCut template each run. Prefer templates with 6 or fewer clip slots. The 10-slot template made on
