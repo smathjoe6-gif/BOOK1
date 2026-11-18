@@ -12,6 +12,7 @@ Pure Python 3 standard library - nothing to install.
   python3 gk_tiktok.py login            # connect your TikTok account
   python3 gk_tiktok.py me               # show which account is connected
   python3 gk_tiktok.py upload FILE.mp4  # send a video to TikTok drafts (for scripts/automation)
+  python3 gk_tiktok.py post FILE.mp4 "caption"  # DIRECT POST to the profile (needs video.publish)
   python3 gk_tiktok.py status PUBLISH_ID
 
 (c) 2026 GK Legend Studio. All rights reserved. https://www.youtube.com/@PathFoundGK
@@ -22,7 +23,7 @@ from pathlib import Path
 
 PORT = 8765
 REDIRECT_URI = "https://legal.lekkerglobally.com/tiktok/callback/"  # forwards to localhost
-SCOPES = "user.info.basic,video.upload"
+SCOPES = "user.info.basic,video.upload,video.publish"
 HOME = Path.home() / ".gk_tiktok"
 CONFIG = HOME / "config.json"
 TOKEN = HOME / "token.json"
@@ -136,6 +137,55 @@ def upload(path, log=print):
         headers={"Authorization": f"Bearer {tok}"}), "Upload init")["data"]
     pid, url = init["publish_id"], init["upload_url"]
     log(f"Uploading {path.name} ({size / MB:.1f} MB) in {count} part(s)...")
+    with open(path, "rb") as f:
+        for i in range(count):
+            start = i * chunk
+            end = size - 1 if i == count - 1 else start + chunk - 1
+            f.seek(start)
+            part = f.read(end - start + 1)
+            r = urllib.request.Request(url, data=part, method="PUT", headers={
+                "Content-Type": "video/quicktime" if path.suffix.lower() == ".mov" else "video/mp4",
+                "Content-Length": str(len(part)),
+                "Content-Range": f"bytes {start}-{end}/{size}"})
+            with urllib.request.urlopen(r, timeout=600) as resp:
+                log(f"  part {i + 1}/{count}: HTTP {resp.status}")
+    log(f"Sent. publish_id = {pid}")
+    return pid
+
+
+def creator_info():
+    return _check(_req("POST", f"{API}/post/publish/creator_info/query/", {},
+                       headers={"Authorization": f"Bearer {access_token()}"}), "Creator info").get("data", {})
+
+
+def direct_post(path, title="", log=print):
+    """DIRECT POST (needs the video.publish scope, which TikTok must approve).
+    Posts straight to the profile, no draft. Until TikTok audits the app, TikTok only
+    allows PRIVATE (SELF_ONLY) posts, so we use the most public option it offers us."""
+    path = Path(path).expanduser()
+    size = path.stat().st_size
+    info = creator_info()
+    options = info.get("privacy_level_options") or ["SELF_ONLY"]
+    for want in ("PUBLIC_TO_EVERYONE", "MUTUAL_FOLLOW_FRIENDS", "FOLLOWER_OF_CREATOR", "SELF_ONLY"):
+        if want in options:
+            privacy = want
+            break
+    else:
+        privacy = options[0]
+    if size <= 64 * MB:
+        chunk, count = size, 1
+    else:
+        chunk = 10 * MB
+        count = size // chunk
+    tok = access_token()
+    body = {"post_info": {"title": (title or path.stem.replace("_", " "))[:2200], "privacy_level": privacy,
+                          "disable_duet": False, "disable_comment": False, "disable_stitch": False},
+            "source_info": {"source": "FILE_UPLOAD", "video_size": size,
+                            "chunk_size": chunk, "total_chunk_count": count}}
+    init = _check(_req("POST", f"{API}/post/publish/video/init/", body,
+                       headers={"Authorization": f"Bearer {tok}"}), "Direct post init")["data"]
+    pid, url = init["publish_id"], init["upload_url"]
+    log(f"Posting {path.name} ({size / MB:.1f} MB) as {privacy} in {count} part(s)...")
     with open(path, "rb") as f:
         for i in range(count):
             start = i * chunk
@@ -316,6 +366,15 @@ def main():
             st = status(pid)
             print("status:", st.get("status"), st.get("fail_reason", ""))
             if st.get("status") in ("SEND_TO_USER_INBOX", "PUBLISH_COMPLETE", "FAILED"):
+                break
+    elif cmd == "post" and len(sys.argv) > 2:
+        # python3 gk_tiktok.py post FILE.mp4 ["caption text"]
+        pid = direct_post(sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else "")
+        for _ in range(24):
+            time.sleep(5)
+            st = status(pid)
+            print("status:", st.get("status"), st.get("fail_reason", ""))
+            if st.get("status") in ("PUBLISH_COMPLETE", "FAILED"):
                 break
     elif cmd == "status" and len(sys.argv) > 2:
         print(json.dumps(status(sys.argv[2]), indent=2))

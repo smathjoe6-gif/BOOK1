@@ -52,3 +52,10 @@ Nothing is posted without the creator's action. Data is never sold, and users ca
 
 ---
 © 2026 GK Legend Studio. All rights reserved. Our heritage is our legacy; our innovation is our future. https://www.youtube.com/@PathFoundGK
+
+
+## Direct posting (no drafts)
+```
+python3 ~/gk_tiktok.py post "/path/to/video.mp4" "Caption text"
+```
+This posts straight to the profile with the `video.publish` scope. In the TikTok developer portal, open the app, add **Direct Post** under Content Posting API, add the `video.publish` scope, then run `python3 ~/gk_tiktok.py login` again so the new permission is granted. TikTok only lets an app post PUBLICLY after it has passed TikTok's audit; until then every direct post is PRIVATE (only you see it). The tool picks the most public option TikTok allows for the app, so nothing needs to change in the code once the app is approved.
