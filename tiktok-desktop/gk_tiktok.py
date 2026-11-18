@@ -77,10 +77,25 @@ def _req(method, url, data=None, headers=None, form=False):
         return {"raw": raw.decode(errors="replace")}
 
 
+FRIENDLY = {
+    "unaudited_client_can_only_post_to_private_accounts":
+        "TikTok has not approved (audited) this app yet, so it can only post to a PRIVATE account. "
+        "In the TikTok app: Profile > menu > Settings and privacy > Privacy > turn on Private account, then try again.",
+    "spam_risk_too_many_posts": "TikTok's daily posting limit for this account was reached. Try again tomorrow.",
+    "spam_risk_user_banned_from_posting": "TikTok has temporarily blocked posting from this account.",
+    "privacy_level_option_mismatch": "That privacy option is not allowed for this account right now. Choose another.",
+    "scope_not_authorized": "This permission was not granted. Click Reconnect and approve all permissions.",
+    "access_token_invalid": "The TikTok connection expired. Click Reconnect.",
+}
+
+
 def _check(resp, what):
     err = resp.get("error")
     if isinstance(err, dict) and err.get("code") not in (None, "ok"):
-        raise RuntimeError(f"{what} failed: {err.get('code')} - {err.get('message')}")
+        code = err.get("code")
+        if code in FRIENDLY:
+            raise RuntimeError(f"{what}: {FRIENDLY[code]}")
+        raise RuntimeError(f"{what} failed: {code} - {err.get('message')}")
     if isinstance(err, str) and err:
         raise RuntimeError(f"{what} failed: {err} - {resp.get('error_description')}")
     return resp
