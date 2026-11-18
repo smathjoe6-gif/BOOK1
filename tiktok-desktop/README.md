@@ -55,7 +55,9 @@ Nothing is posted without the creator's action. Data is never sold, and users ca
 
 
 ## Direct posting (no drafts)
+Open the studio page (`python3 ~/gk_tiktok.py`), drop a video in `GK_TikTok_Outbox`, click **Post to TikTok**, write a caption and pick who can view it (the options come from TikTok for your account). From Terminal:
 ```
-python3 ~/gk_tiktok.py post "/path/to/video.mp4" "Caption text"
+python3 ~/gk_tiktok.py creator            # what TikTok allows for your account
+python3 ~/gk_tiktok.py post FILE.mp4 --caption "..." --privacy PUBLIC_TO_EVERYONE
 ```
-This posts straight to the profile with the `video.publish` scope. In the TikTok developer portal, open the app, add **Direct Post** under Content Posting API, add the `video.publish` scope, then run `python3 ~/gk_tiktok.py login` again so the new permission is granted. TikTok only lets an app post PUBLICLY after it has passed TikTok's audit; until then every direct post is PRIVATE (only you see it). The tool picks the most public option TikTok allows for the app, so nothing needs to change in the code once the app is approved.
+Needs the `video.publish` scope (Content Posting API > Direct Post in the TikTok developer portal, then `login` again). Until TikTok audits the app, TikTok only lets an unaudited app post to a PRIVATE account (error `unaudited_client_can_only_post_to_private_accounts`). Use a private test account for the review demo; public posting on the main account starts after approval.
