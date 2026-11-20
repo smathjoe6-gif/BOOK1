@@ -94,8 +94,17 @@ if (!auth.credentials || !auth.credentials.refresh_token) {
   process.exit(1);
 }
 
+// A file whose name contains FORCE_POST_WORD (default "FORCEPOST", any letter case) skips the "copy of a recent
+// video" check, the same-LOOKING check and the "_2/_3 extra copy" check. Identical bytes (md5) are still blocked.
+const FORCE_POST_WORD = (process.env.FORCE_POST_WORD || 'FORCEPOST').toLowerCase();
+function isForcedPost(name) {
+  return FORCE_POST_WORD !== '' && String(name || '').toLowerCase().includes(FORCE_POST_WORD);
+}
+
 async function processVideoOnce(file) {
   console.log(`\n--- Found: ${file.name} ---`);
+  const forcePost = isForcedPost(file.name);
+  if (forcePost) console.log(`"${file.name}" has the force-post word -- the look-alike and copy checks are skipped for it.`);
 
   // Same bytes already posted (e.g. a " (1)" re-download of a posted video)?
   // Park it in DONE instead of posting it again.
@@ -105,7 +114,7 @@ async function processVideoOnce(file) {
     return 'skipped';
   }
 
-  if (isCopyOfRecentlyPosted(file.name)) {
+  if (!forcePost && isCopyOfRecentlyPosted(file.name)) {
     console.log(`"${file.name}" is a re-downloaded copy ("(1)" style) of a video already posted in the last 7 days -- moving to DONE without posting again.`);
     await moveToDone(auth, file.id);
     return 'skipped';
@@ -116,7 +125,7 @@ async function processVideoOnce(file) {
   console.log(`Downloading...`);
   let localPath = await downloadFile(auth, file.id, file.name);
   const vHashes = await visualHashes(localPath);
-  const lookalike = findVisualDuplicate(vHashes);
+  const lookalike = forcePost ? null : findVisualDuplicate(vHashes);
   if (lookalike) {
     console.log(`"${file.name}" looks the same as "${lookalike}" (posted in the last days) -- moving to DONE without posting again.`);
     await moveToDone(auth, file.id);
@@ -139,11 +148,12 @@ async function processVideoOnce(file) {
     }
   }
   if (!row) {
-    if (isLikelyDuplicateVariant(file.name)) {
+    if (!forcePost && isLikelyDuplicateVariant(file.name)) {
       console.log(`"${file.name}" looks like an extra copy of another video (ends in _2/_3/etc) — skipping so it doesn't post twice. Add a spreadsheet row for it if it's actually different content.`);
       return 'skipped';
     }
-    const generated = await generateCaption(collisionBaseName, { videoPath: localPath });
+    const captionName = forcePost ? collisionBaseName.replace(new RegExp(FORCE_POST_WORD.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'ig'), '').replace(/[_\-\s]{2,}/g, '_').replace(/^[_\-\s]+|[_\-\s]+$/g, '') || collisionBaseName : collisionBaseName;
+    const generated = await generateCaption(captionName, { videoPath: localPath });
     console.log(`No spreadsheet entry for "${file.name}" — auto-writing one: "${generated.title}"`);
     row = { title: generated.title, capture: generated.capture, hashtag: generated.hashtag };
 
